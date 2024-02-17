@@ -1,0 +1,17 @@
+[package]
+name = "hui-examples"
+version = "0.0.0"
+edition = "2021"
+license = "GPL-3.0-or-later"
+publish = false
+
+[dev-dependencies]
+hui = { path = "../hui" }
+hui-glium = { path = "../hui-glium" }
+kubi-logging = { git = "https://github.com/griffi-gh/kubi", rev = "c162893fd" }
+glium = "0.34"
+winit = "0.29"
+glam = "0.25"
+log = "0.4"
+
+#created as a workaround for rust-analyzer dependency cycle (which should be allowed)

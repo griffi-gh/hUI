@@ -7,6 +7,11 @@ version = "0.0.1"
 edition = "2021"
 license = "GPL-3.0-or-later"
 publish = true
+include = [
+  "shaders/**/*",
+  "src/**/*.rs",
+  "Cargo.toml",
+]
 
 [dependencies]
 hui = { version = "=0.0.1", path = "../hui", default-features = false }

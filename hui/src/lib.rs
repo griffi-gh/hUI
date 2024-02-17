@@ -22,7 +22,7 @@ pub trait IfModified<T> {
   fn if_modified(&self) -> Option<&T>;
 }
 
-pub struct KubiUi {
+pub struct UiInstance {
   //mouse_position: Vec2,
   stateful_state: StateRepo,
   //event_queue: VecDeque<UiEvent>,
@@ -33,9 +33,9 @@ pub struct KubiUi {
   text_renderer: TextRenderer,
 }
 
-impl KubiUi {
+impl UiInstance {
   pub fn new() -> Self {
-    KubiUi {
+    UiInstance {
       //mouse_position: Vec2::ZERO,
       stateful_state: StateRepo::default(),
       //event_queue: VecDeque::new(),
@@ -87,7 +87,7 @@ impl KubiUi {
   }
 }
 
-impl Default for KubiUi {
+impl Default for UiInstance {
   fn default() -> Self {
     Self::new()
   }

@@ -6,7 +6,7 @@ use winit::{
   event_loop::{EventLoopBuilder, ControlFlow}
 };
 use hui::{
-  KubiUi,
+  UiInstance,
   element::{
     progress_bar::ProgressBar,
     container::{Container, Sides, Alignment},
@@ -24,10 +24,10 @@ fn main() {
   let (window, display) = SimpleWindowBuilder::new().build(&event_loop);
   window.set_title("Mom Downloader 2000");
 
-  let mut kui = KubiUi::new();
+  let mut hui = UiInstance::new();
   let mut backend = GliumUiRenderer::new(&display);
 
-  let font_handle = kui.add_font_from_bytes(include_bytes!("../assets/roboto/Roboto-Regular.ttf"));
+  let font_handle = hui.add_font_from_bytes(include_bytes!("../assets/roboto/Roboto-Regular.ttf"));
 
   let instant = Instant::now();
 
@@ -43,11 +43,11 @@ fn main() {
 
         let resolution = UVec2::from(display.get_framebuffer_dimensions()).as_vec2();
 
-        kui.begin();
+        hui.begin();
 
         let mom_ratio = (instant.elapsed().as_secs_f32() / 60.).powf(0.5);
 
-        kui.add(Container {
+        hui.add(Container {
           align: (Alignment::Center, Alignment::Center),
           size: (UiSize::Percentage(1.), UiSize::Percentage(1.)),
           background: Some(vec4(0.1, 0.1, 0.1, 1.)),
@@ -98,9 +98,9 @@ fn main() {
           ..Default::default()
         }, resolution);
 
-        kui.end();
+        hui.end();
 
-        backend.update(&kui);
+        backend.update(&hui);
         backend.draw(&mut frame, resolution);
 
         frame.finish().unwrap();

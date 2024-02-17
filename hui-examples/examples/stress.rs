@@ -6,7 +6,7 @@ use winit::{
   event_loop::{EventLoopBuilder, ControlFlow}
 };
 use hui::{
-  KubiUi,
+  UiInstance,
   element::{
     UiElement,
     progress_bar::ProgressBar,
@@ -22,7 +22,7 @@ fn main() {
   let event_loop = EventLoopBuilder::new().build().unwrap();
   let (window, display) = SimpleWindowBuilder::new().build(&event_loop);
 
-  let mut kui = KubiUi::new();
+  let mut hui = UiInstance::new();
   let mut backend = GliumUiRenderer::new(&display);
 
   let instant = Instant::now();
@@ -39,9 +39,9 @@ fn main() {
 
         let resolution = UVec2::from(display.get_framebuffer_dimensions()).as_vec2();
 
-        kui.begin();
+        hui.begin();
 
-        kui.add(Container {
+        hui.add(Container {
           gap: 5.,
           padding: Sides::all(5.),
           elements: vec![
@@ -77,9 +77,9 @@ fn main() {
           ..Default::default()
         }, resolution);
 
-        kui.end();
+        hui.end();
 
-        backend.update(&kui);
+        backend.update(&hui);
         backend.draw(&mut frame, resolution);
 
         frame.finish().unwrap();

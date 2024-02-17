@@ -6,7 +6,7 @@ use winit::{
   event_loop::{EventLoopBuilder, ControlFlow}
 };
 use hui::{
-  KubiUi,
+  UiInstance,
   element::{
     container::Container,
     text::Text, rect::Rect, spacer::Spacer
@@ -23,10 +23,10 @@ fn main() {
   let (window, display) = SimpleWindowBuilder::new().build(&event_loop);
   window.set_title("Text rendering test");
 
-  let mut kui = KubiUi::new();
+  let mut hui = UiInstance::new();
   let mut backend = GliumUiRenderer::new(&display);
 
-  let font_handle = kui.add_font_from_bytes(include_bytes!("../assets/roboto/Roboto-Regular.ttf"));
+  let font_handle = hui.add_font_from_bytes(include_bytes!("../assets/roboto/Roboto-Regular.ttf"));
   let instant = Instant::now();
 
   event_loop.run(|event, window_target| {
@@ -41,9 +41,9 @@ fn main() {
 
         let resolution = UVec2::from(display.get_framebuffer_dimensions()).as_vec2();
 
-        kui.begin();
+        hui.begin();
 
-        kui.add(Container {
+        hui.add(Container {
           size: (UiSize::Percentage(1.), UiSize::Percentage(1.)),
           background: Some(vec4(0.1, 0.1, 0.1, 1.)),
           elements: elements(|elem| {
@@ -102,9 +102,9 @@ fn main() {
           ..Default::default()
         }, resolution);
 
-        kui.end();
+        hui.end();
 
-        backend.update(&kui);
+        backend.update(&hui);
         backend.draw(&mut frame, resolution);
 
         frame.finish().unwrap();

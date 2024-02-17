@@ -10,7 +10,7 @@ use glium::{
   uniform, uniforms::{Sampler, SamplerBehavior, SamplerWrapFunction},
 };
 use hui::{
-  KubiUi,
+  UiInstance,
   draw::{UiDrawPlan, UiVertex, BindTexture},
   text::FontTextureInfo, IfModified,
 };
@@ -122,7 +122,7 @@ pub struct GliumUiRenderer {
 
 impl GliumUiRenderer {
   pub fn new<F: Facade>(facade: &F) -> Self {
-    log::info!("init glium backend for kui");
+    log::info!("initializing hui glium backend");
     Self {
       program: Program::from_source(facade, VERTEX_SHADER, FRAGMENT_SHADER, None).unwrap(),
       program_tex: Program::from_source(facade, VERTEX_SHADER, FRAGMENT_SHADER_TEX, None).unwrap(),
@@ -172,11 +172,11 @@ impl GliumUiRenderer {
     ).unwrap()));
   }
 
-  pub fn update(&mut self, kui: &KubiUi) {
-    if let Some(texture) = kui.font_texture().if_modified() {
+  pub fn update(&mut self, hui: &UiInstance) {
+    if let Some(texture) = hui.font_texture().if_modified() {
       self.update_font_texture(texture);
     }
-    if let Some(plan) = kui.draw_plan().if_modified() {
+    if let Some(plan) = hui.draw_plan().if_modified() {
       self.update_draw_plan(plan);
     }
   }

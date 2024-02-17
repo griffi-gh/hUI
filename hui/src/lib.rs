@@ -1,4 +1,9 @@
-use glam::Vec2;
+#![forbid(unsafe_code)]
+#![forbid(unsafe_op_in_unsafe_fn)]
+#![doc(html_logo_url = "https://raw.githubusercontent.com/griffi-gh/hui/master/.assets/hui.svg")]
+//!
+//! Simple UI library for games and other interactive applications
+//!
 
 pub mod element;
 pub mod event;
@@ -12,6 +17,7 @@ use element::UiElement;
 use state::StateRepo;
 use draw::{UiDrawCommands, UiDrawPlan};
 use text::{TextRenderer, FontTextureInfo, FontHandle};
+use glam::Vec2;
 
 // pub struct ElementContext<'a> {
 //   pub state: &'a mut StateRepo,

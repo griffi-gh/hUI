@@ -4,10 +4,9 @@
 <div>
   Simple UI library for games and other interactive applications
   <a href="./LICENSE.txt" align="right" float="right">
-    <img alt="license" src="https://img.shields.io/github/license/griffi-gh/hui" align="right">
-  </a><br>
-  <a href="https://crates.io/crates/hui" float="right">
-    <img alt="crates.io" src="https://img.shields.io/crates/v/hui.svg" align="right">
+    <img alt="license" src="https://img.shields.io/github/license/griffi-gh/hui" align="right" width="102" height="20">
+  </a><br><a href="https://crates.io/crates/hui" float="right">
+    <img alt="crates.io" src="https://img.shields.io/crates/v/hui.svg" align="right" width="102" height="20">
   </a>
 </div>
 <span>
@@ -16,7 +15,7 @@
 <p></p>
 <br clear="all">
 
-<table>
+<table align="center">
   <td>
     <img src="./.assets/demo0.gif" width="300">
   </td>

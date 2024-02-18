@@ -35,13 +35,13 @@ impl UiElement for ProgressBar {
       size: vec2(
         match self.size.0 {
           UiSize::Auto => ctx.layout.max_size.x.max(300.),
-          UiSize::Percentage(p) => ctx.layout.max_size.x * p,
-          UiSize::Pixels(p) => p,
+          UiSize::Fraction(p) => ctx.layout.max_size.x * p,
+          UiSize::Static(p) => p,
         },
         match self.size.1 {
           UiSize::Auto => BAR_HEIGHT,
-          UiSize::Percentage(p) => ctx.layout.max_size.y * p,
-          UiSize::Pixels(p) => p,
+          UiSize::Fraction(p) => ctx.layout.max_size.y * p,
+          UiSize::Static(p) => p,
         }
       ),
       hints: Default::default(),

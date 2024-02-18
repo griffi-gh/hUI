@@ -8,6 +8,12 @@ use crate::{
   UiSize
 };
 
+pub enum TextSize {
+  FitToWidthRatio(f32),
+  FitToHeightRatio(f32),
+  Constant(u8),
+}
+
 pub struct Text {
   pub text: Cow<'static, str>,
   pub size: (UiSize, UiSize),
@@ -40,13 +46,13 @@ impl UiElement for Text {
       size: vec2(
         match self.size.0 {
           UiSize::Auto => size.0,
-          UiSize::Percentage(percentage) => ctx.layout.max_size.x * percentage,
-          UiSize::Pixels(pixels) => pixels,
+          UiSize::Fraction(percentage) => ctx.layout.max_size.x * percentage,
+          UiSize::Static(pixels) => pixels,
         },
         match self.size.1 {
           UiSize::Auto => size.1,
-          UiSize::Percentage(percentage) => ctx.layout.max_size.y * percentage,
-          UiSize::Pixels(pixels) => pixels,
+          UiSize::Fraction(percentage) => ctx.layout.max_size.y * percentage,
+          UiSize::Static(pixels) => pixels,
         },
       ),
       hints: Default::default(),

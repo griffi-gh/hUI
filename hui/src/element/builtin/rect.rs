@@ -14,7 +14,7 @@ pub struct Rect {
 impl Default for Rect {
   fn default() -> Self {
     Self {
-      size: (UiSize::Pixels(10.), UiSize::Pixels(10.)),
+      size: (UiSize::Static(10.), UiSize::Static(10.)),
       color: Some(Vec4::new(0., 0., 0., 0.5)),
     }
   }
@@ -26,13 +26,13 @@ impl UiElement for Rect {
       size: vec2(
         match self.size.0 {
           UiSize::Auto => ctx.layout.max_size.x,
-          UiSize::Percentage(percentage) => ctx.layout.max_size.x * percentage,
-          UiSize::Pixels(pixels) => pixels,
+          UiSize::Fraction(percentage) => ctx.layout.max_size.x * percentage,
+          UiSize::Static(pixels) => pixels,
         },
         match self.size.1 {
           UiSize::Auto => ctx.layout.max_size.y,
-          UiSize::Percentage(percentage) => ctx.layout.max_size.y * percentage,
-          UiSize::Pixels(pixels) => pixels,
+          UiSize::Fraction(percentage) => ctx.layout.max_size.y * percentage,
+          UiSize::Static(pixels) => pixels,
         },
       ),
       hints: Default::default(),

@@ -87,13 +87,13 @@ impl Container {
   pub fn measure_max_inner_size(&self, layout: &LayoutInfo) -> Vec2 {
     let outer_size_x = match self.size.0 {
       UiSize::Auto => layout.max_size.x,
-      UiSize::Percentage(p) => layout.max_size.x * p,
-      UiSize::Pixels(p) => p,
+      UiSize::Fraction(p) => layout.max_size.x * p,
+      UiSize::Static(p) => p,
     };
     let outer_size_y = match self.size.1 {
       UiSize::Auto => layout.max_size.y,
-      UiSize::Percentage(p) => layout.max_size.y * p,
-      UiSize::Pixels(p) => p,
+      UiSize::Fraction(p) => layout.max_size.y * p,
+      UiSize::Static(p) => p,
     };
     vec2(
       outer_size_x - (self.padding.left + self.padding.right),
@@ -141,13 +141,13 @@ impl UiElement for Container {
 
     match self.size.0 {
       UiSize::Auto => (),
-      UiSize::Percentage(percentage) => size.x = ctx.layout.max_size.x * percentage,
-      UiSize::Pixels(pixels) => size.x = pixels,
+      UiSize::Fraction(percentage) => size.x = ctx.layout.max_size.x * percentage,
+      UiSize::Static(pixels) => size.x = pixels,
     }
     match self.size.1 {
       UiSize::Auto => (),
-      UiSize::Percentage(percentage) => size.y = ctx.layout.max_size.y * percentage,
-      UiSize::Pixels(pixels) => size.y = pixels,
+      UiSize::Fraction(percentage) => size.y = ctx.layout.max_size.y * percentage,
+      UiSize::Static(pixels) => size.y = pixels,
     }
 
     Response {

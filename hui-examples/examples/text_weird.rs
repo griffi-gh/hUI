@@ -44,7 +44,7 @@ fn main() {
         hui.begin();
 
         hui.add(Container {
-          size: (UiSize::Percentage(1.), UiSize::Percentage(1.)),
+          size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
           background: Some(vec4(0.1, 0.1, 0.1, 1.)),
           elements: elements(|elem| {
             elem.add(Text {
@@ -68,11 +68,11 @@ fn main() {
               });
             }
             elem.add(Rect {
-              size: (UiSize::Percentage(1.), UiSize::Pixels(10.)),
+              size: (UiSize::Fraction(1.), UiSize::Static(10.)),
               color: Some(vec4(0., 0., 1., 1.)),
             });
             elem.add(Rect {
-              size: (UiSize::Percentage(1.), UiSize::Pixels(10.)),
+              size: (UiSize::Fraction(1.), UiSize::Static(10.)),
               color: Some(vec4(1., 1., 0., 1.)),
             });
             elem.add(Text {
@@ -83,11 +83,11 @@ fn main() {
             });
             if instant.elapsed().as_secs() & 1 != 0 {
               elem.add(Rect {
-                size: (UiSize::Percentage(1.), UiSize::Pixels(10.)),
+                size: (UiSize::Fraction(1.), UiSize::Static(10.)),
                 color: Some(vec4(1., 0., 0., 1.)),
               });
               elem.add(Rect {
-                size: (UiSize::Percentage(1.), UiSize::Pixels(10.)),
+                size: (UiSize::Fraction(1.), UiSize::Static(10.)),
                 color: Some(vec4(0., 0., 0., 1.)),
               });
               elem.add(Spacer(100.));

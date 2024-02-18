@@ -39,7 +39,7 @@ fn main() {
           gap: 5.,
           padding: Sides::all(5.),
           align: (Alignment::Center, Alignment::Center),
-          size: (UiSize::Percentage(1.), UiSize::Percentage(1.)),
+          size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
           elements: vec![
             Box::new(Text {
               text: "Hello, world!\nGoodbye, world!\nowo\nuwu".into(),

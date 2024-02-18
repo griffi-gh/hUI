@@ -65,7 +65,7 @@ fn main() {
                 for i in 0..cnt {
                   elements.push(Box::new(ProgressBar {
                     value: (instant.elapsed().as_secs_f32() + (i as f32 / 10.)).sin().powi(2),
-                    size: (UiSize::Auto, UiSize::Pixels(5.)),
+                    size: (UiSize::Auto, UiSize::Static(5.)),
                     ..Default::default()
                   }));
                 }

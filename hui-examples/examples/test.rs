@@ -48,7 +48,7 @@ fn main() {
           gap: 5.,
           padding: Sides::all(5.),
           align: (Alignment::Begin, Alignment::Center),
-          size: (UiSize::Percentage(1.), UiSize::Percentage(1.)),
+          size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
           elements: vec![
             Box::new(ProgressBar {
               value: 0.5,
@@ -62,31 +62,31 @@ fn main() {
           gap: 5.,
           padding: Sides::all(5.),
           align: (Alignment::End, Alignment::Center),
-          size: (UiSize::Percentage(1.), UiSize::Percentage(1.)),
+          size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
           elements: vec![
             Box::new(ProgressBar {
               value: z,
               ..Default::default()
             }),
             Box::new(Container {
-              size: (UiSize::Percentage(1.), UiSize::Auto),
+              size: (UiSize::Fraction(1.), UiSize::Auto),
               align: (Alignment::Center, Alignment::End),
               padding: Sides::all(5.),
               gap: 10.,
               elements: vec![
                 Box::new(Rect {
-                  size: (UiSize::Percentage(0.5), UiSize::Pixels(30.)),
+                  size: (UiSize::Fraction(0.5), UiSize::Static(30.)),
                   color: Some(vec4(0.75, 0., 0., 1.))
                 }),
                 Box::new(Rect {
-                  size: (UiSize::Percentage(z / 2. + 0.5), UiSize::Pixels(30.)),
+                  size: (UiSize::Fraction(z / 2. + 0.5), UiSize::Static(30.)),
                   color: Some(vec4(0., 0.75, 0., 1.))
                 }),
               ],
               ..Default::default()
             }),
             Box::new(Rect {
-              size: (UiSize::Percentage(z / 2. + 0.5), UiSize::Pixels(30.)),
+              size: (UiSize::Fraction(z / 2. + 0.5), UiSize::Static(30.)),
               color: Some(vec4(0., 0.75, 0., 1.))
             }),
             Box::new(Container {
@@ -98,7 +98,7 @@ fn main() {
                 let mut x: Vec<Box<dyn UiElement>> = vec![];
                 for i in 0..10 {
                   x.push(Box::new(Rect {
-                    size: (UiSize::Pixels(50.), UiSize::Pixels(50.)),
+                    size: (UiSize::Static(50.), UiSize::Static(50.)),
                     color: if i == 1 {
                       Some(vec4(0.75, 0.75, 0.75, 0.75))
                     } else {
@@ -120,7 +120,7 @@ fn main() {
               },
               elements: vec![
                 Box::new(Rect {
-                  size: (UiSize::Pixels(50.), UiSize::Pixels(50.)),
+                  size: (UiSize::Static(50.), UiSize::Static(50.)),
                   color: Some(vec4(1., 1., 1., 0.75))
                 }.into_interactable().on_click(|| {
                   println!("clicked");

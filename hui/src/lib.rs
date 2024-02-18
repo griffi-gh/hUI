@@ -113,8 +113,8 @@ impl Default for UiInstance {
 pub enum UiSize {
   #[default]
   Auto,
-  Percentage(f32),
-  Pixels(f32),
+  Fraction(f32),
+  Static(f32),
 }
 
 #[derive(Default, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]

@@ -49,13 +49,13 @@ fn main() {
 
         hui.add(Container {
           align: (Alignment::Center, Alignment::Center),
-          size: (UiSize::Percentage(1.), UiSize::Percentage(1.)),
+          size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
           background: Some(vec4(0.1, 0.1, 0.1, 1.)),
           elements: vec![Box::new(Container {
             gap: 5.,
             padding: Sides::all(10.),
             align: (Alignment::Begin, Alignment::Begin),
-            size: (UiSize::Pixels(450.), UiSize::Auto),
+            size: (UiSize::Static(450.), UiSize::Auto),
             background: Some(vec4(0.2, 0.2, 0.5, 1.)),
             elements: elements(|el| {
               if instant.elapsed().as_secs_f32() < 5. {

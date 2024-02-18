@@ -1,4 +1,4 @@
-use crate::{element::UiElement, draw::UiDrawCommands};
+use crate::element::{UiElement, MeasureContext, ProcessContext};
 
 pub struct Interactable<T: UiElement> {
   pub element: T,
@@ -31,12 +31,12 @@ impl<T: UiElement> Interactable<T> {
 }
 
 impl<T: UiElement> UiElement for Interactable<T> {
-  fn measure(&self, state: &crate::state::StateRepo, layout: &crate::LayoutInfo) -> crate::measure::Response {
-    self.element.measure(state, layout)
+  fn measure(&self, ctx: MeasureContext) -> crate::measure::Response {
+    self.element.measure(ctx)
   }
 
-  fn process(&self, measure: &crate::measure::Response, state: &mut crate::state::StateRepo, layout: &crate::LayoutInfo, draw: &mut UiDrawCommands) {
-    self.element.process(measure, state, layout, draw)
+  fn process(&self, ctx: ProcessContext) {
+    self.element.process(ctx)
   }
 }
 

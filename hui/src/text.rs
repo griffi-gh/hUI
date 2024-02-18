@@ -48,3 +48,41 @@ impl Default for TextRenderer {
     Self::new()
   }
 }
+
+pub struct TextMeasureResponse {
+  pub max_width: f32,
+  pub height: f32,
+}
+
+#[derive(Clone, Copy)]
+pub struct TextMeasure<'a>(&'a TextRenderer);
+
+impl<'a> TextMeasure<'a> {
+  pub fn measure(&self, font: FontHandle, size: u8, text: &str) -> TextMeasureResponse {
+    use fontdue::layout::{Layout, CoordinateSystem, TextStyle};
+    let mut layout = Layout::new(CoordinateSystem::PositiveYDown);
+    layout.append(
+      &[self.0.internal_font(font)],
+      &TextStyle::new(text, size as f32, 0)
+    );
+    TextMeasureResponse {
+      max_width: layout.lines().map(|lines| {
+        lines.iter().fold(0.0_f32, |acc, x| {
+          let glyph = layout.glyphs().get(x.glyph_end).unwrap();
+          acc.max(glyph.x + glyph.width as f32)
+        })
+      }).unwrap_or(0.),
+      height: layout.height() as f32,
+    }
+  }
+}
+
+impl TextRenderer {
+  pub fn to_measure(&self) -> TextMeasure {
+    TextMeasure(self)
+  }
+
+  pub fn measure(&self, font: FontHandle, size: u8, text: &str) -> TextMeasureResponse {
+    TextMeasure(self).measure(font, size, text)
+  }
+}

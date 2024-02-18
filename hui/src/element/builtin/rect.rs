@@ -1,11 +1,10 @@
 use glam::{vec2, Vec4};
 use crate::{
-  LayoutInfo,
-  UiSize,
-  element::UiElement,
-  state::StateRepo,
+  draw::{UiDrawCommand, UiDrawCommands},
+  element::{MeasureContext, ProcessContext, UiElement},
   measure::Response,
-  draw::{UiDrawCommand, UiDrawCommands}
+  state::StateRepo,
+  LayoutInfo, UiSize
 };
 
 pub struct Rect {
@@ -23,17 +22,17 @@ impl Default for Rect {
 }
 
 impl UiElement for Rect {
-  fn measure(&self, _state: &StateRepo, layout: &LayoutInfo) -> Response {
+  fn measure(&self, ctx: MeasureContext) -> Response {
     Response {
       size: vec2(
         match self.size.0 {
-          UiSize::Auto => layout.max_size.x,
-          UiSize::Percentage(percentage) => layout.max_size.x * percentage,
+          UiSize::Auto => ctx.layout.max_size.x,
+          UiSize::Percentage(percentage) => ctx.layout.max_size.x * percentage,
           UiSize::Pixels(pixels) => pixels,
         },
         match self.size.1 {
-          UiSize::Auto => layout.max_size.y,
-          UiSize::Percentage(percentage) => layout.max_size.y * percentage,
+          UiSize::Auto => ctx.layout.max_size.y,
+          UiSize::Percentage(percentage) => ctx.layout.max_size.y * percentage,
           UiSize::Pixels(pixels) => pixels,
         },
       ),
@@ -42,11 +41,11 @@ impl UiElement for Rect {
     }
   }
 
-  fn process(&self, measure: &Response, _state: &mut StateRepo, layout: &LayoutInfo, draw: &mut UiDrawCommands) {
+  fn process(&self, ctx: ProcessContext) {
     if let Some(color) = self.color {
-      draw.add(UiDrawCommand::Rectangle {
-        position: layout.position,
-        size: measure.size,
+      ctx.draw.add(UiDrawCommand::Rectangle {
+        position: ctx.layout.position,
+        size: ctx.measure.size,
         color,
       });
     }

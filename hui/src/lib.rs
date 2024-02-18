@@ -13,7 +13,7 @@ pub mod state;
 pub mod text;
 pub mod interaction;
 
-use element::UiElement;
+use element::{MeasureContext, ProcessContext, UiElement};
 use state::StateRepo;
 use draw::{UiDrawCommands, UiDrawPlan};
 use text::{TextRenderer, FontTextureInfo, FontHandle};
@@ -65,8 +65,18 @@ impl UiInstance {
       max_size,
       direction: UiDirection::Vertical,
     };
-    let measure = element.measure(&self.stateful_state, &layout);
-    element.process(&measure, &mut self.stateful_state, &layout, &mut self.draw_commands);
+    let measure = element.measure(MeasureContext {
+      state: &self.stateful_state,
+      layout: &layout,
+      text_measure: self.text_renderer.to_measure(),
+    });
+    element.process(ProcessContext {
+      measure: &measure,
+      state: &mut self.stateful_state,
+      layout: &layout,
+      draw: &mut self.draw_commands,
+      text_measure: self.text_renderer.to_measure(),
+    });
   }
 
   pub fn begin(&mut self) {

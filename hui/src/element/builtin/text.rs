@@ -1,12 +1,12 @@
 use std::borrow::Cow;
 use glam::{vec2, Vec4};
 use crate::{
-  LayoutInfo,
-  UiSize,
-  element::UiElement,
-  state::StateRepo,
+  draw::{UiDrawCommand, UiDrawCommands},
+  element::{MeasureContext, ProcessContext, UiElement},
   measure::Response,
-  draw::{UiDrawCommand, UiDrawCommands}, text::FontHandle
+  state::StateRepo,
+  text::FontHandle,
+  LayoutInfo, UiSize
 };
 
 pub struct Text {
@@ -30,17 +30,23 @@ impl Default for Text {
 }
 
 impl UiElement for Text {
-  fn measure(&self, _state: &StateRepo, layout: &LayoutInfo) -> Response {
+  fn measure(&self, ctx: MeasureContext) -> Response {
+    let mut size = (0., 0.);
+    if matches!(self.size.0, UiSize::Auto) || matches!(self.size.1, UiSize::Auto) {
+      let res = ctx.text_measure.measure(self.font, self.text_size, &self.text);
+      size.0 = res.max_width;
+      size.1 = res.height;
+    }
     Response {
       size: vec2(
         match self.size.0 {
-          UiSize::Auto => layout.max_size.x,
-          UiSize::Percentage(percentage) => layout.max_size.x * percentage,
+          UiSize::Auto => size.0,
+          UiSize::Percentage(percentage) => ctx.layout.max_size.x * percentage,
           UiSize::Pixels(pixels) => pixels,
         },
         match self.size.1 {
-          UiSize::Auto => self.text_size as f32,
-          UiSize::Percentage(percentage) => layout.max_size.y * percentage,
+          UiSize::Auto => size.1,
+          UiSize::Percentage(percentage) => ctx.layout.max_size.y * percentage,
           UiSize::Pixels(pixels) => pixels,
         },
       ),
@@ -49,10 +55,10 @@ impl UiElement for Text {
     }
   }
 
-  fn process(&self, _measure: &Response, _state: &mut StateRepo, layout: &LayoutInfo, draw: &mut UiDrawCommands) {
-    draw.add(UiDrawCommand::Text {
+  fn process(&self, ctx: ProcessContext) {
+    ctx.draw.add(UiDrawCommand::Text {
       text: self.text.clone(),
-      position: layout.position,
+      position: ctx.layout.position,
       size: self.text_size,
       color: self.color,
       font: self.font

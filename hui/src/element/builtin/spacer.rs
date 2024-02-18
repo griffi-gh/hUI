@@ -1,11 +1,8 @@
 use glam::vec2;
 use crate::{
-  LayoutInfo,
-  UiDirection,
-  element::UiElement,
-  state::StateRepo,
+  element::{MeasureContext, ProcessContext, UiElement},
   measure::Response,
-  draw::{UiDrawCommand, UiDrawCommands}
+  UiDirection
 };
 
 pub struct Spacer(pub f32);
@@ -17,9 +14,9 @@ impl Default for Spacer {
 }
 
 impl UiElement for Spacer {
-  fn measure(&self, state: &StateRepo, layout: &LayoutInfo) -> Response {
+  fn measure(&self, ctx: MeasureContext) -> Response {
     Response {
-      size: match layout.direction {
+      size: match ctx.layout.direction {
         UiDirection::Horizontal => vec2(self.0, 0.),
         UiDirection::Vertical => vec2(0., self.0),
       },
@@ -28,5 +25,5 @@ impl UiElement for Spacer {
     }
   }
 
-  fn process(&self, _measure: &Response, _state: &mut StateRepo, _layout: &LayoutInfo, _draw: &mut UiDrawCommands) {}
+  fn process(&self, _ctx: ProcessContext) {}
 }

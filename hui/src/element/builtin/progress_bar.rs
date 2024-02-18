@@ -1,10 +1,11 @@
 use glam::{vec2, Vec4, vec4};
 use crate::{
-  UiSize, LayoutInfo,
   draw::{UiDrawCommand, UiDrawCommands},
+  element::{MeasureContext, ProcessContext, UiElement},
   measure::Response,
   state::StateRepo,
-  element::UiElement
+  LayoutInfo,
+  UiSize
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -31,17 +32,17 @@ const BAR_HEIGHT: f32 = 20.0;
 impl UiElement for ProgressBar {
   fn name(&self) -> &'static str { "Progress bar" }
 
-  fn measure(&self, _: &StateRepo, layout: &LayoutInfo) -> Response {
+  fn measure(&self, ctx: MeasureContext) -> Response {
     Response {
       size: vec2(
         match self.size.0 {
-          UiSize::Auto => layout.max_size.x.max(300.),
-          UiSize::Percentage(p) => layout.max_size.x * p,
+          UiSize::Auto => ctx.layout.max_size.x.max(300.),
+          UiSize::Percentage(p) => ctx.layout.max_size.x * p,
           UiSize::Pixels(p) => p,
         },
         match self.size.1 {
           UiSize::Auto => BAR_HEIGHT,
-          UiSize::Percentage(p) => layout.max_size.y * p,
+          UiSize::Percentage(p) => ctx.layout.max_size.y * p,
           UiSize::Pixels(p) => p,
         }
       ),
@@ -50,19 +51,19 @@ impl UiElement for ProgressBar {
     }
   }
 
-  fn process(&self, measure: &Response, state: &mut StateRepo, layout: &LayoutInfo, draw: &mut UiDrawCommands) {
+  fn process(&self, ctx: ProcessContext) {
     let value = self.value.clamp(0., 1.);
     if value < 1. {
-      draw.add(UiDrawCommand::Rectangle {
-        position: layout.position,
-        size: measure.size,
+      ctx.draw.add(UiDrawCommand::Rectangle {
+        position: ctx.layout.position,
+        size: ctx.measure.size,
         color: self.color_background
       });
     }
     if value > 0. {
-      draw.add(UiDrawCommand::Rectangle {
-        position: layout.position,
-        size: measure.size * vec2(value, 1.0),
+      ctx.draw.add(UiDrawCommand::Rectangle {
+        position: ctx.layout.position,
+        size: ctx.measure.size * vec2(value, 1.0),
         color: self.color_foreground
       });
     }

@@ -3,7 +3,7 @@ name = "hui-glium"
 description = "Glium backend for hUI"
 repository = "https://github.com/griffi-gh/hui"
 authors = ["griffi-gh <prasol258@gmail.com>"]
-version = "0.0.2"
+version = "0.1.0-alpha.1"
 edition = "2021"
 license = "GPL-3.0-or-later"
 publish = true
@@ -14,7 +14,7 @@ include = [
 ]
 
 [dependencies]
-hui = { version = "^0.0", path = "../hui", default-features = false }
+hui = { version = "^0.1.0-alpha", path = "../hui", default-features = false }
 glium = "0.34"
 glam = "0.25"
 log = "0.4"

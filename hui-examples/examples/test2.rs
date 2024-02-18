@@ -1,14 +1,15 @@
-use std::time::Instant;
-use glam::{UVec2, vec4};
+use glam::UVec2;
 use glium::{backend::glutin::SimpleWindowBuilder, Surface};
 use winit::{
   event::{Event, WindowEvent},
   event_loop::{EventLoopBuilder, ControlFlow}
 };
 use hui::{
+  UiInstance, UiSize,
   element::{
-    container::{Alignment, Container, Sides}, progress_bar::ProgressBar, rect::Rect, text::Text, UiElement
-  }, interaction::IntoInteractable, IfModified, UiDirection, UiInstance, UiSize
+    container::{Alignment, Container, Sides},
+    text::Text,
+  }
 };
 use hui_glium::GliumUiRenderer;
 

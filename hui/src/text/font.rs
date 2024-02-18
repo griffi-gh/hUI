@@ -1,13 +1,13 @@
 use fontdue::Font;
 
-#[cfg(feature = "builtin_font")]
-const BIN_FONT: &[u8] = include_bytes!("../../assets/font/ProggyTiny.ttf");
-
 #[derive(Clone, Copy, PartialEq, Eq, Hash, Debug)]
 pub struct FontHandle(pub(crate) usize);
 
 #[cfg(feature = "builtin_font")]
 pub const BUILTIN_FONT: FontHandle = FontHandle(0);
+
+#[cfg(feature = "builtin_font")]
+const BUILTIN_FONT_DATA: &[u8] = include_bytes!("../../assets/font/ProggyTiny.ttf");
 
 pub struct FontManager {
   fonts: Vec<Font>,
@@ -20,7 +20,10 @@ impl FontManager {
     };
     #[cfg(feature = "builtin_font")]
     {
-      let font = Font::from_bytes(BIN_FONT, fontdue::FontSettings::default()).unwrap();
+      let font = Font::from_bytes(
+        BUILTIN_FONT_DATA,
+        fontdue::FontSettings::default()
+      ).unwrap();
       this.add_font(font);
     };
     this

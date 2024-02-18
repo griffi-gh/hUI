@@ -1,5 +1,5 @@
 use std::time::Instant;
-use glam::{Vec2, IVec2, UVec2};
+use glam::UVec2;
 use glium::{backend::glutin::SimpleWindowBuilder, Surface};
 use winit::{
   event::{Event, WindowEvent},
@@ -20,7 +20,7 @@ fn main() {
   kubi_logging::init();
 
   let event_loop = EventLoopBuilder::new().build().unwrap();
-  let (window, display) = SimpleWindowBuilder::new().build(&event_loop);
+  let (_window, display) = SimpleWindowBuilder::new().build(&event_loop);
 
   let mut hui = UiInstance::new();
   let mut backend = GliumUiRenderer::new(&display);

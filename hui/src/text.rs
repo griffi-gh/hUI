@@ -4,7 +4,7 @@ mod font;
 mod ftm;
 
 use font::FontManager;
-pub use font::FontHandle;
+pub use font::{FontHandle, BUILTIN_FONT};
 use fontdue::{Font, FontSettings};
 use ftm::FontTextureManager;
 pub use ftm::{FontTextureInfo, GlyphCacheEntry};
@@ -72,7 +72,7 @@ impl<'a> TextMeasure<'a> {
           acc.max(glyph.x + glyph.width as f32)
         })
       }).unwrap_or(0.),
-      height: layout.height() as f32,
+      height: layout.height(),
     }
   }
 }

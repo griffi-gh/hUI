@@ -94,7 +94,7 @@ impl CallSwapper {
   }
 
   pub fn swap(&mut self) {
-    self.calls.push(std::mem::replace(&mut self.call, UiDrawCall::default()));
+    self.calls.push(std::mem::take(&mut self.call));
   }
 
   pub fn finish(mut self) -> Vec<UiDrawCall> {

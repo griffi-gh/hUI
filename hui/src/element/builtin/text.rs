@@ -1,12 +1,11 @@
 use std::borrow::Cow;
 use glam::{vec2, Vec4};
 use crate::{
-  draw::{UiDrawCommand, UiDrawCommands},
+  draw::UiDrawCommand,
   element::{MeasureContext, ProcessContext, UiElement},
   measure::Response,
-  state::StateRepo,
-  text::FontHandle,
-  LayoutInfo, UiSize
+  text::{FontHandle, BUILTIN_FONT},
+  UiSize
 };
 
 pub struct Text {
@@ -23,7 +22,7 @@ impl Default for Text {
       text: "".into(),
       size: (UiSize::Auto, UiSize::Auto),
       color: Vec4::new(1., 1., 1., 1.),
-      font: FontHandle(0),
+      font: BUILTIN_FONT,
       text_size: 16,
     }
   }

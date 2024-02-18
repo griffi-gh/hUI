@@ -14,8 +14,7 @@ use hui::{
     rect::Rect
   },
   interaction::IntoInteractable,
-  UiSize,
-  UiDirection, IfModified,
+  UiSize, UiDirection,
 };
 use hui_glium::GliumUiRenderer;
 
@@ -23,7 +22,7 @@ fn main() {
   kubi_logging::init();
 
   let event_loop = EventLoopBuilder::new().build().unwrap();
-  let (window, display) = SimpleWindowBuilder::new().build(&event_loop);
+  let (_window, display) = SimpleWindowBuilder::new().build(&event_loop);
 
   let mut hui = UiInstance::new();
   let mut backend = GliumUiRenderer::new(&display);

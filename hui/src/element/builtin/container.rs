@@ -62,6 +62,7 @@ pub struct Container {
   pub borders: Sides<Option<Border>>,
   pub clip: bool,
   pub elements: Vec<Box<dyn UiElement>>,
+  pub corner_radius: Option<f32>,
 }
 
 impl Default for Container {
@@ -79,6 +80,7 @@ impl Default for Container {
       borders: Default::default(),
       clip: Default::default(),
       elements: Vec::new(),
+      corner_radius: None,
     }
   }
 }
@@ -168,7 +170,8 @@ impl UiElement for Container {
       ctx.draw.add(UiDrawCommand::Rectangle {
         position,
         size: ctx.measure.size,
-        color
+        color,
+        corner_radius: self.corner_radius,
       });
     }
 

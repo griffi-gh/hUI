@@ -14,6 +14,9 @@ pub enum UiDrawCommand {
     size: Vec2,
     ///Color (RGBA)
     color: Vec4,
+    //TODO: rounded corners per side
+    ///Rounded corners
+    corner_radius: Option<f32>,
   },
   Text {
     ///Position in pixels
@@ -129,31 +132,38 @@ impl UiDrawPlan {
       }
 
       match command {
-        UiDrawCommand::Rectangle { position, size, color } => {
+        UiDrawCommand::Rectangle { position, size, color, corner_radius } => {
+          let corner_radius = corner_radius.unwrap_or(0.0);
           let vidx = swapper.current().vertices.len() as u32;
-          swapper.current_mut().indices.extend([vidx, vidx + 1, vidx + 2, vidx, vidx + 2, vidx + 3]);
-          swapper.current_mut().vertices.extend([
-            UiVertex {
-              position: *position,
-              color: *color,
-              uv: vec2(0.0, 0.0),
-            },
-            UiVertex {
-              position: *position + vec2(size.x, 0.0),
-              color: *color,
-              uv: vec2(1.0, 0.0),
-            },
-            UiVertex {
-              position: *position + *size,
-              color: *color,
-              uv: vec2(1.0, 1.0),
-            },
-            UiVertex {
-              position: *position + vec2(0.0, size.y),
-              color: *color,
-              uv: vec2(0.0, 1.0),
-            },
-          ]);
+          if corner_radius > 0.0 {
+            todo!("rounded corners are not implemented");
+            //TODO vtx-based rounded corners
+            //swapper.current_mut().indices.extend();
+          } else {
+            swapper.current_mut().indices.extend([vidx, vidx + 1, vidx + 2, vidx, vidx + 2, vidx + 3]);
+            swapper.current_mut().vertices.extend([
+              UiVertex {
+                position: *position,
+                color: *color,
+                uv: vec2(0.0, 0.0),
+              },
+              UiVertex {
+                position: *position + vec2(size.x, 0.0),
+                color: *color,
+                uv: vec2(1.0, 0.0),
+              },
+              UiVertex {
+                position: *position + *size,
+                color: *color,
+                uv: vec2(1.0, 1.0),
+              },
+              UiVertex {
+                position: *position + vec2(0.0, size.y),
+                color: *color,
+                uv: vec2(0.0, 1.0),
+              },
+            ]);
+          }
         },
         UiDrawCommand::Text { position, size, color, text, font } => {
           //XXX: should we be doing this every time?

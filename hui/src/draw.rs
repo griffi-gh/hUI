@@ -317,6 +317,10 @@ impl UiDrawPlan {
           }
         }
       }
+      #[cfg(feature = "pixel_perfect")]
+      swapper.current_mut().vertices.iter_mut().for_each(|v| {
+        v.position = v.position.floor()
+      });
       prev_command = Some(command);
     }
     Self {

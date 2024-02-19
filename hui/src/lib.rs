@@ -1,9 +1,12 @@
-#![forbid(unsafe_code)]
-#![forbid(unsafe_op_in_unsafe_fn)]
 #![doc(html_logo_url = "https://raw.githubusercontent.com/griffi-gh/hui/master/.assets/hui.svg")]
 //!
 //! Simple UI library for games and other interactive applications
 //!
+//! # Features
+#![doc = document_features::document_features!()]
+
+#![forbid(unsafe_code)]
+#![forbid(unsafe_op_in_unsafe_fn)]
 
 use std::collections::VecDeque;
 

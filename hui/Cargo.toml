@@ -23,9 +23,15 @@ fontdue = "0.8"
 rect_packer = "0.2"
 log = "0.4"
 nz = "0.3"
+document-features = "0.2"
 
 [features]
-default = ["builtin_elements", "builtin_font"]
+default = ["builtin_elements", "builtin_font", "pixel_perfect"]
+## Enable the built-in font (ProggyTiny, adds 35kb to the executable)
 builtin_font = []
+## Enable the built-in elements (`Container`, `ProgressBar`, etc.)
 builtin_elements = []
+## Round vertex positions to nearest integer coordinates (fixes blurry text)
+pixel_perfect = []
+
 #parallel = ["dep:rayon", "fontdue/parallel"]

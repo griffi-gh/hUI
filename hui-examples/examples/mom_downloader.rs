@@ -6,14 +6,9 @@ use winit::{
   event_loop::{EventLoopBuilder, ControlFlow}
 };
 use hui::{
-  UiInstance,
   element::{
-    progress_bar::ProgressBar,
-    container::{Container, Sides, Alignment},
-    text::Text
-  },
-  UiSize,
-  elements,
+    container::{Alignment, Container, Sides}, progress_bar::ProgressBar, text::Text
+  }, elements, UiDirection, UiInstance, UiSize
 };
 use hui_glium::GliumUiRenderer;
 
@@ -57,38 +52,45 @@ fn main() {
             align: (Alignment::Begin, Alignment::Begin),
             size: (UiSize::Static(450.), UiSize::Auto),
             background: Some(vec4(0.2, 0.2, 0.5, 1.)),
+            corner_radius: Some(8.),
             elements: elements(|el| {
               if instant.elapsed().as_secs_f32() < 5. {
                 el.add(Text {
                   text: "Downloading your mom...".into(),
                   font: font_handle,
-                  text_size: 32,
+                  text_size: 24,
                   ..Default::default()
                 });
                 el.add(ProgressBar {
                   value: mom_ratio,
                   ..Default::default()
                 });
-                el.add(Text {
-                  text: format!("{:.2}% ({:.1} GB)", mom_ratio * 100., mom_ratio * 10000.).into(),
-                  font: font_handle,
-                  text_size: 24,
+                el.add(Container {
+                  direction: UiDirection::Horizontal,
+                  align: (Alignment::End, Alignment::Center),
+                  size: (UiSize::Fraction(1.), UiSize::Auto),
+                  elements: vec![Box::new(Text {
+                    text: format!("{:.2}% ({:.1} GB)", mom_ratio * 100., mom_ratio * 10000.).into(),
+                    font: font_handle,
+                    text_size: 16,
+                    ..Default::default()
+                  })],
                   ..Default::default()
                 });
               } else if instant.elapsed().as_secs() < 10 {
                 el.add(Text {
-                  text: "Error 413 Request Entity Too Large".into(),
+                  text: "Error 413: Request Entity Too Large".into(),
                   font: font_handle,
                   color: vec4(1., 0.125, 0.125, 1.),
-                  text_size: 26,
+                  text_size: 20,
                   ..Default::default()
                 });
                 el.add(Text {
                   text: format!("Exiting in {}...", 10 - instant.elapsed().as_secs()).into(),
                   font: font_handle,
-                  text_size: 24,
+                  text_size: 16,
                   ..Default::default()
-                })
+                });
               } else {
                 window_target.exit();
               }

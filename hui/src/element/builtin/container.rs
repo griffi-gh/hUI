@@ -182,10 +182,10 @@ impl UiElement for Container {
     match (self.align.0, self.direction) {
       (Alignment::Begin, _) => (),
       (Alignment::Center, UiDirection::Horizontal) => {
-        position.x += (ctx.measure.size.x - ctx.measure.hints.inner_content_size.unwrap().x) / 2.;
+        position.x += (ctx.measure.size.x - ctx.measure.hints.inner_content_size.unwrap().x) / 2. - self.padding.left;
       },
       (Alignment::Center, UiDirection::Vertical) => {
-        position.y += (ctx.measure.size.y - ctx.measure.hints.inner_content_size.unwrap().y) / 2.;
+        position.y += (ctx.measure.size.y - ctx.measure.hints.inner_content_size.unwrap().y) / 2. - self.padding.top;
       },
       (Alignment::End, UiDirection::Horizontal) => {
         position.x += ctx.measure.size.x - ctx.measure.hints.inner_content_size.unwrap().x - self.padding.right - self.padding.left;

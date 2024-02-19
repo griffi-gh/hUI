@@ -5,8 +5,11 @@
 //! Simple UI library for games and other interactive applications
 //!
 
+use std::collections::VecDeque;
+
 pub mod element;
 pub mod event;
+pub mod input;
 pub mod draw;
 pub mod measure;
 pub mod state;
@@ -14,6 +17,7 @@ pub mod text;
 pub mod interaction;
 
 use element::{MeasureContext, ProcessContext, UiElement};
+use event::UiEvent;
 use state::StateRepo;
 use draw::{UiDrawCommands, UiDrawPlan};
 use text::{TextRenderer, FontTextureInfo, FontHandle};
@@ -37,6 +41,7 @@ pub struct UiInstance {
   draw_plan: UiDrawPlan,
   draw_plan_modified: bool,
   text_renderer: TextRenderer,
+  events: VecDeque<UiEvent>,
 }
 
 impl UiInstance {
@@ -52,6 +57,7 @@ impl UiInstance {
       draw_plan_modified: false,
       // ftm: FontTextureManager::default(),
       text_renderer: TextRenderer::new(),
+      events: VecDeque::new(),
     }
   }
 
@@ -100,6 +106,10 @@ impl UiInstance {
 
   pub fn font_texture(&self) -> FontTextureInfo {
     self.text_renderer.font_texture()
+  }
+
+  pub fn push_event(&mut self, event: UiEvent) {
+    self.events.push_back(event);
   }
 }
 

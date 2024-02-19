@@ -46,7 +46,7 @@ impl UiElement for Rect {
         position: ctx.layout.position,
         size: ctx.measure.size,
         color,
-        corner_radius: None,
+        rounded_corners: None,
       });
     }
   }

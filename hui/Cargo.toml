@@ -22,6 +22,7 @@ glam = "0.25"
 fontdue = "0.8"
 rect_packer = "0.2"
 log = "0.4"
+nz = "0.3"
 
 [features]
 default = ["builtin_elements", "builtin_font"]

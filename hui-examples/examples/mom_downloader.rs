@@ -6,7 +6,7 @@ use winit::{
   event_loop::{EventLoopBuilder, ControlFlow}
 };
 use hui::{
-  element::{
+  draw::CornerRadius, element::{
     container::{Alignment, Container, Sides}, progress_bar::ProgressBar, text::Text
   }, elements, UiDirection, UiInstance, UiSize
 };
@@ -52,7 +52,7 @@ fn main() {
             align: (Alignment::Begin, Alignment::Begin),
             size: (UiSize::Static(450.), UiSize::Auto),
             background: Some(vec4(0.2, 0.2, 0.5, 1.)),
-            corner_radius: Some(8.),
+            corner_radius: Some(CornerRadius::all(8.)),
             elements: elements(|el| {
               if instant.elapsed().as_secs_f32() < 5. {
                 el.add(Text {

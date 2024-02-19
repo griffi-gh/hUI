@@ -1,6 +1,6 @@
 use glam::{Vec2, vec2, Vec4};
 use crate::{
-  draw::UiDrawCommand,
+  draw::{CornerRadius, RoundedCorners, UiDrawCommand},
   element::{MeasureContext, ProcessContext, UiElement},
   measure::{Hints, Response},
   LayoutInfo, UiDirection, UiSize
@@ -62,7 +62,7 @@ pub struct Container {
   pub borders: Sides<Option<Border>>,
   //pub clip: bool, //TODO clip children
   pub elements: Vec<Box<dyn UiElement>>,
-  pub corner_radius: Option<f32>,
+  pub corner_radius: Option<CornerRadius>,
 }
 
 impl Default for Container {
@@ -170,7 +170,7 @@ impl UiElement for Container {
         position,
         size: ctx.measure.size,
         color,
-        corner_radius: self.corner_radius,
+        rounded_corners: self.corner_radius.map(RoundedCorners::from_radius),
       });
     }
 

@@ -56,7 +56,7 @@ impl UiElement for ProgressBar {
         position: ctx.layout.position,
         size: ctx.measure.size,
         color: self.color_background,
-        corner_radius: None,
+        rounded_corners: None,
       });
     }
     if value > 0. {
@@ -64,7 +64,7 @@ impl UiElement for ProgressBar {
         position: ctx.layout.position,
         size: ctx.measure.size * vec2(value, 1.0),
         color: self.color_foreground,
-        corner_radius: None,
+        rounded_corners: None,
       });
     }
   }

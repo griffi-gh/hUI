@@ -1,5 +1,8 @@
 use crate::{IfModified, text::{TextRenderer, FontHandle}};
 
+mod corner_radius;
+
+pub use corner_radius::{CornerRadius, RoundedCorners};
 use std::borrow::Cow;
 use fontdue::layout::{Layout, CoordinateSystem, TextStyle};
 use glam::{Vec2, Vec4, vec2};
@@ -14,9 +17,8 @@ pub enum UiDrawCommand {
     size: Vec2,
     ///Color (RGBA)
     color: Vec4,
-    //TODO: rounded corners per side
     ///Rounded corners
-    corner_radius: Option<f32>,
+    rounded_corners: Option<RoundedCorners>,
   },
   Text {
     ///Position in pixels
@@ -132,10 +134,9 @@ impl UiDrawPlan {
       }
 
       match command {
-        UiDrawCommand::Rectangle { position, size, color, corner_radius } => {
-          let corner_radius = corner_radius.unwrap_or(0.0);
+        UiDrawCommand::Rectangle { position, size, color, rounded_corners } => {
           let vidx = swapper.current().vertices.len() as u32;
-          if corner_radius > 0.0 {
+          if let Some(corner) = rounded_corners.filter(|x| x.radius.max() > 0.0) {
             //this code is stupid as fuck
 
             //Random vert in the center for no reason
@@ -146,9 +147,8 @@ impl UiDrawPlan {
               uv: vec2(0., 0.),
             });
 
-            //TODO: make this configurable or compute dynamically
             //TODO: fix some corners tris being invisible (close enough lol)
-            let rounded_corner_verts = 8;
+            let rounded_corner_verts = corner.point_count.get() as u32;
             for i in 0..rounded_corner_verts {
               let cratio = i as f32 / rounded_corner_verts as f32;
               let angle = cratio * std::f32::consts::PI * 0.5;
@@ -156,25 +156,25 @@ impl UiDrawPlan {
               let y = angle.cos();
               //Top-right corner
               swapper.current_mut().vertices.push(UiVertex {
-                position: *position + vec2(x, 1. - y) * corner_radius + vec2(size.x - corner_radius, 0.),
+                position: *position + vec2(x, 1. - y) * corner.radius.top_right + vec2(size.x - corner.radius.top_right, 0.),
                 color: *color,
                 uv: vec2(0.0, 0.0),
               });
               //Bottom-right corner
               swapper.current_mut().vertices.push(UiVertex {
-                position: *position + vec2(x - 1., y) * corner_radius + vec2(size.x, size.y - corner_radius),
+                position: *position + vec2(x - 1., y) * corner.radius.bottom_right + vec2(size.x, size.y - corner.radius.bottom_right),
                 color: *color,
                 uv: vec2(0.0, 0.0),
               });
               //Bottom-left corner
               swapper.current_mut().vertices.push(UiVertex {
-                position: *position + vec2(1. - x, y) * corner_radius + vec2(0., size.y - corner_radius),
+                position: *position + vec2(1. - x, y) * corner.radius.bottom_left + vec2(0., size.y - corner.radius.bottom_left),
                 color: *color,
                 uv: vec2(0.0, 0.0),
               });
               //Top-left corner
               swapper.current_mut().vertices.push(UiVertex {
-                position: *position + vec2(1. - x, 1. - y) * corner_radius,
+                position: *position + vec2(1. - x, 1. - y) * corner.radius.top_left,
                 color: *color,
                 uv: vec2(0.0, 0.0),
               });

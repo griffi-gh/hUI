@@ -201,16 +201,24 @@ impl UiDrawPlan {
             }
             //Fill in the rest
             //mental illness 2:
-            // swapper.current_mut().indices.extend([
-            //   //Top
-            //   // vidx,
-            //   // vidx + 1 + (rounded_corner_verts - 1),
-            //   // vidx + 1,
-            //   //Right?, i think
-            //   vidx,
-            //   vidx + 1 + (rounded_corner_verts - 1) * 4 + 1,
-            //   vidx + 1 + 1,
-            // ]);
+            swapper.current_mut().indices.extend([
+              //Top
+              vidx,
+              vidx + 1 + (rounded_corner_verts - 1),
+              vidx + 1,
+              //Right?, i think
+              vidx,
+              vidx + 1 + (rounded_corner_verts - 1) * 4,
+              vidx + 1 + (rounded_corner_verts - 1) * 4 + 1,
+              //Left???
+              vidx,
+              vidx + 1 + (rounded_corner_verts - 1) * 4 + 2,
+              vidx + 1 + (rounded_corner_verts - 1) * 4 + 3,
+              //Bottom???
+              vidx,
+              vidx + 3,
+              vidx + 2,
+            ]);
           } else {
             swapper.current_mut().indices.extend([vidx, vidx + 1, vidx + 2, vidx, vidx + 2, vidx + 3]);
             swapper.current_mut().vertices.extend([

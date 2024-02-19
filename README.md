@@ -37,13 +37,13 @@
       <code>hui</code>
     </th>
     <th align="center">
-      <code>glium</code>
+      <code>glium</code> (render)
     </th>
     <th align="center">
-      <code>winit</code>
+      <code>winit</code> (platform)
     </th>
     <th align="center">
-      <code>wgpu</code>
+      <code>wgpu</code> (render)
     </th>
   </tr>
   <tr>

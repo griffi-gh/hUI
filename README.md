@@ -42,10 +42,10 @@
   </tr>
   <tr>
     <td align="center">
-      <code>0.1.0-alpha.2</code>
+      <code>master</code>
     </th>
     <td>
-      <code>hui-glium = "0.1.0-alpha.2"</code><br>
+      <code>hui-glium = &lt;master&gt;</code><br>
       <code>glium = "0.34"</code>
     </td>
     <td>

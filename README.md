@@ -1,5 +1,5 @@
 <p></p><p></p>
-<img src="./.assets/hui.svg" width="120" align="left">
+<img src="https://raw.githubusercontent.com/griffi-gh/hui/master/.assets/hui.svg" width="120" align="left">
 <h1>huї</h1>
 <div>
   <span>
@@ -17,10 +17,10 @@
 
 <table align="center">
   <td>
-    <img src="./.assets/demo0.gif" width="300">
+    <img src="https://raw.githubusercontent.com/griffi-gh/hui/master/.assets/demo0.gif" width="300">
   </td>
   <td>
-    <img src="./.assets/demo1.gif" width="300">
+    <img src="https://raw.githubusercontent.com/griffi-gh/hui/master/.assets/demo1.gif" width="300">
   </td>
 </table>
 

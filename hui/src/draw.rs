@@ -136,9 +136,43 @@ impl UiDrawPlan {
           let corner_radius = corner_radius.unwrap_or(0.0);
           let vidx = swapper.current().vertices.len() as u32;
           if corner_radius > 0.0 {
+            let mut vidx_ctr = vidx;
             todo!("rounded corners are not implemented");
             //TODO vtx-based rounded corners
             //swapper.current_mut().indices.extend();
+
+            //TODO: make this configurable or compute dynamically
+            let rounded_corner_verts = 4;
+            for i in 0..rounded_corner_verts {
+              let cratio = i as f32 / rounded_corner_verts as f32;
+              let angle = cratio * std::f32::consts::PI * 0.5;
+              let x = angle.sin();
+              let y = angle.cos();
+              //Top-right corner
+              swapper.current_mut().vertices.push(UiVertex {
+                position: *position + vec2(x, 1. - y) * corner_radius + *size - vec2(corner_radius, 0.),
+                color: *color,
+                uv: vec2(0.0, 0.0),
+              });
+              //Top-left corner
+              swapper.current_mut().vertices.push(UiVertex {
+                position: *position + vec2(x, y),
+                color: *color,
+                uv: vec2(0.0, 0.0),
+              });
+              //Bottom-left corner
+              swapper.current_mut().vertices.push(UiVertex {
+                position: *position + vec2(x, y),
+                color: *color,
+                uv: vec2(0.0, 0.0),
+              });
+              //Bottom-right corner
+              swapper.current_mut().vertices.push(UiVertex {
+                position: *position + vec2(x, y),
+                color: *color,
+                uv: vec2(0.0, 0.0),
+              });
+            }
           } else {
             swapper.current_mut().indices.extend([vidx, vidx + 1, vidx + 2, vidx, vidx + 2, vidx + 3]);
             swapper.current_mut().vertices.extend([

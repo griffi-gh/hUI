@@ -52,7 +52,7 @@
       <code>hui-winit = &lt;master&gt;</code><br>
       <code>winit = "0.29"</code>
     </td>
-    <td align="center">N/A</td>
+    <td align="center">(support planned)</td>
   </tr>
   <tr>
     <td align="center">

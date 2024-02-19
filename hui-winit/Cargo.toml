@@ -1,7 +1,17 @@
 [package]
 name = "hui-winit"
+description = "winit platform backend for `hui`"
+repository = "https://github.com/griffi-gh/hui"
+readme = "../README.md"
+authors = ["griffi-gh <prasol258@gmail.com>"]
 version = "0.1.0-alpha.3"
 edition = "2021"
+license = "GPL-3.0-or-later"
+publish = true
+include = [
+  "src/**/*.rs",
+  "Cargo.toml",
+]
 
 [dependencies]
 hui = { version = "=0.1.0-alpha.3", path = "../hui", default-features = false }

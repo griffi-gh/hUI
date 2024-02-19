@@ -1,7 +1,8 @@
 [package]
 name = "hui-glium"
-description = "Glium backend for hUI"
+description = "glium render backend for `hui`"
 repository = "https://github.com/griffi-gh/hui"
+readme = "../README.md"
 authors = ["griffi-gh <prasol258@gmail.com>"]
 version = "0.1.0-alpha.3"
 edition = "2021"

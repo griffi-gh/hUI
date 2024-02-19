@@ -7,6 +7,10 @@ use std::borrow::Cow;
 use fontdue::layout::{Layout, CoordinateSystem, TextStyle};
 use glam::{Vec2, Vec4, vec2};
 
+/// Available draw commands
+/// - Rectangle: Filled, colored rectangle, with optional rounded corners
+/// - Circle: Simple filled, colored circle
+/// - Text: Draw text using the specified font, size, color, and position
 #[derive(Clone, Debug, PartialEq)]
 pub enum UiDrawCommand {
   ///Filled, colored rectangle
@@ -19,6 +23,14 @@ pub enum UiDrawCommand {
     color: Vec4,
     ///Rounded corners
     rounded_corners: Option<RoundedCorners>,
+  },
+  Circle {
+    ///Position in pixels
+    position: Vec2,
+    ///Radius in pixels
+    radius: f32,
+    ///Color (RGBA)
+    color: Vec4,
   },
   Text {
     ///Position in pixels
@@ -34,12 +46,22 @@ pub enum UiDrawCommand {
   },
 }
 
+impl UiDrawCommand {
+  fn texture_eq_index(&self) -> u64 {
+    match self {
+      UiDrawCommand::Rectangle { .. } |
+      UiDrawCommand::Circle { .. } => u64::MAX - 1,
+      UiDrawCommand::Text { .. } => u64::MAX - 2,
+    }
+  }
+}
+
 #[derive(Default)]
-pub struct UiDrawCommands {
+pub struct UiDrawCommandList {
   pub commands: Vec<UiDrawCommand>,
 }
 
-impl UiDrawCommands {
+impl UiDrawCommandList {
   pub fn add(&mut self, command: UiDrawCommand) {
     self.commands.push(command);
   }
@@ -109,13 +131,13 @@ impl CallSwapper {
 }
 
 impl UiDrawPlan {
-  pub fn build(draw_commands: &UiDrawCommands, tr: &mut TextRenderer) -> Self {
+  pub fn build(draw_commands: &UiDrawCommandList, tr: &mut TextRenderer) -> Self {
     let mut swapper = CallSwapper::new();
-    let mut prev_command = None;
+    let mut prev_command: Option<&UiDrawCommand> = None;
     for command in &draw_commands.commands {
-
       let do_swap = if let Some(prev_command) = prev_command {
-        std::mem::discriminant(prev_command) != std::mem::discriminant(command)
+        //std::mem::discriminant(prev_command) != std::mem::discriminant(command)
+        prev_command.texture_eq_index() != command.texture_eq_index()
       } else {
         false
       };
@@ -125,11 +147,10 @@ impl UiDrawPlan {
       }
 
       if do_swap || prev_command.is_none() {
-        match command {
-          UiDrawCommand::Rectangle { .. } => (),
-          UiDrawCommand::Text { .. } => {
-            swapper.current_mut().bind_texture = Some(BindTexture::FontTexture);
-          }
+        swapper.current_mut().bind_texture =  match command {
+          UiDrawCommand::Rectangle { .. } |
+          UiDrawCommand::Circle { .. } => None,
+          UiDrawCommand::Text { .. } => Some(BindTexture::FontTexture),
         }
       }
 
@@ -245,6 +266,9 @@ impl UiDrawPlan {
               },
             ]);
           }
+        },
+        UiDrawCommand::Circle { .. } => {
+          todo!("circle draw command not implemented yet")
         },
         UiDrawCommand::Text { position, size, color, text, font } => {
           //XXX: should we be doing this every time?

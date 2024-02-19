@@ -19,7 +19,7 @@ pub mod interaction;
 use element::{MeasureContext, ProcessContext, UiElement};
 use event::UiEvent;
 use state::StateRepo;
-use draw::{UiDrawCommands, UiDrawPlan};
+use draw::{UiDrawCommandList, UiDrawPlan};
 use text::{TextRenderer, FontTextureInfo, FontHandle};
 use glam::Vec2;
 
@@ -36,8 +36,8 @@ pub struct UiInstance {
   //mouse_position: Vec2,
   stateful_state: StateRepo,
   //event_queue: VecDeque<UiEvent>,
-  prev_draw_commands: UiDrawCommands,
-  draw_commands: UiDrawCommands,
+  prev_draw_commands: UiDrawCommandList,
+  draw_commands: UiDrawCommandList,
   draw_plan: UiDrawPlan,
   draw_plan_modified: bool,
   text_renderer: TextRenderer,
@@ -51,8 +51,8 @@ impl UiInstance {
       stateful_state: StateRepo::default(),
       //event_queue: VecDeque::new(),
       // root_elements: Vec::new(),
-      prev_draw_commands: UiDrawCommands::default(),
-      draw_commands: UiDrawCommands::default(),
+      prev_draw_commands: UiDrawCommandList::default(),
+      draw_commands: UiDrawCommandList::default(),
       draw_plan: UiDrawPlan::default(),
       draw_plan_modified: false,
       // ftm: FontTextureManager::default(),

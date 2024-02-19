@@ -44,7 +44,7 @@ fn main() {
             corner_radius: Some(30.),
             elements: vec![
               Box::new(Container {
-                padding: Sides::all(40.),
+                padding: Sides::all(20.),
                 align: (Alignment::Center, Alignment::Center),
                 size: (UiSize::Auto, UiSize::Auto),
                 background: Some(vec4(0.1, 0.1, 0.1, 0.5)),

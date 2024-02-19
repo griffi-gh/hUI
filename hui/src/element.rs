@@ -7,16 +7,7 @@ use crate::{
   LayoutInfo
 };
 
-#[cfg(feature = "builtin_elements")]
-mod builtin {
-  pub mod rect;
-  pub mod container;
-  pub mod spacer;
-  pub mod progress_bar;
-  pub mod text;
-}
-
-#[cfg(feature = "builtin_elements")]
+mod builtin;
 pub use builtin::*;
 
 pub struct MeasureContext<'a> {

@@ -29,8 +29,10 @@ document-features = "0.2"
 default = ["builtin_elements", "builtin_font", "pixel_perfect"]
 ## Enable the built-in font (ProggyTiny, adds 35kb to the executable)
 builtin_font = []
-## Enable the built-in elements (`Container`, `ProgressBar`, etc.)
-builtin_elements = []
+## Enable the built-in elements (`Container`, `ProgressBar`, etc.)\
+builtin_elements = ["builtin_container"]
+## Enable only the `Container` component (which is essential for laying out other components)
+builtin_container = []
 ## Round vertex positions to nearest integer coordinates (fixes blurry text)
 pixel_perfect = []
 

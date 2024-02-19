@@ -6,7 +6,10 @@ use winit::{
 };
 use hui::{
   UiInstance, UiSize,
-  element::container::{Alignment, Container, Sides}
+  element::{
+    container::{Alignment, Container},
+    text::Text
+  },
 };
 use hui_glium::GliumUiRenderer;
 
@@ -33,12 +36,23 @@ fn main() {
         hui.begin();
 
         hui.add(Container {
-          gap: 5.,
-          padding: Sides::all(5.),
           align: (Alignment::Center, Alignment::Center),
           size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
-          background: Some(vec4(0.1, 0.1, 0.1, 1.)),
-          corner_radius: Some(10.),
+          elements: vec![Box::new(Container {
+            align: (Alignment::Center, Alignment::Center),
+            size: (UiSize::Fraction(0.5), UiSize::Fraction(0.5)),
+            background: Some(vec4(1., 0.1, 0.1, 1.)),
+            corner_radius: Some(30.),
+            elements: vec![
+              Box::new(Text {
+                text: "You tried".into(),
+                text_size: 50,
+                color: vec4(1., 1., 1., 1.),
+                ..Default::default()
+              }),
+            ],
+            ..Default::default()
+          })],
           ..Default::default()
         }, resolution);
 

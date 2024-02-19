@@ -56,7 +56,7 @@ pub enum BindTexture {
   //UserDefined(usize),
 }
 
-#[derive(Clone, Copy, Debug, PartialEq)]
+#[derive(Clone, Copy, Debug, PartialEq, Default)]
 pub struct UiVertex {
   pub position: Vec2,
   pub color: Vec4,
@@ -136,10 +136,15 @@ impl UiDrawPlan {
           let corner_radius = corner_radius.unwrap_or(0.0);
           let vidx = swapper.current().vertices.len() as u32;
           if corner_radius > 0.0 {
-            let mut vidx_ctr = vidx;
-            todo!("rounded corners are not implemented");
-            //TODO vtx-based rounded corners
-            //swapper.current_mut().indices.extend();
+            //this code is stupid as fuck
+
+            //Random vert in the center for no reason
+            //lol
+            swapper.current_mut().vertices.push(UiVertex {
+              position: *position + *size * vec2(0.5, 0.5),
+              color: *color,
+              uv: vec2(0., 0.),
+            });
 
             //TODO: make this configurable or compute dynamically
             let rounded_corner_verts = 4;
@@ -150,29 +155,62 @@ impl UiDrawPlan {
               let y = angle.cos();
               //Top-right corner
               swapper.current_mut().vertices.push(UiVertex {
-                position: *position + vec2(x, 1. - y) * corner_radius + *size - vec2(corner_radius, 0.),
-                color: *color,
-                uv: vec2(0.0, 0.0),
-              });
-              //Top-left corner
-              swapper.current_mut().vertices.push(UiVertex {
-                position: *position + vec2(x, y),
-                color: *color,
-                uv: vec2(0.0, 0.0),
-              });
-              //Bottom-left corner
-              swapper.current_mut().vertices.push(UiVertex {
-                position: *position + vec2(x, y),
+                position: *position + vec2(x, 1. - y) * corner_radius + vec2(size.x - corner_radius, 0.),
                 color: *color,
                 uv: vec2(0.0, 0.0),
               });
               //Bottom-right corner
               swapper.current_mut().vertices.push(UiVertex {
-                position: *position + vec2(x, y),
+                position: *position + vec2(x - 1., y) * corner_radius + vec2(size.x, size.y - corner_radius),
                 color: *color,
                 uv: vec2(0.0, 0.0),
               });
+              //Bottom-left corner
+              swapper.current_mut().vertices.push(UiVertex {
+                position: *position + vec2(1. - x, y) * corner_radius + vec2(0., size.y - corner_radius),
+                color: *color,
+                uv: vec2(0.0, 0.0),
+              });
+              //Top-left corner
+              swapper.current_mut().vertices.push(UiVertex {
+                position: *position + vec2(1. - x, 1. - y) * corner_radius,
+                color: *color,
+                uv: vec2(0.0, 0.0),
+              });
+              // mental illness:
+              if i > 0 {
+                swapper.current_mut().indices.extend([
+                  //Top-right corner
+                  vidx,
+                  vidx + 1 + (i - 1) * 4,
+                  vidx + 1 + i * 4,
+                  //Bottom-right corner
+                  vidx,
+                  vidx + 1 + (i - 1) * 4 + 1,
+                  vidx + 1 + i * 4 + 1,
+                  //Bottom-left corner
+                  vidx,
+                  vidx + 1 + (i - 1) * 4 + 2,
+                  vidx + 1 + i * 4 + 2,
+                  //Top-left corner
+                  vidx,
+                  vidx + 1 + (i - 1) * 4 + 3,
+                  vidx + 1 + i * 4 + 3,
+                ]);
+              }
             }
+            //Fill in the rest
+            //mental illness 2:
+            // swapper.current_mut().indices.extend([
+            //   //Top
+            //   // vidx,
+            //   // vidx + 1 + (rounded_corner_verts - 1),
+            //   // vidx + 1,
+            //   //Right?, i think
+            //   vidx,
+            //   vidx + 1 + (rounded_corner_verts - 1) * 4 + 1,
+            //   vidx + 1 + 1,
+            // ]);
           } else {
             swapper.current_mut().indices.extend([vidx, vidx + 1, vidx + 2, vidx, vidx + 2, vidx + 3]);
             swapper.current_mut().vertices.extend([

@@ -5,9 +5,9 @@
   <span>
     Simple UI library for games and other interactive applications
   </span><a href="https://crates.io/crates/hui" float="right">
-    <img alt="crates.io" src="https://img.shields.io/crates/v/hui.svg" align="right" height="20">
+    <img alt="crates.io" src="https://img.shields.io/crates/v/hui.svg?style=flat-square" align="right" height="20">
   </a><br><a href="./LICENSE.txt" align="right" float="right">
-    <img alt="license" src="https://img.shields.io/github/license/griffi-gh/hui" align="right" width="102" height="20">
+    <img alt="license" src="https://img.shields.io/github/license/griffi-gh/hui?style=flat-square" align="right" width="102" height="20">
   </a><span>
     Formerly kubi-ui
   </span>
@@ -25,6 +25,12 @@
 </table>
 
 <h2>Backends</h2>
+<p>
+  Latest stable release:&nbsp;
+  <a href="https://crates.io/crates/hui" float="right">
+    <img alt="crates.io" src="https://img.shields.io/crates/v/hui.svg?style=flat-square&label=&color=0d1117" height="20">
+  </a>
+</p>
 <table>
   <tr>
     <th align="center">

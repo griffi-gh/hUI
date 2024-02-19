@@ -60,7 +60,7 @@ pub struct Container {
   pub align: (Alignment, Alignment),
   pub background: Option<Vec4>,
   pub borders: Sides<Option<Border>>,
-  pub clip: bool,
+  //pub clip: bool, //TODO clip children
   pub elements: Vec<Box<dyn UiElement>>,
   pub corner_radius: Option<f32>,
 }
@@ -78,7 +78,6 @@ impl Default for Container {
       align: (Alignment::Begin, Alignment::Begin),
       background: Default::default(),
       borders: Default::default(),
-      clip: Default::default(),
       elements: Vec::new(),
       corner_radius: None,
     }

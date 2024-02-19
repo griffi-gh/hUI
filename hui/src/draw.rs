@@ -147,7 +147,8 @@ impl UiDrawPlan {
             });
 
             //TODO: make this configurable or compute dynamically
-            let rounded_corner_verts = 4;
+            //TODO: fix some corners tris being invisible (close enough lol)
+            let rounded_corner_verts = 8;
             for i in 0..rounded_corner_verts {
               let cratio = i as f32 / rounded_corner_verts as f32;
               let angle = cratio * std::f32::consts::PI * 0.5;
@@ -204,7 +205,7 @@ impl UiDrawPlan {
             swapper.current_mut().indices.extend([
               //Top
               vidx,
-              vidx + 1 + (rounded_corner_verts - 1),
+              vidx + 4,
               vidx + 1,
               //Right?, i think
               vidx,

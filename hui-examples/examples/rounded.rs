@@ -5,11 +5,10 @@ use winit::{
   event_loop::{EventLoopBuilder, ControlFlow}
 };
 use hui::{
-  UiInstance, UiSize,
   element::{
-    container::{Alignment, Container},
+    container::{Alignment, Container, Sides},
     text::Text
-  },
+  }, UiInstance, UiSize
 };
 use hui_glium::GliumUiRenderer;
 
@@ -44,10 +43,20 @@ fn main() {
             background: Some(vec4(1., 0.1, 0.1, 1.)),
             corner_radius: Some(30.),
             elements: vec![
-              Box::new(Text {
-                text: "You tried".into(),
-                text_size: 50,
-                color: vec4(1., 1., 1., 1.),
+              Box::new(Container {
+                padding: Sides::all(40.),
+                align: (Alignment::Center, Alignment::Center),
+                size: (UiSize::Auto, UiSize::Auto),
+                background: Some(vec4(0.1, 0.1, 0.1, 0.5)),
+                corner_radius: Some(30.),
+                elements: vec![
+                  Box::new(Text {
+                    text: "You tried".into(),
+                    text_size: 50,
+                    color: vec4(1., 1., 1., 1.),
+                    ..Default::default()
+                  }),
+                ],
                 ..Default::default()
               }),
             ],

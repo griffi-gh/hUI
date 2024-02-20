@@ -67,6 +67,7 @@ fn main() {
                 });
                 el.add(ProgressBar {
                   value: mom_ratio,
+                  corner_radius: Corners::all(0.125 * ProgressBar::DEFAULT_HEIGHT),
                   ..Default::default()
                 });
                 el.add(Container {

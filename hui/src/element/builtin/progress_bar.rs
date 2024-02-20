@@ -9,7 +9,7 @@ pub struct ProgressBar {
   pub value: f32,
   pub color_foreground: Vec4,
   pub color_background: Vec4,
-  pub border_radius: Corners<f32>,
+  pub corner_radius: Corners<f32>,
 }
 
 impl ProgressBar {
@@ -23,7 +23,7 @@ impl Default for ProgressBar {
       value: 0.,
       color_foreground: vec4(0.0, 0.0, 1.0, 1.0),
       color_background: vec4(0.0, 0.0, 0.0, 1.0),
-      border_radius: Corners::all(0.),
+      corner_radius: Corners::all(0.),
     }
   }
 }
@@ -53,9 +53,9 @@ impl UiElement for ProgressBar {
   fn process(&self, ctx: ProcessContext) {
     let value = self.value.clamp(0., 1.);
     let rounded_corners =
-      (self.border_radius.max_f32() > 0.).then_some({
+      (self.corner_radius.max_f32() > 0.).then_some({
         //HACK: fix clipping issues; //todo: get rid of this
-        let mut radii = self.border_radius;
+        let mut radii = self.corner_radius;
         let width = ctx.measure.size.x * value;
         if width <= radii.max_f32() * 2. {
           radii.bottom_right = 0.;

@@ -1,4 +1,4 @@
-use glam::Vec4;
+use glam::{vec4, Vec3, Vec4};
 use crate::rectangle::Corners;
 
 // #[derive(Clone, Copy, PartialEq, Eq, Debug)]
@@ -17,9 +17,15 @@ pub enum Background {
   Gradient(Corners<Vec4>),
 }
 
-impl From<Vec4> for Background {
-  fn from(color: Vec4) -> Self {
-    Self::Solid(color)
+impl From<(f32, f32, f32, f32)> for Background {
+  fn from(color: (f32, f32, f32, f32)) -> Self {
+    Self::Solid(vec4(color.0, color.1, color.2, color.3))
+  }
+}
+
+impl From<Corners<Vec4>> for Background {
+  fn from(corners: Corners<Vec4>) -> Self {
+    Self::Gradient(corners)
   }
 }
 
@@ -29,6 +35,44 @@ impl From<Option<Vec4>> for Background {
       Some(color) => Self::Solid(color),
       None => Self::Transparent,
     }
+  }
+}
+
+impl From<Vec4> for Background {
+  fn from(color: Vec4) -> Self {
+    Self::Solid(color)
+  }
+}
+
+impl From<(f32, f32, f32)> for Background {
+  fn from(color: (f32, f32, f32)) -> Self {
+    Self::Solid(vec4(color.0, color.1, color.2, 1.))
+  }
+}
+
+impl From<Corners<Vec3>> for Background {
+  fn from(corners: Corners<Vec3>) -> Self {
+    Self::Gradient(Corners {
+      top_left: corners.top_left.extend(1.),
+      top_right: corners.top_right.extend(1.),
+      bottom_left: corners.bottom_left.extend(1.),
+      bottom_right: corners.bottom_right.extend(1.),
+    })
+  }
+}
+
+impl From<Option<Vec3>> for Background {
+  fn from(color: Option<Vec3>) -> Self {
+    match color {
+      Some(color) => Self::Solid(color.extend(1.)),
+      None => Self::Transparent,
+    }
+  }
+}
+
+impl From<Vec3> for Background {
+  fn from(color: Vec3) -> Self {
+    Self::Solid(color.extend(1.))
   }
 }
 

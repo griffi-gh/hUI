@@ -38,45 +38,91 @@ fn main() {
         hui.begin();
 
         hui.add(Container {
+          gap: 10.,
           align: Alignment::Center.into(),
           size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
-          elements: vec![Box::new(Container {
-            align: Alignment::Center.into(),
-            size: (UiSize::Fraction(0.5), UiSize::Fraction(0.5)),
-            background: vec4(1., 0., 0., 1.).into(),
-            corner_radius: Corners {
-              top_left: 10.,
-              top_right: 20.,
-              bottom_left: 50.,
-              bottom_right: 80.
-            },
-            elements: vec![
-              Box::new(Container {
-                padding: Sides::all(20.),
-                direction: UiDirection::Horizontal,
-                align: Alignment::Center.into(),
-                size: (UiSize::Auto, UiSize::Auto),
-                background: vec4(0.1, 0.1, 0.1, 0.5).into(),
-                corner_radius: Corners::all(8.),
-                elements: vec![
-                  Box::new(Text {
-                    text: "Corners".into(),
-                    text_size: 50,
-                    color: vec4(1., 1., 1., 1.),
-                    ..Default::default()
-                  }),
-                  Box::new(Text {
-                    text: "!".into(),
-                    text_size: 50,
-                    color: vec4(1., 1., 0., 1.),
-                    ..Default::default()
-                  }),
-                ],
-                ..Default::default()
-              }),
-            ],
-            ..Default::default()
-          })],
+          elements: vec![
+            Box::new(Container {
+              align: Alignment::Center.into(),
+              size: (UiSize::Fraction(0.5), UiSize::Fraction(0.5)),
+              background: vec4(1., 0., 0., 1.).into(),
+              corner_radius: Corners {
+                top_left: 10.,
+                top_right: 20.,
+                bottom_left: 50.,
+                bottom_right: 80.
+              },
+              elements: vec![
+                Box::new(Container {
+                  padding: Sides::all(20.),
+                  direction: UiDirection::Horizontal,
+                  align: Alignment::Center.into(),
+                  size: (UiSize::Auto, UiSize::Auto),
+                  background: vec4(0.1, 0.1, 0.1, 0.5).into(),
+                  corner_radius: Corners::all(8.),
+                  elements: vec![
+                    Box::new(Text {
+                      text: "Corners".into(),
+                      text_size: 50,
+                      color: vec4(1., 1., 1., 1.),
+                      ..Default::default()
+                    }),
+                    Box::new(Text {
+                      text: "!".into(),
+                      text_size: 50,
+                      color: vec4(1., 1., 0., 1.),
+                      ..Default::default()
+                    }),
+                  ],
+                  ..Default::default()
+                }),
+              ],
+              ..Default::default()
+            }),
+            Box::new(Container {
+              gap: 10.,
+              direction: UiDirection::Horizontal,
+              elements: vec![
+                Box::new(Container {
+                  size: (UiSize::Static(100.), UiSize::Static(100.)),
+                  background: Corners::left_right(
+                    vec4(1., 0., 0., 1.),
+                    vec4(0., 1., 0., 1.)
+                  ).into(),
+                  corner_radius: Corners::all(0.),
+                  ..Default::default()
+                }),
+                Box::new(Container {
+                  size: (UiSize::Static(100.), UiSize::Static(100.)),
+                  background: Corners::left_right(
+                    vec4(1., 0., 0., 1.),
+                    vec4(0., 1., 0., 1.)
+                  ).into(),
+                  corner_radius: Corners::all(10.),
+                  ..Default::default()
+                }),
+                Box::new(Container {
+                  size: (UiSize::Static(100.), UiSize::Static(100.)),
+                  background: Corners::left_right(
+                    vec4(1., 0., 0., 1.),
+                    vec4(0., 1., 0., 1.)
+                  ).into(),
+                  corner_radius: Corners::all(20.),
+                  ..Default::default()
+                }),
+                Box::new(Container {
+                  size: (UiSize::Static(100.), UiSize::Static(100.)),
+                  background: Corners::left_right(
+                    vec4(1., 0., 0., 1.),
+                    vec4(0., 1., 0., 1.)
+                  ).into(),
+                  corner_radius: Corners::all(30.),
+                  ..Default::default()
+                }),
+              ],
+              ..Default::default()
+            }),
+          ],
           ..Default::default()
         }, resolution);
 

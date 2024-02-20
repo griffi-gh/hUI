@@ -66,7 +66,7 @@ fn main() {
           elements: vec![
             Box::new(ProgressBar {
               value: z,
-              border_radius: Corners::all(0.25 * ProgressBar::DEFAULT_HEIGHT),
+              corner_radius: Corners::all(0.25 * ProgressBar::DEFAULT_HEIGHT),
               ..Default::default()
             }),
             Box::new(Container {
@@ -81,7 +81,10 @@ fn main() {
                 }),
                 Box::new(Rect {
                   size: (UiSize::Fraction(z / 2. + 0.5), UiSize::Static(30.)),
-                  color: vec4(0., 0.75, 0., 1.).into()
+                  color: Corners::left_right(
+                    vec4(1., 0., 0., 1.),
+                    vec4(0., 1., 0., 1.)
+                  ).into()
                 }),
               ],
               ..Default::default()

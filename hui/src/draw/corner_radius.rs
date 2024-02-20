@@ -1,5 +1,5 @@
 use std::num::NonZeroU16;
-use crate::Corners;
+use crate::rectangle::Corners;
 
 fn point_count(corners: Corners<f32>) -> NonZeroU16 {
   //Increase for higher quality

@@ -3,7 +3,7 @@ use crate::{
   draw::UiDrawCommand,
   element::{MeasureContext, ProcessContext, UiElement},
   measure::Response,
-  UiSize
+  layout::UiSize
 };
 
 pub struct Rect {

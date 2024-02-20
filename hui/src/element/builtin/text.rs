@@ -5,7 +5,7 @@ use crate::{
   element::{MeasureContext, ProcessContext, UiElement},
   measure::Response,
   text::{FontHandle, BUILTIN_FONT},
-  UiSize
+  layout::UiSize
 };
 
 pub enum TextSize {

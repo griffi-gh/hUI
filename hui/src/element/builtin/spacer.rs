@@ -2,7 +2,7 @@ use glam::vec2;
 use crate::{
   element::{MeasureContext, ProcessContext, UiElement},
   measure::Response,
-  UiDirection
+  layout::UiDirection
 };
 
 pub struct Spacer(pub f32);

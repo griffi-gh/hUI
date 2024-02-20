@@ -4,7 +4,7 @@ use crate::{
   measure::Response,
   state::StateRepo,
   text::TextMeasure,
-  LayoutInfo
+  layout::LayoutInfo
 };
 
 mod builtin;

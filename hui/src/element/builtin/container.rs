@@ -128,7 +128,7 @@ impl UiElement for Container {
     let mut position = ctx.layout.position;
 
     //background
-    if self.background.z > 0. {
+    if self.background.w > 0. {
       ctx.draw.add(UiDrawCommand::Rectangle {
         position,
         size: ctx.measure.size,

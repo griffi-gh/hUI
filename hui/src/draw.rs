@@ -305,14 +305,18 @@ impl UiDrawPlan {
             if !layout_glyph.char_data.rasterize() {
               continue
             }
+            let font_texture_size = (
+              tr.font_texture().size.x as f32,
+              tr.font_texture().size.y as f32
+            );
             let vidx = swapper.current().vertices.len() as u32;
             let glyph = tr.glyph(*font, layout_glyph.parent, layout_glyph.key.px as u8);
             //rpos_x += glyph.metrics.advance_width;//glyph.metrics.advance_width;
             swapper.current_mut().indices.extend([vidx, vidx + 1, vidx + 2, vidx, vidx + 2, vidx + 3]);
-            let p0x = glyph.position.x as f32 / 1024.;
-            let p1x = (glyph.position.x + glyph.size.x as i32) as f32 / 1024.;
-            let p0y = glyph.position.y as f32 / 1024.;
-            let p1y = (glyph.position.y + glyph.size.y as i32) as f32 / 1024.;
+            let p0x = glyph.position.x as f32 / font_texture_size.0;
+            let p1x = (glyph.position.x + glyph.size.x as i32) as f32 / font_texture_size.0;
+            let p0y = glyph.position.y as f32 / font_texture_size.1;
+            let p1y = (glyph.position.y + glyph.size.y as i32) as f32 / font_texture_size.1;
             swapper.current_mut().vertices.extend([
               UiVertex {
                 position: *position + vec2(layout_glyph.x, layout_glyph.y),

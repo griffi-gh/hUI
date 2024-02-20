@@ -44,7 +44,7 @@ fn main() {
 
         hui.add(Container {
           size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
-          background: Some(vec4(0.1, 0.1, 0.1, 1.)),
+          background: vec4(0.1, 0.1, 0.1, 1.),
           elements: elements(|elem| {
             elem.add(Text {
               text: "THIS LINE SHOULD BE SHARP!".into(),

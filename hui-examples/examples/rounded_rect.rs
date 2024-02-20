@@ -43,7 +43,7 @@ fn main() {
           elements: vec![Box::new(Container {
             align: Alignment::Center.into(),
             size: (UiSize::Fraction(0.5), UiSize::Fraction(0.5)),
-            background: Some(vec4(1., 0., 0., 1.)),
+            background: vec4(1., 0., 0., 1.),
             corner_radius: Corners {
               top_left: 10.,
               top_right: 20.,
@@ -56,7 +56,7 @@ fn main() {
                 direction: UiDirection::Horizontal,
                 align: Alignment::Center.into(),
                 size: (UiSize::Auto, UiSize::Auto),
-                background: Some(vec4(0.1, 0.1, 0.1, 0.5)),
+                background: vec4(0.1, 0.1, 0.1, 0.5),
                 corner_radius: Corners::all(8.),
                 elements: vec![
                   Box::new(Text {

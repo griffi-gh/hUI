@@ -18,7 +18,7 @@ pub struct Container {
   pub padding: Sides<f32>,
   ///Primary/secondary axis
   pub align: Alignment2d,
-  pub background: Option<Vec4>,
+  pub background: Vec4,
   pub borders: Sides<Option<Border>>,
   pub corner_radius: Corners<f32>,
   //pub clip: bool, //TODO clip children
@@ -125,11 +125,11 @@ impl UiElement for Container {
     let mut position = ctx.layout.position;
 
     //background
-    if let Some(color) = self.background {
+    if self.background.z > 0. {
       ctx.draw.add(UiDrawCommand::Rectangle {
         position,
         size: ctx.measure.size,
-        color,
+        color: self.background,
         rounded_corners: (self.corner_radius.max_f32() > 0.).then_some({
           RoundedCorners::from_radius(self.corner_radius)
         }),

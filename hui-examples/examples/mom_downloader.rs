@@ -50,12 +50,12 @@ fn main() {
         hui.add(Container {
           align: Alignment::Center.into(),
           size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
-          background: Some(vec4(0.1, 0.1, 0.1, 1.)),
+          background: vec4(0.1, 0.1, 0.1, 1.),
           elements: vec![Box::new(Container {
             gap: 5.,
             padding: Sides::all(10.),
             size: (UiSize::Static(450.), UiSize::Auto),
-            background: Some(vec4(0.2, 0.2, 0.5, 1.)),
+            background: vec4(0.2, 0.2, 0.5, 1.),
             corner_radius: Corners::all(8.),
             elements: elements(|el| {
               if instant.elapsed().as_secs_f32() < 5. {

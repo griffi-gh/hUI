@@ -92,7 +92,7 @@ fn main() {
             Box::new(Container {
               gap: 5.,
               padding: Sides::all(5.),
-              background: Some(vec4(0., 0., 0., 0.5)),
+              background: vec4(0., 0., 0., 0.5),
               direction: UiDirection::Horizontal,
               elements: {
                 let mut x: Vec<Box<dyn UiElement>> = vec![];
@@ -111,7 +111,7 @@ fn main() {
               ..Default::default()
             }),
             Box::new(Container {
-              background: Some(vec4(1., 0., 0., 1.)),
+              background: vec4(1., 0., 0., 1.),
               padding: Sides {
                 top: 10.,
                 bottom: 20.,

@@ -3,25 +3,29 @@ use crate::{
   draw::{RoundedCorners, UiDrawCommand}, element::{MeasureContext, ProcessContext, UiElement}, layout::{Alignment, Alignment2d, LayoutInfo, UiDirection, UiSize}, measure::{Hints, Response}, rectangle::{Corners, Sides}
 };
 
-pub struct Border {
-  pub color: Vec4,
-  pub width: f32,
-}
+// pub struct Border {
+//   pub color: Vec4,
+//   pub width: f32,
+// }
+
+///XXX: add Order/Direction::Forward/Reverse or sth?
 
 pub struct Container {
+  //TODO: min/max size
   // pub min_size: (UiSize, UiSize),
   // pub max_size: (UiSize, UiSize),
   pub size: (UiSize, UiSize),
   pub direction: UiDirection,
-  //pub reverse: bool,
   pub gap: f32,
   pub padding: Sides<f32>,
   ///Primary/secondary axis
   pub align: Alignment2d,
   pub background: Vec4,
-  pub borders: Sides<Option<Border>>,
+  //TODO: borders
+  //pub borders: Sides<Option<Border>>,
   pub corner_radius: Corners<f32>,
-  //pub clip: bool, //TODO: clip children
+  //TODO: clip children
+  //pub clip: bool,
   pub elements: Vec<Box<dyn UiElement>>,
 }
 
@@ -32,12 +36,11 @@ impl Default for Container {
       // max_size: (UiSize::Auto, UiSize::Auto),
       size: (UiSize::Auto, UiSize::Auto),
       direction: UiDirection::Vertical,
-      //reverse: false,
       gap: 0.,
       padding: Sides::all(0.),
       align: Alignment2d::default(),
       background: Default::default(),
-      borders: Default::default(),
+      //borders: Default::default(),
       elements: Vec::new(),
       corner_radius: Corners::all(0.),
     }

@@ -12,6 +12,7 @@
 mod instance;
 pub mod layout;
 pub mod rectangle;
+pub mod background;
 pub mod element;
 pub mod event;
 pub mod input;

@@ -1,21 +1,23 @@
 use glam::{vec2, Vec4};
 use crate::{
+  background::Background,
   draw::UiDrawCommand,
   element::{MeasureContext, ProcessContext, UiElement},
+  layout::UiSize,
   measure::Response,
-  layout::UiSize
+  rectangle::Corners
 };
 
 pub struct Rect {
   pub size: (UiSize, UiSize),
-  pub color: Option<Vec4>,
+  pub color: Background,
 }
 
 impl Default for Rect {
   fn default() -> Self {
     Self {
       size: (UiSize::Static(10.), UiSize::Static(10.)),
-      color: Some(Vec4::new(0., 0., 0., 0.5)),
+      color: Vec4::new(0., 0., 0., 0.5).into(),
     }
   }
 }
@@ -41,11 +43,11 @@ impl UiElement for Rect {
   }
 
   fn process(&self, ctx: ProcessContext) {
-    if let Some(color) = self.color {
+    if !self.color.is_transparent() {
       ctx.draw.add(UiDrawCommand::Rectangle {
         position: ctx.layout.position,
         size: ctx.measure.size,
-        color,
+        color: self.color.corners().unwrap(),
         rounded_corners: None,
       });
     }

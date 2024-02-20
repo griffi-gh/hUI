@@ -77,23 +77,23 @@ fn main() {
               elements: vec![
                 Box::new(Rect {
                   size: (UiSize::Fraction(0.5), UiSize::Static(30.)),
-                  color: Some(vec4(0.75, 0., 0., 1.))
+                  color: vec4(0.75, 0., 0., 1.).into()
                 }),
                 Box::new(Rect {
                   size: (UiSize::Fraction(z / 2. + 0.5), UiSize::Static(30.)),
-                  color: Some(vec4(0., 0.75, 0., 1.))
+                  color: vec4(0., 0.75, 0., 1.).into()
                 }),
               ],
               ..Default::default()
             }),
             Box::new(Rect {
               size: (UiSize::Fraction(z / 2. + 0.5), UiSize::Static(30.)),
-              color: Some(vec4(0., 0.75, 0., 1.))
+              color: vec4(0., 0.75, 0., 1.).into()
             }),
             Box::new(Container {
               gap: 5.,
               padding: Sides::all(5.),
-              background: vec4(0., 0., 0., 0.5),
+              background: vec4(0., 0., 0., 0.5).into(),
               direction: UiDirection::Horizontal,
               elements: {
                 let mut x: Vec<Box<dyn UiElement>> = vec![];
@@ -101,9 +101,9 @@ fn main() {
                   x.push(Box::new(Rect {
                     size: (UiSize::Static(50.), UiSize::Static(50.)),
                     color: if i == 1 {
-                      Some(vec4(0.75, 0.75, 0.75, 0.75))
+                      vec4(0.75, 0.75, 0.75, 0.75).into()
                     } else {
-                      Some(vec4(0.5, 0.5, 0.5, 0.75))
+                      vec4(0.5, 0.5, 0.5, 0.75).into()
                     }
                   }));
                 }
@@ -112,7 +112,7 @@ fn main() {
               ..Default::default()
             }),
             Box::new(Container {
-              background: vec4(1., 0., 0., 1.),
+              background: vec4(1., 0., 0., 1.).into(),
               padding: Sides {
                 top: 10.,
                 bottom: 20.,
@@ -128,7 +128,7 @@ fn main() {
               elements: vec![
                 Box::new(Rect {
                   size: (UiSize::Static(50.), UiSize::Static(50.)),
-                  color: Some(vec4(1., 1., 1., 0.75))
+                  color: vec4(1., 1., 1., 0.75).into()
                 }),
               ],
               ..Default::default()

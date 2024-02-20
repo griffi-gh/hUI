@@ -1,6 +1,6 @@
 use glam::{Vec2, vec2, Vec4};
 use crate::{
-  draw::{RoundedCorners, UiDrawCommand}, element::{MeasureContext, ProcessContext, UiElement}, layout::{Alignment, Alignment2d, LayoutInfo, UiDirection, UiSize}, measure::{Hints, Response}, rectangle::{Corners, Sides}
+  background::Background, draw::{RoundedCorners, UiDrawCommand}, element::{MeasureContext, ProcessContext, UiElement}, layout::{Alignment, Alignment2d, LayoutInfo, UiDirection, UiSize}, measure::{Hints, Response}, rectangle::{Corners, Sides}
 };
 
 // pub struct Border {
@@ -9,38 +9,30 @@ use crate::{
 // }
 
 ///XXX: add Order/Direction::Forward/Reverse or sth?
+//TODO: clip children flag
+//TODO: borders
+//TODO: min/max size
 
 pub struct Container {
-  //TODO: min/max size
-  // pub min_size: (UiSize, UiSize),
-  // pub max_size: (UiSize, UiSize),
   pub size: (UiSize, UiSize),
   pub direction: UiDirection,
   pub gap: f32,
   pub padding: Sides<f32>,
-  ///Primary/secondary axis
   pub align: Alignment2d,
-  pub background: Vec4,
-  //TODO: borders
-  //pub borders: Sides<Option<Border>>,
+  pub background: Background,
   pub corner_radius: Corners<f32>,
-  //TODO: clip children
-  //pub clip: bool,
   pub elements: Vec<Box<dyn UiElement>>,
 }
 
 impl Default for Container {
   fn default() -> Self {
     Self {
-      // min_size: (UiSize::Auto, UiSize::Auto),
-      // max_size: (UiSize::Auto, UiSize::Auto),
       size: (UiSize::Auto, UiSize::Auto),
       direction: UiDirection::Vertical,
       gap: 0.,
       padding: Sides::all(0.),
       align: Alignment2d::default(),
       background: Default::default(),
-      //borders: Default::default(),
       elements: Vec::new(),
       corner_radius: Corners::all(0.),
     }
@@ -69,7 +61,6 @@ impl Container {
 impl UiElement for Container {
   fn measure(&self, ctx: MeasureContext) -> Response {
     let mut size = Vec2::ZERO;
-    //if matches!(self.size.0, UiSize::Auto) || matches!(self.size.1, UiSize::Auto) {
     let mut leftover_gap = Vec2::ZERO;
     for element in &self.elements {
       let measure = element.measure(MeasureContext{
@@ -128,11 +119,12 @@ impl UiElement for Container {
     let mut position = ctx.layout.position;
 
     //background
-    if self.background.w > 0. {
+    if !self.background.is_transparent() {
+      let corner_colors = self.background.corners().unwrap();
       ctx.draw.add(UiDrawCommand::Rectangle {
         position,
         size: ctx.measure.size,
-        color: self.background,
+        color: corner_colors,
         rounded_corners: (self.corner_radius.max_f32() > 0.).then_some({
           RoundedCorners::from_radius(self.corner_radius)
         }),

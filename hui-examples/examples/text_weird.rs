@@ -44,7 +44,7 @@ fn main() {
 
         hui.add(Container {
           size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
-          background: vec4(0.1, 0.1, 0.1, 1.),
+          background: vec4(0.1, 0.1, 0.1, 1.).into(),
           elements: elements(|elem| {
             elem.add(Text {
               text: "THIS LINE SHOULD BE SHARP!".into(),
@@ -68,11 +68,11 @@ fn main() {
             }
             elem.add(Rect {
               size: (UiSize::Fraction(1.), UiSize::Static(10.)),
-              color: Some(vec4(0., 0., 1., 1.)),
+              color: vec4(0., 0., 1., 1.).into(),
             });
             elem.add(Rect {
               size: (UiSize::Fraction(1.), UiSize::Static(10.)),
-              color: Some(vec4(1., 1., 0., 1.)),
+              color: vec4(1., 1., 0., 1.).into(),
             });
             elem.add(Text {
               text: "Hello, world!\nżółty liść. życie nie ma sensu i wszyscy zginemy;\nтест кирилиці їїїїїїїїїїї\njapanese text: テスト".into(),
@@ -83,11 +83,11 @@ fn main() {
             if instant.elapsed().as_secs() & 1 != 0 {
               elem.add(Rect {
                 size: (UiSize::Fraction(1.), UiSize::Static(10.)),
-                color: Some(vec4(1., 0., 0., 1.)),
+                color: vec4(1., 0., 0., 1.).into(),
               });
               elem.add(Rect {
                 size: (UiSize::Fraction(1.), UiSize::Static(10.)),
-                color: Some(vec4(0., 0., 0., 1.)),
+                color: vec4(0., 0., 0., 1.).into(),
               });
               elem.add(Spacer(100.));
               elem.add(Text {

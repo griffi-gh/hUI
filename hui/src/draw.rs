@@ -1,6 +1,10 @@
 //! Stuff related to tesselation and UI rendering.
 
-use crate::{IfModified, text::{TextRenderer, FontHandle}};
+use crate::{
+  rectangle::Corners,
+  text::{FontHandle, TextRenderer},
+  IfModified
+};
 
 mod corner_radius;
 
@@ -22,7 +26,7 @@ pub enum UiDrawCommand {
     ///Size in pixels
     size: Vec2,
     ///Color (RGBA)
-    color: Vec4,
+    color: Corners<Vec4>,
     ///Rounded corners
     rounded_corners: Option<RoundedCorners>,
   },
@@ -181,7 +185,7 @@ impl UiDrawPlan {
             //lol
             swapper.current_mut().vertices.push(UiVertex {
               position: *position + *size * vec2(0.5, 0.5),
-              color: *color,
+              color: (color.bottom_left + color.bottom_right + color.top_left + color.top_right) / 4.,
               uv: vec2(0., 0.),
             });
 
@@ -195,25 +199,25 @@ impl UiDrawPlan {
               //Top-right corner
               swapper.current_mut().vertices.push(UiVertex {
                 position: *position + vec2(x, 1. - y) * corner.radius.top_right + vec2(size.x - corner.radius.top_right, 0.),
-                color: *color,
+                color: color.top_right,
                 uv: vec2(0.0, 0.0),
               });
               //Bottom-right corner
               swapper.current_mut().vertices.push(UiVertex {
                 position: *position + vec2(x - 1., y) * corner.radius.bottom_right + vec2(size.x, size.y - corner.radius.bottom_right),
-                color: *color,
+                color: color.bottom_right,
                 uv: vec2(0.0, 0.0),
               });
               //Bottom-left corner
               swapper.current_mut().vertices.push(UiVertex {
                 position: *position + vec2(1. - x, y) * corner.radius.bottom_left + vec2(0., size.y - corner.radius.bottom_left),
-                color: *color,
+                color: color.bottom_left,
                 uv: vec2(0.0, 0.0),
               });
               //Top-left corner
               swapper.current_mut().vertices.push(UiVertex {
                 position: *position + vec2(1. - x, 1. - y) * corner.radius.top_left,
-                color: *color,
+                color: color.top_left,
                 uv: vec2(0.0, 0.0),
               });
               // mental illness:
@@ -263,22 +267,22 @@ impl UiDrawPlan {
             swapper.current_mut().vertices.extend([
               UiVertex {
                 position: *position,
-                color: *color,
+                color: color.top_left,
                 uv: vec2(0.0, 0.0),
               },
               UiVertex {
                 position: *position + vec2(size.x, 0.0),
-                color: *color,
+                color: color.top_right,
                 uv: vec2(1.0, 0.0),
               },
               UiVertex {
                 position: *position + *size,
-                color: *color,
+                color: color.bottom_right,
                 uv: vec2(1.0, 1.0),
               },
               UiVertex {
                 position: *position + vec2(0.0, size.y),
-                color: *color,
+                color: color.bottom_left,
                 uv: vec2(0.0, 1.0),
               },
             ]);

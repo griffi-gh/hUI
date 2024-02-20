@@ -71,7 +71,7 @@ impl UiElement for ProgressBar {
       ctx.draw.add(UiDrawCommand::Rectangle {
         position: ctx.layout.position,
         size: ctx.measure.size,
-        color: self.color_background,
+        color: Corners::all(self.color_background),
         rounded_corners
       });
     }
@@ -79,7 +79,7 @@ impl UiElement for ProgressBar {
       ctx.draw.add(UiDrawCommand::Rectangle {
         position: ctx.layout.position,
         size: ctx.measure.size * vec2(value, 1.0),
-        color: self.color_foreground,
+        color: Corners::all(self.color_foreground),
         rounded_corners,
       });
     }

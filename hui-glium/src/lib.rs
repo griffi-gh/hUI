@@ -156,6 +156,7 @@ impl GliumUiRenderer {
           const NO_FNT_TEX: &str = "Font texture exists in draw plan but not yet inited. Make sure to call update_font_texture() *before* update_draw_plan()";
           Some(Rc::clone(self.font_texture.as_ref().expect(NO_FNT_TEX)))
         },
+        Some(BindTexture::UserDefined(_)) => todo!("user defined textures are not implemented yet"),
         None => None,
       }
     }

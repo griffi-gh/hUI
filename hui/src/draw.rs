@@ -1,3 +1,5 @@
+//! Stuff related to tesselation and UI rendering.
+
 use crate::{IfModified, text::{TextRenderer, FontHandle}};
 
 mod corner_radius;
@@ -24,6 +26,7 @@ pub enum UiDrawCommand {
     ///Rounded corners
     rounded_corners: Option<RoundedCorners>,
   },
+  /// Filled, colored circle
   Circle {
     ///Position in pixels
     position: Vec2,
@@ -32,6 +35,7 @@ pub enum UiDrawCommand {
     ///Color (RGBA)
     color: Vec4,
   },
+  /// Draw text using the specified font, size, color, and position
   Text {
     ///Position in pixels
     position: Vec2,
@@ -56,12 +60,14 @@ impl UiDrawCommand {
   }
 }
 
+/// List of draw commands
 #[derive(Default)]
 pub struct UiDrawCommandList {
   pub commands: Vec<UiDrawCommand>,
 }
 
 impl UiDrawCommandList {
+  /// Add a draw command to the list
   pub fn add(&mut self, command: UiDrawCommand) {
     self.commands.push(command);
   }
@@ -74,12 +80,20 @@ impl UiDrawCommandList {
 //   }
 // }
 
+
+/// Texture to bind for a draw call
+///
+/// - FontTexture: The internally managed font texture
+/// - UserDefined: User-defined texture, value is user-defined and usually depends on the render backend
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum BindTexture {
+  /// The internally managed font texture
   FontTexture,
-  //UserDefined(usize),
+  /// User-defined texture, value is user-defined and usually depends on the render backend
+  UserDefined(usize),
 }
 
+/// A vertex for UI rendering
 #[derive(Clone, Copy, Debug, PartialEq, Default)]
 pub struct UiVertex {
   pub position: Vec2,
@@ -87,6 +101,7 @@ pub struct UiVertex {
   pub uv: Vec2,
 }
 
+/// Represents a single draw call, should be handled by the render backend
 #[derive(Default)]
 pub struct UiDrawCall {
   pub vertices: Vec<UiVertex>,
@@ -94,6 +109,7 @@ pub struct UiDrawCall {
   pub bind_texture: Option<BindTexture>,
 }
 
+/// Represents a complete UI rendering plan (a list of optimized draw calls).
 #[derive(Default)]
 pub struct UiDrawPlan {
   pub calls: Vec<UiDrawCall>
@@ -131,6 +147,7 @@ impl CallSwapper {
 }
 
 impl UiDrawPlan {
+  /// Tesselate the UI and build a complete draw plan from a list of draw commands
   pub fn build(draw_commands: &UiDrawCommandList, tr: &mut TextRenderer) -> Self {
     let mut swapper = CallSwapper::new();
     let mut prev_command: Option<&UiDrawCommand> = None;

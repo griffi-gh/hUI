@@ -5,6 +5,7 @@
 //! # Features
 #![doc = document_features::document_features!()]
 
+#![allow(unused_parens)]
 #![forbid(unsafe_code)]
 #![forbid(unsafe_op_in_unsafe_fn)]
 

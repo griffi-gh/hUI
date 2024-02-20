@@ -48,13 +48,12 @@ fn main() {
         let mom_ratio = (instant.elapsed().as_secs_f32() / 60.).powf(0.5);
 
         hui.add(Container {
-          align: (Alignment::Center, Alignment::Center),
+          align: Alignment::Center.into(),
           size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
           background: Some(vec4(0.1, 0.1, 0.1, 1.)),
           elements: vec![Box::new(Container {
             gap: 5.,
             padding: Sides::all(10.),
-            align: (Alignment::Begin, Alignment::Begin),
             size: (UiSize::Static(450.), UiSize::Auto),
             background: Some(vec4(0.2, 0.2, 0.5, 1.)),
             corner_radius: Some(Corners::all(8.)),
@@ -72,7 +71,7 @@ fn main() {
                 });
                 el.add(Container {
                   direction: UiDirection::Horizontal,
-                  align: (Alignment::End, Alignment::Center),
+                  align: (Alignment::End, Alignment::Center).into(),
                   size: (UiSize::Fraction(1.), UiSize::Auto),
                   elements: vec![Box::new(Text {
                     text: format!("{:.2}% ({:.1} GB)", mom_ratio * 100., mom_ratio * 10000.).into(),

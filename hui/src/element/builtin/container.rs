@@ -137,8 +137,15 @@ impl UiElement for Container {
     //padding
     position += vec2(self.padding.left, self.padding.top);
 
+    //convert alignment to pri/sec axis based
+    //.0 = primary, .1 = secondary
+    let pri_sec_align = match self.direction {
+      UiDirection::Horizontal => (self.align.horizontal, self.align.vertical),
+      UiDirection::Vertical => (self.align.horizontal, self.align.vertical),
+    };
+
     //alignment
-    match (self.align.0, self.direction) {
+    match (pri_sec_align.0, self.direction) {
       (Alignment::Begin, _) => (),
       (Alignment::Center, UiDirection::Horizontal) => {
         position.x += (ctx.measure.size.x - ctx.measure.hints.inner_content_size.unwrap().x) / 2. - self.padding.left;
@@ -171,7 +178,7 @@ impl UiElement for Container {
       });
 
       //align (on sec. axis)
-      match (self.align.1, self.direction) {
+      match (pri_sec_align.1, self.direction) {
         (Alignment::Begin, _) => (),
         (Alignment::Center, UiDirection::Horizontal) => {
           el_layout.position.y += (ctx.measure.size.y - self.padding.bottom - self.padding.top - el_measure.size.y) / 2.;

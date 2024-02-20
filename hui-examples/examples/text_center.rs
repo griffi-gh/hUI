@@ -40,7 +40,7 @@ fn main() {
         hui.add(Container {
           gap: 5.,
           padding: Sides::all(5.),
-          align: (Alignment::Center, Alignment::Center),
+          align: Alignment::Center.into(),
           size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
           elements: vec![
             Box::new(Text {

@@ -9,8 +9,10 @@ pub enum Alignment {
   /// (left for horizontal, top for vertical alignment)
   #[default]
   Begin = 0,
-  /// Put the element in the center of the axis
+
+  /// Put the element in the center
   Center = 1,
+
   /// Put the element at the end of the axis\
   /// (right for horizontal, bottom for vertical alignment)
   End = 2,
@@ -43,24 +45,34 @@ pub struct Alignment2d {
   pub vertical: Alignment,
 }
 
+impl Alignment2d {
+  #[inline]
+  pub const fn all(alignment: Alignment) -> Self {
+    Self {
+      horizontal: alignment,
+      vertical: alignment,
+    }
+  }
+}
+
 impl From<(Alignment, Alignment)> for Alignment2d {
+  #[inline]
   fn from((horizontal, vertical): (Alignment, Alignment)) -> Self {
     Self { horizontal, vertical }
   }
 }
 
 impl From<[Alignment; 2]> for Alignment2d {
+  #[inline]
   fn from([horizontal, vertical]: [Alignment; 2]) -> Self {
     Self { horizontal, vertical }
   }
 }
 
 impl From<Alignment> for Alignment2d {
+  #[inline]
   fn from(alignment: Alignment) -> Self {
-    Self {
-      horizontal: alignment,
-      vertical: alignment,
-    }
+    Self::all(alignment)
   }
 }
 

@@ -38,10 +38,10 @@ fn main() {
         hui.begin();
 
         hui.add(Container {
-          align: (Alignment::Center, Alignment::Center),
+          align: Alignment::Center.into(),
           size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
           elements: vec![Box::new(Container {
-            align: (Alignment::Center, Alignment::Center),
+            align: Alignment::Center.into(),
             size: (UiSize::Fraction(0.5), UiSize::Fraction(0.5)),
             background: Some(vec4(1., 0., 0., 1.)),
             corner_radius: Some(Corners {
@@ -54,7 +54,7 @@ fn main() {
               Box::new(Container {
                 padding: Sides::all(20.),
                 direction: UiDirection::Horizontal,
-                align: (Alignment::Center, Alignment::Center),
+                align: Alignment::Center.into(),
                 size: (UiSize::Auto, UiSize::Auto),
                 background: Some(vec4(0.1, 0.1, 0.1, 0.5)),
                 corner_radius: Some(Corners::all(8.)),

@@ -47,7 +47,7 @@ fn main() {
         hui.add(Container {
           gap: 5.,
           padding: Sides::all(5.),
-          align: (Alignment::Begin, Alignment::Center),
+          align: (Alignment::Begin, Alignment::Center).into(),
           size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
           elements: vec![
             Box::new(ProgressBar {
@@ -61,7 +61,7 @@ fn main() {
         hui.add(Container {
           gap: 5.,
           padding: Sides::all(5.),
-          align: (Alignment::End, Alignment::Center),
+          align: (Alignment::End, Alignment::Center).into(),
           size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
           elements: vec![
             Box::new(ProgressBar {
@@ -70,7 +70,7 @@ fn main() {
             }),
             Box::new(Container {
               size: (UiSize::Fraction(1.), UiSize::Auto),
-              align: (Alignment::Center, Alignment::End),
+              align: (Alignment::Center, Alignment::End).into(),
               padding: Sides::all(5.),
               gap: 10.,
               elements: vec![
@@ -131,7 +131,7 @@ fn main() {
                 }),
               ],
               ..Default::default()
-            })
+            }),
           ],
           ..Default::default()
         }, resolution);

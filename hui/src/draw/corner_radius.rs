@@ -1,6 +1,8 @@
 use std::num::NonZeroU16;
 use crate::rectangle::Corners;
 
+//TODO uneven corners (separate width/height for each corner)
+
 fn point_count(corners: Corners<f32>) -> NonZeroU16 {
   //Increase for higher quality
   const VTX_PER_CORER_RADIUS_PIXEL: f32 = 0.5;

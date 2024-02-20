@@ -62,6 +62,16 @@
   </tr>
   <tr>
     <td align="center">
+      <code>0.1.0-alpha.3</code>
+    </th>
+    <td>
+      <code>hui-glium = "0.1.0-alpha.3"</code><br>
+      <code>glium = "0.34"</code>
+    </td>
+    <td align="center" colspan="2">N/A</td>
+  </tr>
+  <tr>
+    <td align="center">
       <code>0.1.0-alpha.2</code>
     </th>
     <td>

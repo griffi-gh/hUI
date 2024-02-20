@@ -6,15 +6,13 @@ use winit::{
   event_loop::{EventLoopBuilder, ControlFlow}
 };
 use hui::{
-  UiInstance,
+  UiInstance, UiSize, UiDirection,
   element::{
     UiElement,
     progress_bar::ProgressBar,
     container::{Container, Sides, Alignment},
     rect::Rect
   },
-  interaction::IntoInteractable,
-  UiSize, UiDirection,
 };
 use hui_glium::GliumUiRenderer;
 
@@ -122,9 +120,7 @@ fn main() {
                 Box::new(Rect {
                   size: (UiSize::Static(50.), UiSize::Static(50.)),
                   color: Some(vec4(1., 1., 1., 0.75))
-                }.into_interactable().on_click(|| {
-                  println!("clicked");
-                }))
+                }),
               ],
               ..Default::default()
             })

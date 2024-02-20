@@ -12,6 +12,10 @@ pub struct ProgressBar {
   pub border_radius: Corners<f32>,
 }
 
+impl ProgressBar {
+  pub const DEFAULT_HEIGHT: f32 = 20.0;
+}
+
 impl Default for ProgressBar {
   fn default() -> Self {
     Self {
@@ -23,8 +27,6 @@ impl Default for ProgressBar {
     }
   }
 }
-
-const BAR_HEIGHT: f32 = 20.0;
 
 impl UiElement for ProgressBar {
   fn name(&self) -> &'static str { "Progress bar" }
@@ -38,7 +40,7 @@ impl UiElement for ProgressBar {
           UiSize::Static(p) => p,
         },
         match self.size.1 {
-          UiSize::Auto => BAR_HEIGHT,
+          UiSize::Auto => Self::DEFAULT_HEIGHT,
           UiSize::Fraction(p) => ctx.layout.max_size.y * p,
           UiSize::Static(p) => p,
         }
@@ -52,7 +54,18 @@ impl UiElement for ProgressBar {
     let value = self.value.clamp(0., 1.);
     let rounded_corners =
       (self.border_radius.max_f32() > 0.).then_some({
-        RoundedCorners::from_radius(self.border_radius)
+        //HACK: fix clipping issues; //todo: get rid of this
+        let mut radii = self.border_radius;
+        let width = ctx.measure.size.x * value;
+        if width <= radii.max_f32() * 2. {
+          radii.bottom_right = 0.;
+          radii.top_right = 0.;
+        }
+        if width <= radii.max_f32() {
+          radii.bottom_left = 0.;
+          radii.top_left = 0.;
+        }
+        RoundedCorners::from_radius(radii)
       });
     if value < 1. {
       ctx.draw.add(UiDrawCommand::Rectangle {

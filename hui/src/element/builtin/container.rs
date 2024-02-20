@@ -21,7 +21,7 @@ pub struct Container {
   pub background: Vec4,
   pub borders: Sides<Option<Border>>,
   pub corner_radius: Corners<f32>,
-  //pub clip: bool, //TODO clip children
+  //pub clip: bool, //TODO: clip children
   pub elements: Vec<Box<dyn UiElement>>,
 }
 

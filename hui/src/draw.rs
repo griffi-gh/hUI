@@ -185,7 +185,7 @@ impl UiDrawPlan {
               uv: vec2(0., 0.),
             });
 
-            //TODO: fix some corners tris being invisible (close enough lol)
+            //TODO: fix some corners tris being invisible (but it's already close enough lol)
             let rounded_corner_verts = corner.point_count.get() as u32;
             for i in 0..rounded_corner_verts {
               let cratio = i as f32 / rounded_corner_verts as f32;

@@ -2,7 +2,7 @@ use glam::vec2;
 use hui::{event::UiEvent, UiInstance};
 use winit::event::{Event, WindowEvent};
 
-//TODO: window id
+//TODO: check window id
 pub fn handle_winit_event<T>(ui: &mut UiInstance, event: &Event<T>) {
   if let Event::WindowEvent { event, .. } = event {
     match event {
@@ -24,7 +24,7 @@ pub fn handle_winit_event<T>(ui: &mut UiInstance, event: &Event<T>) {
           },
         })
       },
-      //TODO keyboard
+      //TODO: translate keyboard input
       _ => (),
     }
   }

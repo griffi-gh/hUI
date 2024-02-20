@@ -66,6 +66,7 @@ fn main() {
           elements: vec![
             Box::new(ProgressBar {
               value: z,
+              border_radius: Corners::all(0.25 * ProgressBar::DEFAULT_HEIGHT),
               ..Default::default()
             }),
             Box::new(Container {

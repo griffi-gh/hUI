@@ -56,7 +56,7 @@ fn main() {
             padding: Sides::all(10.),
             size: (UiSize::Static(450.), UiSize::Auto),
             background: Some(vec4(0.2, 0.2, 0.5, 1.)),
-            corner_radius: Some(Corners::all(8.)),
+            corner_radius: Corners::all(8.),
             elements: elements(|el| {
               if instant.elapsed().as_secs_f32() < 5. {
                 el.add(Text {

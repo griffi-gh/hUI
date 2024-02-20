@@ -118,12 +118,12 @@ fn main() {
                 left: 30.,
                 right: 40.,
               },
-              corner_radius: Some(Corners {
+              corner_radius: Corners {
                 top_left: 0.,
                 top_right: 30.,
                 bottom_left: 0.,
                 bottom_right: 0.,
-              }),
+              },
               elements: vec![
                 Box::new(Rect {
                   size: (UiSize::Static(50.), UiSize::Static(50.)),

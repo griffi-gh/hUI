@@ -20,7 +20,7 @@ pub struct Container {
   pub align: Alignment2d,
   pub background: Option<Vec4>,
   pub borders: Sides<Option<Border>>,
-  pub corner_radius: Option<Corners<f32>>,
+  pub corner_radius: Corners<f32>,
   //pub clip: bool, //TODO clip children
   pub elements: Vec<Box<dyn UiElement>>,
 }
@@ -39,7 +39,7 @@ impl Default for Container {
       background: Default::default(),
       borders: Default::default(),
       elements: Vec::new(),
-      corner_radius: None,
+      corner_radius: Corners::all(0.),
     }
   }
 }
@@ -130,7 +130,9 @@ impl UiElement for Container {
         position,
         size: ctx.measure.size,
         color,
-        rounded_corners: self.corner_radius.map(RoundedCorners::from_radius),
+        rounded_corners: (self.corner_radius.max_f32() > 0.).then_some({
+          RoundedCorners::from_radius(self.corner_radius)
+        }),
       });
     }
 

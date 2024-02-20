@@ -5,9 +5,11 @@ use winit::{
   event_loop::{EventLoopBuilder, ControlFlow}
 };
 use hui::{
-  UiInstance, UiSize,
+  UiInstance,
+  rectangle::Sides,
+  layout::{UiSize, Alignment},
   element::{
-    container::{Alignment, Container, Sides},
+    container::Container,
     text::Text,
   }
 };

@@ -7,12 +7,13 @@ use winit::{
 };
 use hui::{
   UiInstance,
+  layout::UiSize,
+  rectangle::Sides,
   element::{
-    UiElement,
+    container::Container,
     progress_bar::ProgressBar,
-    container::{Container, Sides}
+    UiElement
   },
-  UiSize
 };
 use hui_glium::GliumUiRenderer;
 

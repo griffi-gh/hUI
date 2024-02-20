@@ -2,7 +2,7 @@ use crate::{IfModified, text::{TextRenderer, FontHandle}};
 
 mod corner_radius;
 
-pub use corner_radius::{CornerRadius, RoundedCorners};
+pub use corner_radius::RoundedCorners;
 use std::borrow::Cow;
 use fontdue::layout::{Layout, CoordinateSystem, TextStyle};
 use glam::{Vec2, Vec4, vec2};
@@ -157,7 +157,7 @@ impl UiDrawPlan {
       match command {
         UiDrawCommand::Rectangle { position, size, color, rounded_corners } => {
           let vidx = swapper.current().vertices.len() as u32;
-          if let Some(corner) = rounded_corners.filter(|x| x.radius.max() > 0.0) {
+          if let Some(corner) = rounded_corners.filter(|x| x.radius.max_f32() > 0.0) {
             //this code is stupid as fuck
 
             //Random vert in the center for no reason
@@ -271,6 +271,10 @@ impl UiDrawPlan {
           todo!("circle draw command not implemented yet")
         },
         UiDrawCommand::Text { position, size, color, text, font } => {
+          if text.is_empty() {
+            continue
+          }
+
           //XXX: should we be doing this every time?
           let mut layout = Layout::new(CoordinateSystem::PositiveYDown);
           layout.append(
@@ -314,12 +318,20 @@ impl UiDrawPlan {
                 uv: vec2(p0x, p1y),
               },
             ]);
+            #[cfg(all(
+              feature = "pixel_perfect_text",
+              not(feature = "pixel_perfect")
+            ))] {
+              for vtx in &mut swapper.current_mut().vertices[(vidx as usize)..] {
+                vtx.position = vtx.position.round()
+              }
+            }
           }
         }
       }
       #[cfg(feature = "pixel_perfect")]
       swapper.current_mut().vertices.iter_mut().for_each(|v| {
-        v.position = v.position.floor()
+        v.position = v.position.round()
       });
       prev_command = Some(command);
     }

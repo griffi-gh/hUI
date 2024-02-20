@@ -26,14 +26,18 @@ nz = "0.3"
 document-features = "0.2"
 
 [features]
-default = ["builtin_elements", "builtin_font", "pixel_perfect"]
+default = ["builtin_elements", "builtin_font", "pixel_perfect_text"]
 ## Enable the built-in font (ProggyTiny, adds 35kb to the executable)
 builtin_font = []
 ## Enable the built-in elements (`Container`, `ProgressBar`, etc.)\
 builtin_elements = ["builtin_container"]
 ## Enable only the `Container` component (which is essential for laying out other components)
 builtin_container = []
-## Round vertex positions to nearest integer coordinates (fixes blurry text)
-pixel_perfect = []
-
-#parallel = ["dep:rayon", "fontdue/parallel"]
+## Round all vertex positions to nearest integer coordinates (not recommended)
+pixel_perfect = ["pixel_perfect_text"]
+## Apply pixel-perfect rendering hack to text (fixes blurry text rendering)
+pixel_perfect_text = []
+#! Make sure to disable the `pixel_perfect` feature if you are rendering UI in 3D space\
+#! or using DPI (or any other form of) scaling while passing the virtual resolution to the ui
+# ## Enable multi-threading support (currently only affects some 3rd-party libraries)
+# parallel = ["fontdue/parallel"]

@@ -10,6 +10,8 @@
 
 use std::collections::VecDeque;
 
+pub mod layout;
+pub mod rectangle;
 pub mod element;
 pub mod event;
 pub mod input;
@@ -17,8 +19,9 @@ pub mod draw;
 pub mod measure;
 pub mod state;
 pub mod text;
-pub mod interaction;
 
+use layout::{UiDirection, UiSize, LayoutInfo};
+use rectangle::{Corners, Sides};
 use element::{MeasureContext, ProcessContext, UiElement};
 use event::UiEvent;
 use state::StateRepo;
@@ -122,35 +125,20 @@ impl Default for UiInstance {
   }
 }
 
-#[derive(Default, Debug, Clone, Copy)]
-pub enum UiSize {
-  #[default]
-  Auto,
-  Fraction(f32),
-  Static(f32),
-}
-
-#[derive(Default, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum UiDirection {
-  #[default]
-  Vertical,
-  Horizontal,
-}
-
-pub struct LayoutInfo {
-  ///Not availabe during measuring step
-  pub position: Vec2,
-  pub max_size: Vec2,
-  pub direction: UiDirection,
-}
-
+#[allow(deprecated)]
+#[deprecated(since = "0.1.0-alpha.3", note = "will be removed in the next release")]
 pub struct ElementList(Vec<Box<dyn UiElement>>);
 
+#[allow(deprecated)]
+#[deprecated(since = "0.1.0-alpha.3", note = "will be removed in the next release")]
 impl ElementList {
   pub fn add(&mut self, element: impl UiElement + 'static) {
     self.0.push(Box::new(element));
   }
 }
+
+#[allow(deprecated)]
+#[deprecated(since = "0.1.0-alpha.3", note = "will be removed in the next release")]
 pub fn elements(f: impl FnOnce(&mut ElementList)) -> Vec<Box<dyn UiElement>> {
   let mut elements = ElementList(Vec::new());
   f(&mut elements);

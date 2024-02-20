@@ -6,13 +6,12 @@ use winit::{
   event_loop::{EventLoopBuilder, ControlFlow}
 };
 use hui::{
-  UiInstance,
+  UiInstance, elements,
+  layout::UiSize,
   element::{
     container::Container,
     text::Text, rect::Rect, spacer::Spacer
   },
-  UiSize,
-  elements,
 };
 use hui_glium::GliumUiRenderer;
 

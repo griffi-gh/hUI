@@ -1,51 +1,15 @@
 use glam::{Vec2, vec2, Vec4};
 use crate::{
-  draw::{CornerRadius, RoundedCorners, UiDrawCommand},
+  layout::{Alignment, LayoutInfo, UiDirection, UiSize},
+  rectangle::{Corners, Sides},
+  draw::{RoundedCorners, UiDrawCommand},
   element::{MeasureContext, ProcessContext, UiElement},
   measure::{Hints, Response},
-  LayoutInfo, UiDirection, UiSize
 };
-
-#[derive(Clone, Copy, PartialEq, Eq, Debug)]
-pub enum Alignment {
-  Begin,
-  Center,
-  End,
-}
 
 pub struct Border {
   pub color: Vec4,
   pub width: f32,
-}
-
-#[derive(Default, Clone, Copy, PartialEq, Eq, Debug)]
-pub struct Sides<T> {
-  pub top: T,
-  pub bottom: T,
-  pub left: T,
-  pub right: T,
-}
-
-impl<T: Clone> Sides<T> {
-  #[inline]
-  pub fn all(value: T) -> Self {
-    Self {
-      top: value.clone(),
-      bottom: value.clone(),
-      left: value.clone(),
-      right: value,
-    }
-  }
-
-  #[inline]
-  pub fn horizontal_vertical(horizontal: T, vertical: T) -> Self {
-    Self {
-      top: vertical.clone(),
-      bottom: vertical,
-      left: horizontal.clone(),
-      right: horizontal,
-    }
-  }
 }
 
 pub struct Container {
@@ -62,7 +26,7 @@ pub struct Container {
   pub borders: Sides<Option<Border>>,
   //pub clip: bool, //TODO clip children
   pub elements: Vec<Box<dyn UiElement>>,
-  pub corner_radius: Option<CornerRadius>,
+  pub corner_radius: Option<Corners<f32>>,
 }
 
 impl Default for Container {

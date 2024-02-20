@@ -5,10 +5,13 @@ use winit::{
   event_loop::{EventLoopBuilder, ControlFlow}
 };
 use hui::{
-  draw::CornerRadius, element::{
-    container::{Alignment, Container, Sides},
+  UiInstance,
+  layout::{Alignment, UiSize, UiDirection},
+  rectangle::{Corners, Sides},
+  element::{
+    container::Container,
     text::Text
-  }, UiDirection, UiInstance, UiSize
+  },
 };
 use hui_glium::GliumUiRenderer;
 
@@ -41,7 +44,7 @@ fn main() {
             align: (Alignment::Center, Alignment::Center),
             size: (UiSize::Fraction(0.5), UiSize::Fraction(0.5)),
             background: Some(vec4(1., 0., 0., 1.)),
-            corner_radius: Some(CornerRadius {
+            corner_radius: Some(Corners {
               top_left: 10.,
               top_right: 20.,
               bottom_left: 50.,
@@ -54,7 +57,7 @@ fn main() {
                 align: (Alignment::Center, Alignment::Center),
                 size: (UiSize::Auto, UiSize::Auto),
                 background: Some(vec4(0.1, 0.1, 0.1, 0.5)),
-                corner_radius: Some(CornerRadius::all(8.)),
+                corner_radius: Some(Corners::all(8.)),
                 elements: vec![
                   Box::new(Text {
                     text: "Corners".into(),

@@ -6,9 +6,14 @@ use winit::{
   event_loop::{EventLoopBuilder, ControlFlow}
 };
 use hui::{
-  draw::CornerRadius, element::{
-    container::{Alignment, Container, Sides}, progress_bar::ProgressBar, text::Text
-  }, elements, UiDirection, UiInstance, UiSize
+  UiInstance, elements,
+  layout::{Alignment, UiDirection, UiSize},
+  rectangle::{Corners, Sides},
+  element::{
+    container::Container,
+    progress_bar::ProgressBar,
+    text::Text,
+  },
 };
 use hui_glium::GliumUiRenderer;
 
@@ -52,7 +57,7 @@ fn main() {
             align: (Alignment::Begin, Alignment::Begin),
             size: (UiSize::Static(450.), UiSize::Auto),
             background: Some(vec4(0.2, 0.2, 0.5, 1.)),
-            corner_radius: Some(CornerRadius::all(8.)),
+            corner_radius: Some(Corners::all(8.)),
             elements: elements(|el| {
               if instant.elapsed().as_secs_f32() < 5. {
                 el.add(Text {

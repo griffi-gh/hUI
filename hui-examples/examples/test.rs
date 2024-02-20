@@ -6,11 +6,13 @@ use winit::{
   event_loop::{EventLoopBuilder, ControlFlow}
 };
 use hui::{
-  UiInstance, UiSize, UiDirection,
+  UiInstance,
+  layout::{Alignment, UiSize, UiDirection},
+  rectangle::{Sides, Corners},
   element::{
     UiElement,
     progress_bar::ProgressBar,
-    container::{Container, Sides, Alignment},
+    container::Container,
     rect::Rect
   },
 };
@@ -116,6 +118,12 @@ fn main() {
                 left: 30.,
                 right: 40.,
               },
+              corner_radius: Some(Corners {
+                top_left: 0.,
+                top_right: 30.,
+                bottom_left: 0.,
+                bottom_right: 0.,
+              }),
               elements: vec![
                 Box::new(Rect {
                   size: (UiSize::Static(50.), UiSize::Static(50.)),

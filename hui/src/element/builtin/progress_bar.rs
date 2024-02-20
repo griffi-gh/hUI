@@ -1,9 +1,6 @@
 use glam::{vec2, Vec4, vec4};
 use crate::{
-  draw::UiDrawCommand,
-  element::{MeasureContext, ProcessContext, UiElement},
-  measure::Response,
-  layout::UiSize
+  draw::{RoundedCorners, UiDrawCommand}, element::{MeasureContext, ProcessContext, UiElement}, layout::UiSize, measure::Response, rectangle::Corners
 };
 
 #[derive(Debug, Clone, Copy)]
@@ -12,6 +9,7 @@ pub struct ProgressBar {
   pub value: f32,
   pub color_foreground: Vec4,
   pub color_background: Vec4,
+  pub border_radius: Corners<f32>,
 }
 
 impl Default for ProgressBar {
@@ -21,6 +19,7 @@ impl Default for ProgressBar {
       value: 0.,
       color_foreground: vec4(0.0, 0.0, 1.0, 1.0),
       color_background: vec4(0.0, 0.0, 0.0, 1.0),
+      border_radius: Corners::all(0.),
     }
   }
 }
@@ -51,12 +50,16 @@ impl UiElement for ProgressBar {
 
   fn process(&self, ctx: ProcessContext) {
     let value = self.value.clamp(0., 1.);
+    let rounded_corners =
+      (self.border_radius.max_f32() > 0.).then_some({
+        RoundedCorners::from_radius(self.border_radius)
+      });
     if value < 1. {
       ctx.draw.add(UiDrawCommand::Rectangle {
         position: ctx.layout.position,
         size: ctx.measure.size,
         color: self.color_background,
-        rounded_corners: None,
+        rounded_corners
       });
     }
     if value > 0. {
@@ -64,7 +67,7 @@ impl UiElement for ProgressBar {
         position: ctx.layout.position,
         size: ctx.measure.size * vec2(value, 1.0),
         color: self.color_foreground,
-        rounded_corners: None,
+        rounded_corners,
       });
     }
   }

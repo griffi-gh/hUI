@@ -84,7 +84,7 @@ fn main() {
                   color: Corners::left_right(
                     vec4(1., 0., 0., 1.),
                     vec4(0., 1., 0., 1.)
-                  ).into()
+                  ).into(),
                 }),
               ],
               ..Default::default()

@@ -1,6 +1,6 @@
 <p></p><p></p>
 <img src="https://raw.githubusercontent.com/griffi-gh/hui/master/.assets/hui.svg" width="120" align="left">
-<h1>huї</h1>
+<h1>hui</h1>
 <div>
   <span>
     Simple UI library for games and other interactive applications

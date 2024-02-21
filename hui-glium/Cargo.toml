@@ -15,8 +15,7 @@ include = [
 ]
 
 [dependencies]
-#hack: hui doesn't compile without the builtin_font feature due to a bug
-hui = { version = "=0.1.0-alpha.4", path = "../hui", default-features = false, features = ["builtin_font"] }
+hui = { version = "=0.1.0-alpha.4", path = "../hui", default-features = false }
 glium = { version = "0.34", default-features = false }
 glam = "0.25"
 log = "0.4"

@@ -6,6 +6,12 @@ pub struct FontHandle(pub(crate) usize);
 #[cfg(feature = "builtin_font")]
 pub const BUILTIN_FONT: FontHandle = FontHandle(0);
 
+
+pub(crate) const DEFAULT_FONT: FontHandle = {
+  #[cfg(feature = "builtin_font")] { BUILTIN_FONT }
+  #[cfg(not(feature = "builtin_font"))] { FontHandle(0) }
+};
+
 #[cfg(feature = "builtin_font")]
 const BUILTIN_FONT_DATA: &[u8] = include_bytes!("../../assets/font/ProggyTiny.ttf");
 

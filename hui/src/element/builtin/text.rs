@@ -1,12 +1,9 @@
 use std::borrow::Cow;
 use glam::{vec2, Vec4};
 use crate::{
-  draw::UiDrawCommand,
-  element::{MeasureContext, ProcessContext, UiElement},
-  measure::Response,
-  text::{FontHandle, BUILTIN_FONT},
-  layout::UiSize
+  draw::UiDrawCommand, element::{MeasureContext, ProcessContext, UiElement}, layout::UiSize, measure::Response, text::{FontHandle, DEFAULT_FONT}
 };
+
 
 //TODO: text fit
 // pub enum TextSize {
@@ -29,7 +26,7 @@ impl Default for Text {
       text: "".into(),
       size: (UiSize::Auto, UiSize::Auto),
       color: Vec4::new(1., 1., 1., 1.),
-      font: BUILTIN_FONT,
+      font: DEFAULT_FONT,
       text_size: 16,
     }
   }

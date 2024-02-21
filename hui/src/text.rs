@@ -4,7 +4,10 @@ mod font;
 mod ftm;
 
 use font::FontManager;
-pub use font::{FontHandle, BUILTIN_FONT};
+pub use font::FontHandle;
+#[cfg(feature="builtin_font")]
+pub use font::BUILTIN_FONT;
+pub(crate) use font::DEFAULT_FONT;
 use fontdue::{Font, FontSettings};
 use ftm::FontTextureManager;
 pub use ftm::{FontTextureInfo, GlyphCacheEntry};

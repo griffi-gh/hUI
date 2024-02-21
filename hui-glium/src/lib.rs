@@ -11,7 +11,7 @@ use glium::{
 };
 use hui::{
   UiInstance,
-  draw::{UiDrawPlan, UiVertex, BindTexture},
+  draw::{UiDrawCall, UiVertex, BindTexture},
   text::FontTextureInfo, IfModified,
 };
 
@@ -48,10 +48,20 @@ struct BufferPair {
 
 impl BufferPair {
   pub fn new<F: Facade>(facade: &F) -> Self {
-    log::debug!("init ui buffers...");
+    log::debug!("init ui buffers (empty)...");
     Self {
       vertex_buffer: VertexBuffer::empty_dynamic(facade, 1024).unwrap(),
       index_buffer: IndexBuffer::empty_dynamic(facade, PrimitiveType::TrianglesList, 1024).unwrap(),
+      vertex_count: 0,
+      index_count: 0,
+    }
+  }
+
+  pub fn new_with_data<F: Facade>(facade: &F, vtx: &[Vertex], idx: &[u32]) -> Self {
+    log::debug!("init ui buffers (data)...");
+    Self {
+      vertex_buffer: VertexBuffer::dynamic(facade, vtx).unwrap(),
+      index_buffer: IndexBuffer::dynamic(facade, PrimitiveType::TrianglesList, idx).unwrap(),
       vertex_count: 0,
       index_count: 0,
     }
@@ -106,18 +116,12 @@ impl BufferPair {
   }
 }
 
-struct GlDrawCall {
-  active: bool,
-  buffer: BufferPair,
-  bind_texture: Option<Rc<SrgbTexture2d>>,
-}
-
 pub struct GliumUiRenderer {
   context: Rc<Context>,
   program: glium::Program,
   program_tex: glium::Program,
-  font_texture: Option<Rc<SrgbTexture2d>>,
-  plan: Vec<GlDrawCall>,
+  ui_texture: Option<Rc<SrgbTexture2d>>,
+  buffer_pair: Option<BufferPair>,
 }
 
 impl GliumUiRenderer {
@@ -127,44 +131,33 @@ impl GliumUiRenderer {
       program: Program::from_source(facade, VERTEX_SHADER, FRAGMENT_SHADER, None).unwrap(),
       program_tex: Program::from_source(facade, VERTEX_SHADER, FRAGMENT_SHADER_TEX, None).unwrap(),
       context: Rc::clone(facade.get_context()),
-      font_texture: None,
-      plan: vec![]
+      ui_texture: None,
+      buffer_pair: None,
     }
   }
 
-  pub fn update_draw_plan(&mut self, plan: &UiDrawPlan) {
-    if plan.calls.len() > self.plan.len() {
-      self.plan.resize_with(plan.calls.len(), || {
-        GlDrawCall {
-          buffer: BufferPair::new(&self.context),
-          bind_texture: None,
-          active: false,
-        }
-      });
-    } else {
-      for step in &mut self.plan[plan.calls.len()..] {
-        step.active = false;
-      }
+  pub fn update_draw_plan(&mut self, call: &UiDrawCall) {
+    let data_vtx = &call.vertices.iter().copied().map(Vertex::from).collect::<Vec<_>>()[..];
+    let data_idx = &call.indices[..];
+    if let Some(buffer) = &mut self.buffer_pair {
+      buffer.write_data(data_vtx, data_idx);
+    } else if !call.indices.is_empty() {
+      self.buffer_pair = Some(BufferPair::new_with_data(&self.context, data_vtx, data_idx));
     }
-    for (idx, call) in plan.calls.iter().enumerate() {
-      let data_vtx = &call.vertices.iter().copied().map(Vertex::from).collect::<Vec<_>>()[..];
-      let data_idx = &call.indices[..];
-      self.plan[idx].active = true;
-      self.plan[idx].buffer.write_data(data_vtx, data_idx);
-      self.plan[idx].bind_texture = match call.bind_texture {
-        Some(BindTexture::FontTexture) => {
-          const NO_FNT_TEX: &str = "Font texture exists in draw plan but not yet inited. Make sure to call update_font_texture() *before* update_draw_plan()";
-          Some(Rc::clone(self.font_texture.as_ref().expect(NO_FNT_TEX)))
-        },
-        Some(BindTexture::UserDefined(_)) => todo!("user defined textures are not implemented yet"),
-        None => None,
-      }
-    }
+
+    // self.plan[0].bind_texture = match call.bind_texture {
+    //   Some(BindTexture::FontTexture) => {
+    //     const NO_FNT_TEX: &str = "Font texture exists in draw plan but not yet inited. Make sure to call update_font_texture() *before* update_draw_plan()";
+    //     Some(Rc::clone(self.font_texture.as_ref().expect(NO_FNT_TEX)))
+    //   },
+    //   Some(BindTexture::UserDefined(_)) => todo!("user defined textures are not implemented yet"),
+    //   None => None,
+    // }
   }
 
-  pub fn update_font_texture(&mut self, font_texture: &FontTextureInfo) {
+  pub fn update_ui_texture(&mut self, font_texture: &FontTextureInfo) {
     log::debug!("updating font texture");
-    self.font_texture = Some(Rc::new(SrgbTexture2d::new(
+    self.ui_texture = Some(Rc::new(SrgbTexture2d::new(
       &self.context,
       RawImage2d::from_raw_rgba(
         font_texture.data.to_owned(),
@@ -175,9 +168,9 @@ impl GliumUiRenderer {
 
   pub fn update(&mut self, hui: &UiInstance) {
     if let Some(texture) = hui.font_texture().if_modified() {
-      self.update_font_texture(texture);
+      self.update_ui_texture(texture);
     }
-    if let Some(plan) = hui.draw_plan().if_modified() {
+    if let Some(plan) = hui.draw_call().if_modified() {
       self.update_draw_plan(plan);
     }
   }
@@ -188,43 +181,41 @@ impl GliumUiRenderer {
       ..Default::default()
     };
 
-    for step in &self.plan {
-      if !step.active {
-        continue
+    if let Some(buffer) = &self.buffer_pair {
+      if buffer.is_empty() {
+        return
       }
 
-      if step.buffer.is_empty() {
-        continue
-      }
+      let vtx_buffer = buffer.vertex_buffer.slice(0..buffer.vertex_count).unwrap();
+      let idx_buffer = buffer.index_buffer.slice(0..buffer.index_count).unwrap();
 
-      let vtx_buffer = step.buffer.vertex_buffer.slice(0..step.buffer.vertex_count).unwrap();
-      let idx_buffer = step.buffer.index_buffer.slice(0..step.buffer.index_count).unwrap();
+      frame.draw(
+        vtx_buffer,
+        idx_buffer,
+        &self.program_tex,
+        &uniform! {
+          resolution: resolution.to_array(),
+          tex: Sampler(self.ui_texture.as_ref().unwrap().as_ref(), SamplerBehavior {
+            wrap_function: (SamplerWrapFunction::Clamp, SamplerWrapFunction::Clamp, SamplerWrapFunction::Clamp),
+            ..Default::default()
+          }),
+        },
+        &params,
+      ).unwrap();
 
-      if let Some(bind_texture) = step.bind_texture.as_ref() {
-        frame.draw(
-          vtx_buffer,
-          idx_buffer,
-          &self.program_tex,
-          &uniform! {
-            resolution: resolution.to_array(),
-            tex: Sampler(bind_texture.as_ref(), SamplerBehavior {
-              wrap_function: (SamplerWrapFunction::Clamp, SamplerWrapFunction::Clamp, SamplerWrapFunction::Clamp),
-              ..Default::default()
-            }),
-          },
-          &params,
-        ).unwrap();
-      } else {
-        frame.draw(
-          vtx_buffer,
-          idx_buffer,
-          &self.program,
-          &uniform! {
-            resolution: resolution.to_array(),
-          },
-          &params,
-        ).unwrap();
-      }
+      // if let Some(bind_texture) = call.bind_texture.as_ref() {
+
+      // } else {
+      //   frame.draw(
+      //     vtx_buffer,
+      //     idx_buffer,
+      //     &self.program,
+      //     &uniform! {
+      //       resolution: resolution.to_array(),
+      //     },
+      //     &params,
+      //   ).unwrap();
+      // }
     }
   }
 }

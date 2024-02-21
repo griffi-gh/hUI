@@ -6,6 +6,7 @@ use crate::{
   IfModified
 };
 
+mod atlas;
 mod corner_radius;
 
 pub use corner_radius::RoundedCorners;
@@ -54,16 +55,6 @@ pub enum UiDrawCommand {
   },
 }
 
-impl UiDrawCommand {
-  fn texture_eq_index(&self) -> u64 {
-    match self {
-      UiDrawCommand::Rectangle { .. } |
-      UiDrawCommand::Circle { .. } => u64::MAX - 1,
-      UiDrawCommand::Text { .. } => u64::MAX - 2,
-    }
-  }
-}
-
 /// List of draw commands
 #[derive(Default)]
 pub struct UiDrawCommandList {
@@ -110,80 +101,22 @@ pub struct UiVertex {
 pub struct UiDrawCall {
   pub vertices: Vec<UiVertex>,
   pub indices: Vec<u32>,
-  pub bind_texture: Option<BindTexture>,
 }
 
-/// Represents a complete UI rendering plan (a list of optimized draw calls).
-#[derive(Default)]
-pub struct UiDrawPlan {
-  pub calls: Vec<UiDrawCall>
-}
-
-struct CallSwapper {
-  calls: Vec<UiDrawCall>,
-  call: UiDrawCall,
-}
-
-impl CallSwapper {
-  pub fn new() -> Self {
-    Self {
-      calls: vec![],
-      call: UiDrawCall::default(),
-    }
-  }
-
-  pub fn current(&self) -> &UiDrawCall {
-    &self.call
-  }
-
-  pub fn current_mut(&mut self) -> &mut UiDrawCall {
-    &mut self.call
-  }
-
-  pub fn swap(&mut self) {
-    self.calls.push(std::mem::take(&mut self.call));
-  }
-
-  pub fn finish(mut self) -> Vec<UiDrawCall> {
-    self.calls.push(self.call);
-    self.calls
-  }
-}
-
-impl UiDrawPlan {
+impl UiDrawCall {
   /// Tesselate the UI and build a complete draw plan from a list of draw commands
   pub fn build(draw_commands: &UiDrawCommandList, tr: &mut TextRenderer) -> Self {
-    let mut swapper = CallSwapper::new();
-    let mut prev_command: Option<&UiDrawCommand> = None;
+    let mut draw_call = UiDrawCall::default();
     for command in &draw_commands.commands {
-      let do_swap = if let Some(prev_command) = prev_command {
-        //std::mem::discriminant(prev_command) != std::mem::discriminant(command)
-        prev_command.texture_eq_index() != command.texture_eq_index()
-      } else {
-        false
-      };
-
-      if do_swap {
-        swapper.swap();
-      }
-
-      if do_swap || prev_command.is_none() {
-        swapper.current_mut().bind_texture =  match command {
-          UiDrawCommand::Rectangle { .. } |
-          UiDrawCommand::Circle { .. } => None,
-          UiDrawCommand::Text { .. } => Some(BindTexture::FontTexture),
-        }
-      }
-
       match command {
         UiDrawCommand::Rectangle { position, size, color, rounded_corners } => {
-          let vidx = swapper.current().vertices.len() as u32;
+          let vidx = draw_call.vertices.len() as u32;
           if let Some(corner) = rounded_corners.filter(|x| x.radius.max_f32() > 0.0) {
             //this code is stupid as fuck
 
             //Random vert in the center for no reason
             //lol
-            swapper.current_mut().vertices.push(UiVertex {
+            draw_call.vertices.push(UiVertex {
               position: *position + *size * vec2(0.5, 0.5),
               color: (color.bottom_left + color.bottom_right + color.top_left + color.top_right) / 4.,
               uv: vec2(0., 0.),
@@ -197,32 +130,32 @@ impl UiDrawPlan {
               let x = angle.sin();
               let y = angle.cos();
               //Top-right corner
-              swapper.current_mut().vertices.push(UiVertex {
+              draw_call.vertices.push(UiVertex {
                 position: *position + vec2(x, 1. - y) * corner.radius.top_right + vec2(size.x - corner.radius.top_right, 0.),
                 color: color.top_right,
                 uv: vec2(0.0, 0.0),
               });
               //Bottom-right corner
-              swapper.current_mut().vertices.push(UiVertex {
+              draw_call.vertices.push(UiVertex {
                 position: *position + vec2(x - 1., y) * corner.radius.bottom_right + vec2(size.x, size.y - corner.radius.bottom_right),
                 color: color.bottom_right,
                 uv: vec2(0.0, 0.0),
               });
               //Bottom-left corner
-              swapper.current_mut().vertices.push(UiVertex {
+              draw_call.vertices.push(UiVertex {
                 position: *position + vec2(1. - x, y) * corner.radius.bottom_left + vec2(0., size.y - corner.radius.bottom_left),
                 color: color.bottom_left,
                 uv: vec2(0.0, 0.0),
               });
               //Top-left corner
-              swapper.current_mut().vertices.push(UiVertex {
+              draw_call.vertices.push(UiVertex {
                 position: *position + vec2(1. - x, 1. - y) * corner.radius.top_left,
                 color: color.top_left,
                 uv: vec2(0.0, 0.0),
               });
               // mental illness:
               if i > 0 {
-                swapper.current_mut().indices.extend([
+                draw_call.indices.extend([
                   //Top-right corner
                   vidx,
                   vidx + 1 + (i - 1) * 4,
@@ -244,7 +177,7 @@ impl UiDrawPlan {
             }
             //Fill in the rest
             //mental illness 2:
-            swapper.current_mut().indices.extend([
+            draw_call.indices.extend([
               //Top
               vidx,
               vidx + 4,
@@ -263,8 +196,8 @@ impl UiDrawPlan {
               vidx + 2,
             ]);
           } else {
-            swapper.current_mut().indices.extend([vidx, vidx + 1, vidx + 2, vidx, vidx + 2, vidx + 3]);
-            swapper.current_mut().vertices.extend([
+            draw_call.indices.extend([vidx, vidx + 1, vidx + 2, vidx, vidx + 2, vidx + 3]);
+            draw_call.vertices.extend([
               UiVertex {
                 position: *position,
                 color: color.top_left,
@@ -313,15 +246,15 @@ impl UiDrawPlan {
               tr.font_texture().size.x as f32,
               tr.font_texture().size.y as f32
             );
-            let vidx = swapper.current().vertices.len() as u32;
+            let vidx = draw_call.vertices.len() as u32;
             let glyph = tr.glyph(*font, layout_glyph.parent, layout_glyph.key.px as u8);
             //rpos_x += glyph.metrics.advance_width;//glyph.metrics.advance_width;
-            swapper.current_mut().indices.extend([vidx, vidx + 1, vidx + 2, vidx, vidx + 2, vidx + 3]);
+            draw_call.indices.extend([vidx, vidx + 1, vidx + 2, vidx, vidx + 2, vidx + 3]);
             let p0x = glyph.position.x as f32 / font_texture_size.0;
             let p1x = (glyph.position.x + glyph.size.x as i32) as f32 / font_texture_size.0;
             let p0y = glyph.position.y as f32 / font_texture_size.1;
             let p1y = (glyph.position.y + glyph.size.y as i32) as f32 / font_texture_size.1;
-            swapper.current_mut().vertices.extend([
+            draw_call.vertices.extend([
               UiVertex {
                 position: *position + vec2(layout_glyph.x, layout_glyph.y),
                 color: *color,
@@ -347,27 +280,24 @@ impl UiDrawPlan {
               feature = "pixel_perfect_text",
               not(feature = "pixel_perfect")
             ))] {
-              for vtx in &mut swapper.current_mut().vertices[(vidx as usize)..] {
+              for vtx in &mut draw_call.vertices[(vidx as usize)..] {
                 vtx.position = vtx.position.round()
               }
             }
           }
         }
       }
-      #[cfg(feature = "pixel_perfect")]
-      swapper.current_mut().vertices.iter_mut().for_each(|v| {
-        v.position = v.position.round()
-      });
-      prev_command = Some(command);
     }
-    Self {
-      calls: swapper.finish()
-    }
+    #[cfg(feature = "pixel_perfect")]
+    draw_call.vertices.iter_mut().for_each(|v| {
+      v.position = v.position.round()
+    });
+    draw_call
   }
 }
 
-impl IfModified<UiDrawPlan> for (bool, &UiDrawPlan) {
-  fn if_modified(&self) -> Option<&UiDrawPlan> {
+impl IfModified<UiDrawCall> for (bool, &UiDrawCall) {
+  fn if_modified(&self) -> Option<&UiDrawCall> {
     match self.0 {
       true => Some(self.1),
       false => None,

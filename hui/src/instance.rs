@@ -5,7 +5,7 @@ use crate:: {
   element::{MeasureContext, ProcessContext, UiElement},
   event::UiEvent,
   state::StateRepo,
-  draw::{UiDrawCommandList, UiDrawPlan},
+  draw::{UiDrawCommandList, UiDrawCall},
   text::{TextRenderer, FontTextureInfo, FontHandle},
 };
 
@@ -17,8 +17,8 @@ pub struct UiInstance {
   //event_queue: VecDeque<UiEvent>,
   prev_draw_commands: UiDrawCommandList,
   draw_commands: UiDrawCommandList,
-  draw_plan: UiDrawPlan,
-  draw_plan_modified: bool,
+  draw_call: UiDrawCall,
+  draw_call_modified: bool,
   text_renderer: TextRenderer,
   events: VecDeque<UiEvent>,
 }
@@ -35,8 +35,8 @@ impl UiInstance {
       // root_elements: Vec::new(),
       prev_draw_commands: UiDrawCommandList::default(),
       draw_commands: UiDrawCommandList::default(),
-      draw_plan: UiDrawPlan::default(),
-      draw_plan_modified: false,
+      draw_call: UiDrawCall::default(),
+      draw_call_modified: false,
       // ftm: FontTextureManager::default(),
       text_renderer: TextRenderer::new(),
       events: VecDeque::new(),
@@ -78,7 +78,7 @@ impl UiInstance {
   /// You must call this function at the beginning of the frame, before adding any elements
   pub fn begin(&mut self) {
     std::mem::swap(&mut self.prev_draw_commands, &mut self.draw_commands);
-    self.draw_plan_modified = false;
+    self.draw_call_modified = false;
     self.draw_commands.commands.clear();
     self.text_renderer.reset_frame();
   }
@@ -90,18 +90,18 @@ impl UiInstance {
     if self.draw_commands.commands == self.prev_draw_commands.commands {
       return
     }
-    self.draw_plan = UiDrawPlan::build(&self.draw_commands, &mut self.text_renderer);
-    self.draw_plan_modified = true;
+    self.draw_call = UiDrawCall::build(&self.draw_commands, &mut self.text_renderer);
+    self.draw_call_modified = true;
   }
 
-  /// Get the draw plan (a list of draw calls) for the current frame
+  /// Get the draw call for the current frame
   ///
   /// This function should only be used by the render backend.\
   /// You should not call this directly unless you're implementing a custom render backend
   ///
   /// Returns a tuple with a boolean indicating if the draw plan was modified since the last frame
-  pub fn draw_plan(&self) -> (bool, &UiDrawPlan) {
-    (self.draw_plan_modified, &self.draw_plan)
+  pub fn draw_call(&self) -> (bool, &UiDrawCall) {
+    (self.draw_call_modified, &self.draw_call)
   }
 
   /// Get the font texture for the current frame

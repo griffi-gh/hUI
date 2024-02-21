@@ -8,11 +8,12 @@ use crate::{
   layout::UiSize
 };
 
-pub enum TextSize {
-  FitToWidthRatio(f32),
-  FitToHeightRatio(f32),
-  Constant(u8),
-}
+//TODO: text fit
+// pub enum TextSize {
+//   FitToWidthRatio(f32),
+//   FitToHeightRatio(f32),
+//   Constant(u8),
+// }
 
 pub struct Text {
   pub text: Cow<'static, str>,

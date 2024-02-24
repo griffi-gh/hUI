@@ -6,10 +6,13 @@ use crate::{
   IfModified
 };
 
-mod atlas;
-mod corner_radius;
+pub(crate) mod atlas;
+//pub(crate) use atlas::{TextureAllocation, TextureAtlasManager};
+//pub use atlas::TextureHandle;
 
+mod corner_radius;
 pub use corner_radius::RoundedCorners;
+
 use std::borrow::Cow;
 use fontdue::layout::{Layout, CoordinateSystem, TextStyle};
 use glam::{Vec2, Vec4, vec2};
@@ -296,6 +299,7 @@ impl UiDrawCall {
   }
 }
 
+#[allow(deprecated)]
 impl IfModified<UiDrawCall> for (bool, &UiDrawCall) {
   fn if_modified(&self) -> Option<&UiDrawCall> {
     match self.0 {

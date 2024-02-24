@@ -3,7 +3,11 @@ use hashbrown::HashMap;
 use nohash_hasher::BuildNoHashHasher;
 use rect_packer::DensePacker;
 
+use crate::IfModified;
+
 const CHANNEL_COUNT: u32 = 4;
+//TODO: make this work
+const ALLOW_ROTATION: bool = false;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct TextureHandle {
@@ -27,15 +31,20 @@ pub(crate) struct TextureAllocation {
   pub rotated: bool,
 }
 
+/// Manages a texture atlas and the allocation of space within it\
+/// The atlas is alllowed to grow and resize dynamically, as needed
 pub(crate) struct TextureAtlasManager {
   packer: DensePacker,
   count: u32,
   size: UVec2,
   data: Vec<u8>,
   allocations: HashMap<u32, TextureAllocation, BuildNoHashHasher<u32>>,
+  modified: bool,
 }
 
 impl TextureAtlasManager {
+  /// Create a new texture atlas with the specified size\
+  /// 512x512 is a good default size for most applications, and the texture atlas can grow dynamically as needed
   pub fn new(size: UVec2) -> Self {
     Self {
       packer: DensePacker::new(size.x as i32, size.y as i32),
@@ -43,9 +52,11 @@ impl TextureAtlasManager {
       size: UVec2::new(0, 0),
       data: vec![0; (size.x * size.y * CHANNEL_COUNT) as usize],
       allocations: HashMap::default(),
+      modified: true,
     }
   }
 
+  /// Resize the texture atlas to the new size in-place, preserving the existing data
   pub fn resize(&mut self, new_size: UVec2) {
     if new_size.x > self.size.x && new_size.y > self.size.y{
       self.packer.resize(new_size.x as i32, new_size.y as i32);
@@ -65,13 +76,15 @@ impl TextureAtlasManager {
       todo!("Atlas downscaling is not implemented yet");
     }
     self.size = new_size;
+    self.modified = true;
   }
 
   /// Allocate a new texture region in the atlas and return a handle to it\
   /// Returns None if the texture could not be allocated due to lack of space\
-  /// Use `allocate_resize` to allocate a texture and resize the atlas if necessary
-  fn allocate(&mut self, size: UVec2) -> Option<TextureHandle> {
-    let result = self.packer.pack(size.x as i32, size.y as i32, true)?;
+  /// Use `allocate` to allocate a texture and resize the atlas if necessary\
+  /// Does not modify the texture data
+  fn try_allocate(&mut self, size: UVec2) -> Option<TextureHandle> {
+    let result = self.packer.pack(size.x as i32, size.y as i32, ALLOW_ROTATION)?;
     let index = self.count;
     self.count += 1;
     let allocation = TextureAllocation {
@@ -79,28 +92,30 @@ impl TextureAtlasManager {
       position: UVec2::new(result.x as u32, result.y as u32),
       size,
       //If the size does not match the requested size, the texture was rotated
-      rotated: result.width != size.x as i32,
+      rotated: ALLOW_ROTATION && (result.width != size.x as i32),
     };
     self.allocations.insert_unique_unchecked(index, allocation);
     Some(TextureHandle { index })
   }
 
   /// Allocate a new texture region in the atlas and resize the atlas if necessary\
-  /// This function should never fail under normal circumstances.
-  fn allocate_resize(&mut self, size: UVec2) -> TextureHandle {
+  /// This function should never fail under normal circumstances.\
+  /// May modify the texture data if the atlas is resized
+  pub fn allocate(&mut self, size: UVec2) -> TextureHandle {
     let mut new_size = self.size;
     while !self.packer.can_pack(size.x as i32, size.y as i32, true) {
       new_size *= 2;
       self.packer.resize(new_size.x as i32, new_size.y as i32);
     }
     self.resize(new_size);
-    self.allocate(size).unwrap()
+    self.try_allocate(size).unwrap()
   }
 
-  /// Allocate a new texture region in the atlas and copy the data into it
+  /// Allocate a new texture region in the atlas and copy the data into it\
+  /// This function may resize the atlas as needed, and should never fail under normal circumstances.
   pub fn add(&mut self, width: usize, data: &[u8]) -> TextureHandle {
     let size = uvec2(width as u32, (data.len() / (width * CHANNEL_COUNT as usize)) as u32);
-    let handle = self.allocate_resize(size);
+    let handle = self.allocate(size);
     let allocation = self.allocations.get_mut(&handle.index).unwrap();
     assert!(!allocation.rotated, "Rotated textures are not implemented yet");
     for y in 0..size.y {
@@ -130,10 +145,33 @@ impl TextureAtlasManager {
   pub fn get(&self, handle: TextureHandle) -> Option<&TextureAllocation> {
     self.allocations.get(&handle.index)
   }
+
+  /// Reset the `is_modified` flag
+  pub fn reset_modified(&mut self) {
+    self.modified = false;
+  }
+
+  /// Returns true if the atlas has been modified since the last call to `reset_modified`\
+  /// If this function returns true, the texture atlas should be re-uploaded to the GPU\
+  /// This function is mostly useful for developers of graphics backends
+  pub fn is_modified(&self) -> bool {
+    self.modified
+  }
 }
 
 impl Default for TextureAtlasManager {
+  /// Create a new texture atlas with a default size of 512x512
   fn default() -> Self {
     Self::new(UVec2::new(512, 512))
+  }
+}
+
+#[allow(deprecated)]
+impl<'a> IfModified<TextureAtlasManager> for TextureAtlasManager {
+  fn if_modified(&self) -> Option<&Self> {
+    match self.modified {
+      true => Some(self),
+      false => None,
+    }
   }
 }

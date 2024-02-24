@@ -12,6 +12,8 @@ use fontdue::{Font, FontSettings};
 use ftm::FontTextureManager;
 pub use ftm::{FontTextureInfo, GlyphCacheEntry};
 
+use crate::draw::atlas::TextureAtlasManager;
+
 pub struct TextRenderer {
   fm: FontManager,
   ftm: FontTextureManager,
@@ -29,16 +31,8 @@ impl TextRenderer {
     self.fm.add_font(Font::from_bytes(font, FontSettings::default()).unwrap())
   }
 
-  pub fn reset_frame(&mut self) {
-    self.ftm.reset_modified();
-  }
-
-  pub fn font_texture(&self) -> FontTextureInfo {
-    self.ftm.info()
-  }
-
-  pub fn glyph(&mut self, font_handle: FontHandle, character: char, size: u8) -> Arc<GlyphCacheEntry> {
-    self.ftm.glyph(&self.fm, font_handle, character, size)
+  pub fn glyph(&mut self, atlas: &mut TextureAtlasManager, font_handle: FontHandle, character: char, size: u8) -> Arc<GlyphCacheEntry> {
+    self.ftm.glyph(&self.fm, atlas, font_handle, character, size)
   }
 
   pub(crate) fn internal_font(&self, handle: FontHandle) -> &Font {

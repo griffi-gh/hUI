@@ -1,11 +1,7 @@
 use std::sync::Arc;
 use fontdue::Metrics;
-use glam::UVec2;
 use hashbrown::HashMap;
-use crate::{
-  draw::atlas::{TextureAtlasManager, TextureHandle},
-  IfModified
-};
+use crate::draw::atlas::{TextureAtlasManager, TextureHandle};
 
 use super::font::{FontHandle, FontManager};
 
@@ -51,8 +47,8 @@ impl FontTextureManager {
     }
     let font = font_manager.get(font_handle).unwrap();
     let (metrics, bitmap) = font.rasterize(character, size as f32);
-    log::debug!("rasterized glyph: {}, {:?}, {:?}", character, metrics, bitmap);
-    let texture = atlas.add(metrics.width, &bitmap);
+    log::trace!("rasterized glyph: {}, {:?}, {:?}", character, metrics, bitmap);
+    let texture = atlas.add_grayscale(metrics.width, &bitmap);
     let entry = Arc::new(GlyphCacheEntry {
       metrics,
       texture

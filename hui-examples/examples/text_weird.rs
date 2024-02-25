@@ -6,7 +6,7 @@ use winit::{
   event_loop::{EventLoopBuilder, ControlFlow}
 };
 use hui::{
-  UiInstance, elements,
+  UiInstance,
   layout::UiSize,
   element::{
     container::Container,
@@ -14,6 +14,12 @@ use hui::{
   },
 };
 use hui_glium::GliumUiRenderer;
+
+fn elements(mut f: impl FnMut(&mut Vec<Box<dyn hui::element::UiElement>>)) -> Vec<Box<dyn hui::element::UiElement>> {
+  let mut e = vec![];
+  f(&mut e);
+  e
+}
 
 fn main() {
   kubi_logging::init();
@@ -25,7 +31,7 @@ fn main() {
   let mut hui = UiInstance::new();
   let mut backend = GliumUiRenderer::new(&display);
 
-  let font_handle = hui.add_font_from_bytes(include_bytes!("../assets/roboto/Roboto-Regular.ttf"));
+  let font_handle = hui.add_font(include_bytes!("../assets/roboto/Roboto-Regular.ttf"));
   let instant = Instant::now();
 
   event_loop.run(|event, window_target| {
@@ -46,56 +52,56 @@ fn main() {
           size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
           background: vec4(0.1, 0.1, 0.1, 1.).into(),
           elements: elements(|elem| {
-            elem.add(Text {
+            elem.push(Box::new(Text {
               text: "THIS LINE SHOULD BE SHARP!".into(),
               ..Default::default()
-            });
-            elem.add(Text {
+            }));
+            elem.push(Box::new(Text {
               text: "THIS LINE SHOULD BE SHARP!".into(),
               text_size: 32,
               ..Default::default()
-            });
-            elem.add(Text {
+            }));
+            elem.push(Box::new(Text {
               text: "All lines except 3 and 6 below will be blurry:".into(),
               ..Default::default()
-            });
+            }));
             for size in [9, 12, 16, 18, 24, 32] {
-              elem.add(Text {
+              elem.push(Box::new(Text {
                 text: "Testing default font, Proggy Tiny".into(),
                 text_size: size,
                 ..Default::default()
-              });
+              }));
             }
-            elem.add(Rect {
+            elem.push(Box::new(Rect {
               size: (UiSize::Fraction(1.), UiSize::Static(10.)),
               color: vec4(0., 0., 1., 1.).into(),
-            });
-            elem.add(Rect {
+            }));
+            elem.push(Box::new(Rect {
               size: (UiSize::Fraction(1.), UiSize::Static(10.)),
               color: vec4(1., 1., 0., 1.).into(),
-            });
-            elem.add(Text {
+            }));
+            elem.push(Box::new(Text {
               text: "Hello, world!\nżółty liść. życie nie ma sensu i wszyscy zginemy;\nтест кирилиці їїїїїїїїїїї\njapanese text: テスト".into(),
               font: font_handle,
               text_size: 32,
               ..Default::default()
-            });
+            }));
             if instant.elapsed().as_secs() & 1 != 0 {
-              elem.add(Rect {
+              elem.push(Box::new(Rect {
                 size: (UiSize::Fraction(1.), UiSize::Static(10.)),
                 color: vec4(1., 0., 0., 1.).into(),
-              });
-              elem.add(Rect {
+              }));
+              elem.push(Box::new(Rect {
                 size: (UiSize::Fraction(1.), UiSize::Static(10.)),
                 color: vec4(0., 0., 0., 1.).into(),
-              });
-              elem.add(Spacer(100.));
-              elem.add(Text {
+              }));
+              elem.push(Box::new(Spacer(100.)));
+              elem.push(Box::new(Text {
                 text: "FLAG SHOULD NOT OVERLAP WITH TEXT".into(),
                 text_size: 64,
                 color: vec4(1., 0., 1., 1.),
                 ..Default::default()
-              });
+              }));
             }
           }),
           ..Default::default()

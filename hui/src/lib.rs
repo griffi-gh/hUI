@@ -22,9 +22,3 @@ pub mod state;
 pub mod text;
 
 pub use instance::UiInstance;
-
-#[deprecated(since = "0.1.0-alpha.4", note = "will be removed in the next release")]
-pub trait IfModified<T> {
-  #[deprecated(since = "0.1.0-alpha.4", note = "will be removed in the next release")]
-  fn if_modified(&self) -> Option<&T>;
-}

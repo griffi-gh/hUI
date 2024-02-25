@@ -10,7 +10,7 @@ pub use font::BUILTIN_FONT;
 pub(crate) use font::DEFAULT_FONT;
 use fontdue::{Font, FontSettings};
 use ftm::FontTextureManager;
-pub use ftm::{FontTextureInfo, GlyphCacheEntry};
+pub use ftm::GlyphCacheEntry;
 
 use crate::draw::atlas::TextureAtlasManager;
 
@@ -32,7 +32,7 @@ impl TextRenderer {
   }
 
   pub fn glyph(&mut self, atlas: &mut TextureAtlasManager, font_handle: FontHandle, character: char, size: u8) -> Arc<GlyphCacheEntry> {
-    self.ftm.glyph(&self.fm, atlas, font_handle, character, size)
+    self.ftm.glyph(atlas, &self.fm, font_handle, character, size)
   }
 
   pub(crate) fn internal_font(&self, handle: FontHandle) -> &Font {
@@ -55,7 +55,7 @@ pub struct TextMeasureResponse {
 pub struct TextMeasure<'a>(&'a TextRenderer);
 
 impl<'a> TextMeasure<'a> {
-  pub fn measure(&self, font: FontHandle, size: u8, text: &str) -> TextMeasureResponse {
+  pub fn measure(&self, font: FontHandle, size: u16, text: &str) -> TextMeasureResponse {
     use fontdue::layout::{Layout, CoordinateSystem, TextStyle};
     let mut layout = Layout::new(CoordinateSystem::PositiveYDown);
     layout.append(
@@ -79,7 +79,7 @@ impl TextRenderer {
     TextMeasure(self)
   }
 
-  pub fn measure(&self, font: FontHandle, size: u8, text: &str) -> TextMeasureResponse {
+  pub fn measure(&self, font: FontHandle, size: u16, text: &str) -> TextMeasureResponse {
     TextMeasure(self).measure(font, size, text)
   }
 }

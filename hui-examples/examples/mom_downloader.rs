@@ -6,7 +6,7 @@ use winit::{
   event_loop::{EventLoopBuilder, ControlFlow}
 };
 use hui::{
-  UiInstance, elements,
+  UiInstance,
   layout::{Alignment, UiDirection, UiSize},
   rectangle::{Corners, Sides},
   element::{
@@ -16,6 +16,12 @@ use hui::{
   },
 };
 use hui_glium::GliumUiRenderer;
+
+fn elements(mut f: impl FnMut(&mut Vec<Box<dyn hui::element::UiElement>>)) -> Vec<Box<dyn hui::element::UiElement>> {
+  let mut e = vec![];
+  f(&mut e);
+  e
+}
 
 fn main() {
   kubi_logging::init();
@@ -27,7 +33,7 @@ fn main() {
   let mut hui = UiInstance::new();
   let mut backend = GliumUiRenderer::new(&display);
 
-  let font_handle = hui.add_font_from_bytes(include_bytes!("../assets/roboto/Roboto-Regular.ttf"));
+  let font_handle = hui.add_font(include_bytes!("../assets/roboto/Roboto-Regular.ttf"));
 
   let instant = Instant::now();
 
@@ -59,18 +65,18 @@ fn main() {
             corner_radius: Corners::all(8.),
             elements: elements(|el| {
               if instant.elapsed().as_secs_f32() < 5. {
-                el.add(Text {
+                el.push(Box::new(Text {
                   text: "Downloading your mom...".into(),
                   font: font_handle,
                   text_size: 24,
                   ..Default::default()
-                });
-                el.add(ProgressBar {
+                }));
+                el.push(Box::new(ProgressBar {
                   value: mom_ratio,
                   corner_radius: Corners::all(0.125 * ProgressBar::DEFAULT_HEIGHT),
                   ..Default::default()
-                });
-                el.add(Container {
+                }));
+                el.push(Box::new(Container {
                   direction: UiDirection::Horizontal,
                   align: (Alignment::End, Alignment::Center).into(),
                   size: (UiSize::Fraction(1.), UiSize::Auto),
@@ -81,21 +87,21 @@ fn main() {
                     ..Default::default()
                   })],
                   ..Default::default()
-                });
+                }));
               } else if instant.elapsed().as_secs() < 10 {
-                el.add(Text {
+                el.push(Box::new(Text {
                   text: "Error 413: Request Entity Too Large".into(),
                   font: font_handle,
                   color: vec4(1., 0.125, 0.125, 1.),
                   text_size: 20,
                   ..Default::default()
-                });
-                el.add(Text {
+                }));
+                el.push(Box::new(Text {
                   text: format!("Exiting in {}...", 10 - instant.elapsed().as_secs()).into(),
                   font: font_handle,
                   text_size: 16,
                   ..Default::default()
-                });
+                }));
               } else {
                 window_target.exit();
               }

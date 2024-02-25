@@ -1,13 +1,18 @@
-use glam::{uvec2, UVec2};
+use glam::{uvec2, vec2, UVec2, Vec2};
 use hashbrown::HashMap;
 use nohash_hasher::BuildNoHashHasher;
 use rect_packer::DensePacker;
-
-use crate::IfModified;
+use crate::rectangle::Corners;
 
 const CHANNEL_COUNT: u32 = 4;
 //TODO: make this work
 const ALLOW_ROTATION: bool = false;
+
+pub struct TextureAtlasMeta<'a> {
+  pub data: &'a [u8],
+  pub size: UVec2,
+  pub modified: bool,
+}
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub struct TextureHandle {
@@ -22,13 +27,13 @@ pub(crate) struct TextureAllocation {
   pub index: u32,
 
   /// Position in the texture atlas
-  pub position: UVec2,
+  pub(crate) position: UVec2,
 
   /// Requested texture size
   pub size: UVec2,
 
   /// True if the texture was rotated by 90 degrees
-  pub rotated: bool,
+  pub(crate) rotated: bool,
 }
 
 /// Manages a texture atlas and the allocation of space within it\
@@ -39,25 +44,35 @@ pub(crate) struct TextureAtlasManager {
   size: UVec2,
   data: Vec<u8>,
   allocations: HashMap<u32, TextureAllocation, BuildNoHashHasher<u32>>,
+  /// True if the atlas has been modified in a way which requires a texture reupload
+  /// since the beginning of the current frame
   modified: bool,
 }
 
 impl TextureAtlasManager {
   /// Create a new texture atlas with the specified size\
   /// 512x512 is a good default size for most applications, and the texture atlas can grow dynamically as needed
+  /// By default, the texture atlas gets initialized with a single white pixel texture
   pub fn new(size: UVec2) -> Self {
-    Self {
+    let mut tmp = Self {
       packer: DensePacker::new(size.x as i32, size.y as i32),
       count: 0,
-      size: UVec2::new(0, 0),
+      size,
       data: vec![0; (size.x * size.y * CHANNEL_COUNT) as usize],
       allocations: HashMap::default(),
       modified: true,
-    }
+    };
+    tmp.add(1, &[255,255,255,255]);
+    tmp
   }
 
   /// Resize the texture atlas to the new size in-place, preserving the existing data
   pub fn resize(&mut self, new_size: UVec2) {
+    log::trace!("resizing texture atlas to {:?}", new_size);
+    if self.size == new_size {
+      log::warn!("Texture atlas is already the requested size");
+      return
+    }
     if new_size.x > self.size.x && new_size.y > self.size.y{
       self.packer.resize(new_size.x as i32, new_size.y as i32);
       //Resize the data array in-place
@@ -84,6 +99,7 @@ impl TextureAtlasManager {
   /// Use `allocate` to allocate a texture and resize the atlas if necessary\
   /// Does not modify the texture data
   fn try_allocate(&mut self, size: UVec2) -> Option<TextureHandle> {
+    log::trace!("Allocating texture of size {:?}", size);
     let result = self.packer.pack(size.x as i32, size.y as i32, ALLOW_ROTATION)?;
     let index = self.count;
     self.count += 1;
@@ -107,7 +123,9 @@ impl TextureAtlasManager {
       new_size *= 2;
       self.packer.resize(new_size.x as i32, new_size.y as i32);
     }
-    self.resize(new_size);
+    if new_size != self.size {
+      self.resize(new_size);
+    }
     self.try_allocate(size).unwrap()
   }
 
@@ -115,8 +133,8 @@ impl TextureAtlasManager {
   /// This function may resize the atlas as needed, and should never fail under normal circumstances.
   pub fn add(&mut self, width: usize, data: &[u8]) -> TextureHandle {
     let size = uvec2(width as u32, (data.len() / (width * CHANNEL_COUNT as usize)) as u32);
-    let handle = self.allocate(size);
-    let allocation = self.allocations.get_mut(&handle.index).unwrap();
+    let handle: TextureHandle = self.allocate(size);
+    let allocation = self.allocations.get(&handle.index).unwrap();
     assert!(!allocation.rotated, "Rotated textures are not implemented yet");
     for y in 0..size.y {
       for x in 0..size.x {
@@ -127,6 +145,26 @@ impl TextureAtlasManager {
         }
       }
     }
+    self.modified = true;
+    handle
+  }
+
+  /// Works the same way as [`TextureAtlasManager::add`], but the input data is assumed to be grayscale (1 channel per pixel)\
+  /// The data is copied into the alpha channel of the texture, while all the other channels are set to 255\
+  /// May resize the atlas as needed, and should never fail under normal circumstances.
+  pub fn add_grayscale(&mut self, width: usize, data: &[u8]) -> TextureHandle {
+    let size = uvec2(width as u32, (data.len() / width) as u32);
+    let handle = self.allocate(size);
+    let allocation = self.allocations.get(&handle.index).unwrap();
+    assert!(!allocation.rotated, "Rotated textures are not implemented yet");
+    for y in 0..size.y {
+      for x in 0..size.x {
+        let src_idx = (y * size.x + x) as usize;
+        let dst_idx = (((allocation.position.y + y) * self.size.x + allocation.position.x + x) * CHANNEL_COUNT) as usize;
+        self.data[dst_idx..(dst_idx + CHANNEL_COUNT as usize)].copy_from_slice(&[255, 255, 255, data[src_idx]]);
+      }
+    }
+    self.modified = true;
     handle
   }
 
@@ -138,24 +176,42 @@ impl TextureAtlasManager {
     todo!()
   }
 
-  pub fn atlas_size(&self) -> UVec2 {
-    self.size
-  }
-
   pub fn get(&self, handle: TextureHandle) -> Option<&TextureAllocation> {
     self.allocations.get(&handle.index)
   }
 
+  pub(crate) fn get_uv(&self, handle: TextureHandle) -> Corners<Vec2> {
+    let info = self.get(handle).unwrap();
+    let atlas_size = self.meta().size.as_vec2();
+    let p0x = info.position.x as f32 / atlas_size.x;
+    let p1x = (info.position.x as f32 + info.size.x as f32) / atlas_size.x;
+    let p0y = info.position.y as f32 / atlas_size.y;
+    let p1y = (info.position.y as f32 + info.size.y as f32) / atlas_size.y;
+    Corners {
+      top_left: vec2(p0x, p0y),
+      top_right: vec2(p1x, p0y),
+      bottom_left: vec2(p0x, p1y),
+      bottom_right: vec2(p1x, p1y),
+    }
+  }
+
   /// Reset the `is_modified` flag
-  pub fn reset_modified(&mut self) {
+  pub(crate) fn reset_modified(&mut self) {
     self.modified = false;
   }
 
-  /// Returns true if the atlas has been modified since the last call to `reset_modified`\
-  /// If this function returns true, the texture atlas should be re-uploaded to the GPU\
-  /// This function is mostly useful for developers of graphics backends
+  /// Returns true if the atlas has been modified since the beginning of the current frame\
+  /// If this function returns true, the texture atlas should be re-uploaded to the GPU before rendering\
   pub fn is_modified(&self) -> bool {
     self.modified
+  }
+
+  pub fn meta(&self) -> TextureAtlasMeta {
+    TextureAtlasMeta {
+      data: &self.data,
+      size: self.size,
+      modified: self.modified,
+    }
   }
 }
 
@@ -163,15 +219,5 @@ impl Default for TextureAtlasManager {
   /// Create a new texture atlas with a default size of 512x512
   fn default() -> Self {
     Self::new(UVec2::new(512, 512))
-  }
-}
-
-#[allow(deprecated)]
-impl<'a> IfModified<TextureAtlasManager> for TextureAtlasManager {
-  fn if_modified(&self) -> Option<&Self> {
-    match self.modified {
-      true => Some(self),
-      false => None,
-    }
   }
 }

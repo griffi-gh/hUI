@@ -1,12 +1,15 @@
 use std::collections::VecDeque;
 use glam::Vec2;
-use crate:: {
-  layout::{UiDirection, LayoutInfo},
+use crate::{
+  draw::{
+    atlas::{TextureAtlasManager, TextureAtlasMeta},
+    UiDrawCall, UiDrawCommandList,
+  },
   element::{MeasureContext, ProcessContext, UiElement},
   event::UiEvent,
+  layout::{LayoutInfo, UiDirection},
   state::StateRepo,
-  draw::{UiDrawCommandList, UiDrawCall},
-  text::{TextRenderer, FontTextureInfo, FontHandle},
+  text::{FontHandle, TextRenderer}
 };
 
 /// The main instance of the UI system.\
@@ -20,6 +23,7 @@ pub struct UiInstance {
   draw_call: UiDrawCall,
   draw_call_modified: bool,
   text_renderer: TextRenderer,
+  atlas: TextureAtlasManager,
   events: VecDeque<UiEvent>,
 }
 
@@ -39,13 +43,19 @@ impl UiInstance {
       draw_call_modified: false,
       // ftm: FontTextureManager::default(),
       text_renderer: TextRenderer::new(),
+      atlas: {
+        let mut atlas = TextureAtlasManager::default();
+        //HACK: Ensure that vec(0, 0) uv is white square
+        atlas.add_grayscale(1, &[255]);
+        atlas
+      },
       events: VecDeque::new(),
     }
   }
 
   /// Parse and add a font from a raw byte slice to the UI\
   /// Returns a font handle.
-  pub fn add_font_from_bytes(&mut self, font: &[u8]) -> FontHandle {
+  pub fn add_font(&mut self, font: &[u8]) -> FontHandle {
     self.text_renderer.add_font_from_bytes(font)
   }
 
@@ -80,7 +90,7 @@ impl UiInstance {
     std::mem::swap(&mut self.prev_draw_commands, &mut self.draw_commands);
     self.draw_call_modified = false;
     self.draw_commands.commands.clear();
-    self.text_renderer.reset_frame();
+    self.atlas.reset_modified();
   }
 
   /// End the frame and prepare the UI for rendering
@@ -90,29 +100,29 @@ impl UiInstance {
     if self.draw_commands.commands == self.prev_draw_commands.commands {
       return
     }
-    self.draw_call = UiDrawCall::build(&self.draw_commands, &mut self.text_renderer);
+    self.draw_call = UiDrawCall::build(&self.draw_commands, &mut self.atlas, &mut self.text_renderer);
     self.draw_call_modified = true;
   }
 
-  /// Get the draw call for the current frame
+  /// Get the draw call information for the current frame
   ///
   /// This function should only be used by the render backend.\
   /// You should not call this directly unless you're implementing a custom render backend
   ///
-  /// Returns a tuple with a boolean indicating if the draw plan was modified since the last frame
+  /// Returns a tuple with a boolean indicating if the buffers have been modified since the last frame
   pub fn draw_call(&self) -> (bool, &UiDrawCall) {
     (self.draw_call_modified, &self.draw_call)
   }
 
-  /// Get the font texture for the current frame
+  /// Get the texture atlas size and data for the current frame
   ///
   /// This function should only be used by the render backend.\
   /// You should not call this directly unless you're implementing a custom render backend
   ///
-  /// Make sure to check `FontTextureInfo::modified` to see if the texture was modified
-  /// since the last frame before uploading it to the GPU
-  pub fn font_texture(&self) -> FontTextureInfo {
-    self.text_renderer.font_texture()
+  /// Make sure to check [`TextureAtlasMeta::modified`] to see if the texture has been modified
+  /// since the beginning of the current frame before uploading it to the GPU
+  pub fn atlas(&self) -> TextureAtlasMeta {
+    self.atlas.meta()
   }
 
   /// Push a platform event to the UI event queue

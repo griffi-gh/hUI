@@ -10,14 +10,11 @@ use glium::{
   uniform, uniforms::{Sampler, SamplerBehavior, SamplerWrapFunction},
 };
 use hui::{
-  UiInstance,
-  draw::{UiDrawCall, UiVertex, BindTexture},
-  text::FontTextureInfo, IfModified,
+  draw::{TextureAtlasMeta, UiDrawCall, UiVertex}, UiInstance
 };
 
 const VERTEX_SHADER: &str = include_str!("../shaders/vertex.vert");
 const FRAGMENT_SHADER: &str = include_str!("../shaders/fragment.frag");
-const FRAGMENT_SHADER_TEX: &str = include_str!("../shaders/fragment_tex.frag");
 
 #[derive(Clone, Copy)]
 #[repr(C)]
@@ -119,7 +116,6 @@ impl BufferPair {
 pub struct GliumUiRenderer {
   context: Rc<Context>,
   program: glium::Program,
-  program_tex: glium::Program,
   ui_texture: Option<Rc<SrgbTexture2d>>,
   buffer_pair: Option<BufferPair>,
 }
@@ -129,7 +125,6 @@ impl GliumUiRenderer {
     log::info!("initializing hui glium backend");
     Self {
       program: Program::from_source(facade, VERTEX_SHADER, FRAGMENT_SHADER, None).unwrap(),
-      program_tex: Program::from_source(facade, VERTEX_SHADER, FRAGMENT_SHADER_TEX, None).unwrap(),
       context: Rc::clone(facade.get_context()),
       ui_texture: None,
       buffer_pair: None,
@@ -144,34 +139,25 @@ impl GliumUiRenderer {
     } else if !call.indices.is_empty() {
       self.buffer_pair = Some(BufferPair::new_with_data(&self.context, data_vtx, data_idx));
     }
-
-    // self.plan[0].bind_texture = match call.bind_texture {
-    //   Some(BindTexture::FontTexture) => {
-    //     const NO_FNT_TEX: &str = "Font texture exists in draw plan but not yet inited. Make sure to call update_font_texture() *before* update_draw_plan()";
-    //     Some(Rc::clone(self.font_texture.as_ref().expect(NO_FNT_TEX)))
-    //   },
-    //   Some(BindTexture::UserDefined(_)) => todo!("user defined textures are not implemented yet"),
-    //   None => None,
-    // }
   }
 
-  pub fn update_ui_texture(&mut self, font_texture: &FontTextureInfo) {
-    log::debug!("updating font texture");
+  pub fn update_texture_atlas(&mut self, atlas: &TextureAtlasMeta) {
+    log::trace!("updating ui atlas texture");
     self.ui_texture = Some(Rc::new(SrgbTexture2d::new(
       &self.context,
       RawImage2d::from_raw_rgba(
-        font_texture.data.to_owned(),
-        (font_texture.size.x, font_texture.size.y)
+        atlas.data.to_owned(),
+        (atlas.size.x, atlas.size.y)
       )
     ).unwrap()));
   }
 
   pub fn update(&mut self, hui: &UiInstance) {
-    if let Some(texture) = hui.font_texture().if_modified() {
-      self.update_ui_texture(texture);
+    if hui.atlas().modified {
+      self.update_texture_atlas(&hui.atlas());
     }
-    if let Some(plan) = hui.draw_call().if_modified() {
-      self.update_draw_plan(plan);
+    if hui.draw_call().0 {
+      self.update_draw_plan(hui.draw_call().1);
     }
   }
 
@@ -192,7 +178,7 @@ impl GliumUiRenderer {
       frame.draw(
         vtx_buffer,
         idx_buffer,
-        &self.program_tex,
+        &self.program,
         &uniform! {
           resolution: resolution.to_array(),
           tex: Sampler(self.ui_texture.as_ref().unwrap().as_ref(), SamplerBehavior {
@@ -202,20 +188,6 @@ impl GliumUiRenderer {
         },
         &params,
       ).unwrap();
-
-      // if let Some(bind_texture) = call.bind_texture.as_ref() {
-
-      // } else {
-      //   frame.draw(
-      //     vtx_buffer,
-      //     idx_buffer,
-      //     &self.program,
-      //     &uniform! {
-      //       resolution: resolution.to_array(),
-      //     },
-      //     &params,
-      //   ).unwrap();
-      // }
     }
   }
 }

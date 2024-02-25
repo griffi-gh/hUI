@@ -17,7 +17,7 @@ pub struct Text {
   pub size: (UiSize, UiSize),
   pub color: Vec4,
   pub font: FontHandle,
-  pub text_size: u8,
+  pub text_size: u16,
 }
 
 impl Default for Text {

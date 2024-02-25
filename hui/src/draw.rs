@@ -2,13 +2,12 @@
 
 use crate::{
   rectangle::Corners,
-  text::{FontHandle, TextRenderer},
-  IfModified
+  text::{FontHandle, TextRenderer}
 };
 
 pub(crate) mod atlas;
-//pub(crate) use atlas::{TextureAllocation, TextureAtlasManager};
-//pub use atlas::TextureHandle;
+use atlas::TextureAtlasManager;
+pub use atlas::{TextureHandle, TextureAtlasMeta};
 
 mod corner_radius;
 pub use corner_radius::RoundedCorners;
@@ -48,7 +47,7 @@ pub enum UiDrawCommand {
     ///Position in pixels
     position: Vec2,
     ///Font size
-    size: u8,
+    size: u16,
     ///Color (RGBA)
     color: Vec4,
     ///Text to draw
@@ -78,19 +77,6 @@ impl UiDrawCommandList {
 //   }
 // }
 
-
-/// Texture to bind for a draw call
-///
-/// - FontTexture: The internally managed font texture
-/// - UserDefined: User-defined texture, value is user-defined and usually depends on the render backend
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum BindTexture {
-  /// The internally managed font texture
-  FontTexture,
-  /// User-defined texture, value is user-defined and usually depends on the render backend
-  UserDefined(usize),
-}
-
 /// A vertex for UI rendering
 #[derive(Clone, Copy, Debug, PartialEq, Default)]
 pub struct UiVertex {
@@ -108,7 +94,7 @@ pub struct UiDrawCall {
 
 impl UiDrawCall {
   /// Tesselate the UI and build a complete draw plan from a list of draw commands
-  pub fn build(draw_commands: &UiDrawCommandList, tr: &mut TextRenderer) -> Self {
+  pub(crate) fn build(draw_commands: &UiDrawCommandList, atlas: &mut TextureAtlasManager, text_renderer: &mut TextRenderer) -> Self {
     let mut draw_call = UiDrawCall::default();
     for command in &draw_commands.commands {
       match command {
@@ -209,17 +195,17 @@ impl UiDrawCall {
               UiVertex {
                 position: *position + vec2(size.x, 0.0),
                 color: color.top_right,
-                uv: vec2(1.0, 0.0),
+                uv: vec2(0.0, 0.0), // vec2(1.0, 0.0),
               },
               UiVertex {
                 position: *position + *size,
                 color: color.bottom_right,
-                uv: vec2(1.0, 1.0),
+                uv: vec2(0.0, 0.0), // vec2(1.0, 1.0),
               },
               UiVertex {
                 position: *position + vec2(0.0, size.y),
                 color: color.bottom_left,
-                uv: vec2(0.0, 1.0),
+                uv: vec2(0.0, 0.0), // vec2(0.0, 1.0),
               },
             ]);
           }
@@ -227,7 +213,7 @@ impl UiDrawCall {
         UiDrawCommand::Circle { .. } => {
           todo!("circle draw command not implemented yet")
         },
-        UiDrawCommand::Text { position, size, color, text, font } => {
+        UiDrawCommand::Text { position, size, color, text, font: font_handle } => {
           if text.is_empty() {
             continue
           }
@@ -235,7 +221,7 @@ impl UiDrawCall {
           //XXX: should we be doing this every time?
           let mut layout = Layout::new(CoordinateSystem::PositiveYDown);
           layout.append(
-            &[tr.internal_font(*font)],
+            &[text_renderer.internal_font(*font_handle)],
             &TextStyle::new(text, *size as f32, 0)
           );
           let glyphs = layout.glyphs();
@@ -245,38 +231,32 @@ impl UiDrawCall {
             if !layout_glyph.char_data.rasterize() {
               continue
             }
-            let font_texture_size = (
-              tr.font_texture().size.x as f32,
-              tr.font_texture().size.y as f32
-            );
+            let atlas_size = atlas.meta().size.as_vec2();
             let vidx = draw_call.vertices.len() as u32;
-            let glyph = tr.glyph(*font, layout_glyph.parent, layout_glyph.key.px as u8);
+            let glyph = text_renderer.glyph(atlas, *font_handle, layout_glyph.parent, layout_glyph.key.px as u8);
+            let uv = atlas.get_uv(glyph.texture);
             //rpos_x += glyph.metrics.advance_width;//glyph.metrics.advance_width;
             draw_call.indices.extend([vidx, vidx + 1, vidx + 2, vidx, vidx + 2, vidx + 3]);
-            let p0x = glyph.position.x as f32 / font_texture_size.0;
-            let p1x = (glyph.position.x + glyph.size.x as i32) as f32 / font_texture_size.0;
-            let p0y = glyph.position.y as f32 / font_texture_size.1;
-            let p1y = (glyph.position.y + glyph.size.y as i32) as f32 / font_texture_size.1;
             draw_call.vertices.extend([
               UiVertex {
                 position: *position + vec2(layout_glyph.x, layout_glyph.y),
                 color: *color,
-                uv: vec2(p0x, p0y),
+                uv: uv.top_left,
               },
               UiVertex {
                 position: *position + vec2(layout_glyph.x + glyph.metrics.width as f32, layout_glyph.y),
                 color: *color,
-                uv: vec2(p1x, p0y),
+                uv: uv.top_right,
               },
               UiVertex {
                 position: *position + vec2(layout_glyph.x + glyph.metrics.width as f32, layout_glyph.y + glyph.metrics.height as f32),
                 color: *color,
-                uv: vec2(p1x, p1y),
+                uv: uv.bottom_right,
               },
               UiVertex {
                 position: *position + vec2(layout_glyph.x, layout_glyph.y + glyph.metrics.height as f32),
                 color: *color,
-                uv: vec2(p0x, p1y),
+                uv: uv.bottom_left,
               },
             ]);
             #[cfg(all(
@@ -296,15 +276,5 @@ impl UiDrawCall {
       v.position = v.position.round()
     });
     draw_call
-  }
-}
-
-#[allow(deprecated)]
-impl IfModified<UiDrawCall> for (bool, &UiDrawCall) {
-  fn if_modified(&self) -> Option<&UiDrawCall> {
-    match self.0 {
-      true => Some(self.1),
-      false => None,
-    }
   }
 }

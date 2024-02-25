@@ -131,7 +131,7 @@ impl GliumUiRenderer {
     }
   }
 
-  pub fn update_draw_plan(&mut self, call: &UiDrawCall) {
+  pub fn update_buffers(&mut self, call: &UiDrawCall) {
     let data_vtx = &call.vertices.iter().copied().map(Vertex::from).collect::<Vec<_>>()[..];
     let data_idx = &call.indices[..];
     if let Some(buffer) = &mut self.buffer_pair {
@@ -156,8 +156,8 @@ impl GliumUiRenderer {
     if self.ui_texture.is_none() || hui.atlas().modified {
       self.update_texture_atlas(&hui.atlas());
     }
-    if hui.draw_call().0 {
-      self.update_draw_plan(hui.draw_call().1);
+    if self.buffer_pair.is_none() || hui.draw_call().0 {
+      self.update_buffers(hui.draw_call().1);
     }
   }
 

@@ -1,6 +1,11 @@
-use glam::{Vec2, vec2, Vec4};
+use glam::{Vec2, vec2};
 use crate::{
-  background::Background, draw::{RoundedCorners, UiDrawCommand}, element::{MeasureContext, ProcessContext, UiElement}, layout::{Alignment, Alignment2d, LayoutInfo, UiDirection, UiSize}, measure::{Hints, Response}, rectangle::{Corners, Sides}
+  background::BackgroundColor,
+  draw::{RoundedCorners, UiDrawCommand},
+  element::{MeasureContext, ProcessContext, UiElement},
+  layout::{Alignment, Alignment2d, LayoutInfo, UiDirection, UiSize},
+  measure::{Hints, Response},
+  rectangle::{Corners, Sides}
 };
 
 // pub struct Border {
@@ -19,7 +24,7 @@ pub struct Container {
   pub gap: f32,
   pub padding: Sides<f32>,
   pub align: Alignment2d,
-  pub background: Background,
+  pub background: BackgroundColor,
   pub corner_radius: Corners<f32>,
   pub elements: Vec<Box<dyn UiElement>>,
 }

@@ -1,35 +1,33 @@
 use glam::{vec4, Vec3, Vec4};
 use crate::rectangle::Corners;
 
-// #[derive(Clone, Copy, PartialEq, Eq, Debug)]
-// pub enum GradientDirection {
-//   ToRight = 0b00,
-//   ToLeft = 0b01,
-//   ToBottom = 0b10,
-//   ToTop = 0b11,
+//TODO: use this
+// pub struct Background {
+//   pub color: BackgroundColor,
+//   pub texture: Option<TextureH>
 // }
 
 #[derive(Clone, Copy, Default, Debug, PartialEq)]
-pub enum Background {
+pub enum BackgroundColor {
   #[default]
   Transparent,
   Solid(Vec4),
   Gradient(Corners<Vec4>),
 }
 
-impl From<(f32, f32, f32, f32)> for Background {
+impl From<(f32, f32, f32, f32)> for BackgroundColor {
   fn from(color: (f32, f32, f32, f32)) -> Self {
     Self::Solid(vec4(color.0, color.1, color.2, color.3))
   }
 }
 
-impl From<Corners<Vec4>> for Background {
+impl From<Corners<Vec4>> for BackgroundColor {
   fn from(corners: Corners<Vec4>) -> Self {
     Self::Gradient(corners)
   }
 }
 
-impl From<Option<Vec4>> for Background {
+impl From<Option<Vec4>> for BackgroundColor {
   fn from(color: Option<Vec4>) -> Self {
     match color {
       Some(color) => Self::Solid(color),
@@ -38,19 +36,19 @@ impl From<Option<Vec4>> for Background {
   }
 }
 
-impl From<Vec4> for Background {
+impl From<Vec4> for BackgroundColor {
   fn from(color: Vec4) -> Self {
     Self::Solid(color)
   }
 }
 
-impl From<(f32, f32, f32)> for Background {
+impl From<(f32, f32, f32)> for BackgroundColor {
   fn from(color: (f32, f32, f32)) -> Self {
     Self::Solid(vec4(color.0, color.1, color.2, 1.))
   }
 }
 
-impl From<Corners<Vec3>> for Background {
+impl From<Corners<Vec3>> for BackgroundColor {
   fn from(corners: Corners<Vec3>) -> Self {
     Self::Gradient(Corners {
       top_left: corners.top_left.extend(1.),
@@ -61,7 +59,7 @@ impl From<Corners<Vec3>> for Background {
   }
 }
 
-impl From<Option<Vec3>> for Background {
+impl From<Option<Vec3>> for BackgroundColor {
   fn from(color: Option<Vec3>) -> Self {
     match color {
       Some(color) => Self::Solid(color.extend(1.)),
@@ -70,13 +68,13 @@ impl From<Option<Vec3>> for Background {
   }
 }
 
-impl From<Vec3> for Background {
+impl From<Vec3> for BackgroundColor {
   fn from(color: Vec3) -> Self {
     Self::Solid(color.extend(1.))
   }
 }
 
-impl Background {
+impl BackgroundColor {
   /// Currently, never returns None.\
   /// `Option` has been added in preparation for future changes.\
   /// (`Background::Texture` etc)

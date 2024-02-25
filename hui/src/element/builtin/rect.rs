@@ -1,16 +1,15 @@
 use glam::{vec2, Vec4};
 use crate::{
-  background::Background,
+  background::BackgroundColor,
   draw::UiDrawCommand,
   element::{MeasureContext, ProcessContext, UiElement},
   layout::UiSize,
-  measure::Response,
-  rectangle::Corners
+  measure::Response
 };
 
 pub struct Rect {
   pub size: (UiSize, UiSize),
-  pub color: Background,
+  pub color: BackgroundColor,
 }
 
 impl Default for Rect {

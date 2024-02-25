@@ -8,8 +8,14 @@ const RGBA_CHANNEL_COUNT: u32 = 4;
 const ALLOW_ROTATION: bool = false;
 
 pub struct TextureAtlasMeta<'a> {
+  /// Texture data\
+  /// The data is stored in RGBA format, with 1 byte (8 bits) per channel
   pub data: &'a [u8],
+  /// Current size of the texture atlas\
+  /// Please note that this value might change
   pub size: UVec2,
+  /// True if the atlas has been modified since the beginning of the current frame\
+  /// If this function returns true, the texture atlas should be re-uploaded to the GPU before rendering\
   pub modified: bool,
 }
 
@@ -207,12 +213,6 @@ impl TextureAtlasManager {
   /// Reset the `is_modified` flag
   pub(crate) fn reset_modified(&mut self) {
     self.modified = false;
-  }
-
-  /// Returns true if the atlas has been modified since the beginning of the current frame\
-  /// If this function returns true, the texture atlas should be re-uploaded to the GPU before rendering\
-  pub fn is_modified(&self) -> bool {
-    self.modified
   }
 
   pub fn meta(&self) -> TextureAtlasMeta {

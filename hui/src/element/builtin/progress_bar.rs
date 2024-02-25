@@ -72,6 +72,7 @@ impl UiElement for ProgressBar {
         position: ctx.layout.position,
         size: ctx.measure.size,
         color: Corners::all(self.color_background),
+        texture: None,
         rounded_corners
       });
     }
@@ -80,6 +81,7 @@ impl UiElement for ProgressBar {
         position: ctx.layout.position,
         size: ctx.measure.size * vec2(value, 1.0),
         color: Corners::all(self.color_foreground),
+        texture: None,
         rounded_corners,
       });
     }

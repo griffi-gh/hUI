@@ -48,6 +48,7 @@ impl UiElement for Rect {
         position: ctx.layout.position,
         size: ctx.measure.size,
         color: self.color.corners().unwrap(),
+        texture: None,
         rounded_corners: None,
       });
     }

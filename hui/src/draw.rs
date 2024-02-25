@@ -16,9 +16,10 @@ use std::borrow::Cow;
 use fontdue::layout::{Layout, CoordinateSystem, TextStyle};
 use glam::{Vec2, Vec4, vec2};
 
+//TODO: circle draw command
+
 /// Available draw commands
-/// - Rectangle: Filled, colored rectangle, with optional rounded corners
-/// - Circle: Simple filled, colored circle
+/// - Rectangle: Filled, colored rectangle, with optional rounded corners and texture
 /// - Text: Draw text using the specified font, size, color, and position
 #[derive(Clone, Debug, PartialEq)]
 pub enum UiDrawCommand {
@@ -30,17 +31,10 @@ pub enum UiDrawCommand {
     size: Vec2,
     ///Color (RGBA)
     color: Corners<Vec4>,
+    ///Texture
+    texture: Option<TextureHandle>,
     ///Rounded corners
     rounded_corners: Option<RoundedCorners>,
-  },
-  /// Filled, colored circle
-  Circle {
-    ///Position in pixels
-    position: Vec2,
-    ///Radius in pixels
-    radius: f32,
-    ///Color (RGBA)
-    color: Vec4,
   },
   /// Draw text using the specified font, size, color, and position
   Text {
@@ -98,7 +92,11 @@ impl UiDrawCall {
     let mut draw_call = UiDrawCall::default();
     for command in &draw_commands.commands {
       match command {
-        UiDrawCommand::Rectangle { position, size, color, rounded_corners } => {
+        UiDrawCommand::Rectangle { position, size, color, texture, rounded_corners } => {
+          let uvs = texture
+            .map(|x| atlas.get_uv(x))
+            .flatten()
+            .unwrap_or(Corners::all(Vec2::ZERO));
           let vidx = draw_call.vertices.len() as u32;
           if let Some(corner) = rounded_corners.filter(|x| x.radius.max_f32() > 0.0) {
             //this code is stupid as fuck
@@ -122,25 +120,25 @@ impl UiDrawCall {
               draw_call.vertices.push(UiVertex {
                 position: *position + vec2(x, 1. - y) * corner.radius.top_right + vec2(size.x - corner.radius.top_right, 0.),
                 color: color.top_right,
-                uv: vec2(0.0, 0.0),
+                uv: uvs.top_right,
               });
               //Bottom-right corner
               draw_call.vertices.push(UiVertex {
                 position: *position + vec2(x - 1., y) * corner.radius.bottom_right + vec2(size.x, size.y - corner.radius.bottom_right),
                 color: color.bottom_right,
-                uv: vec2(0.0, 0.0),
+                uv: uvs.bottom_right,
               });
               //Bottom-left corner
               draw_call.vertices.push(UiVertex {
                 position: *position + vec2(1. - x, y) * corner.radius.bottom_left + vec2(0., size.y - corner.radius.bottom_left),
                 color: color.bottom_left,
-                uv: vec2(0.0, 0.0),
+                uv: uvs.bottom_left,
               });
               //Top-left corner
               draw_call.vertices.push(UiVertex {
                 position: *position + vec2(1. - x, 1. - y) * corner.radius.top_left,
                 color: color.top_left,
-                uv: vec2(0.0, 0.0),
+                uv: uvs.top_left,
               });
               // mental illness:
               if i > 0 {
@@ -190,28 +188,25 @@ impl UiDrawCall {
               UiVertex {
                 position: *position,
                 color: color.top_left,
-                uv: vec2(0.0, 0.0),
+                uv: uvs.top_left,
               },
               UiVertex {
                 position: *position + vec2(size.x, 0.0),
                 color: color.top_right,
-                uv: vec2(0.0, 0.0), // vec2(1.0, 0.0),
+                uv: uvs.top_right,
               },
               UiVertex {
                 position: *position + *size,
                 color: color.bottom_right,
-                uv: vec2(0.0, 0.0), // vec2(1.0, 1.0),
+                uv: uvs.bottom_right,
               },
               UiVertex {
                 position: *position + vec2(0.0, size.y),
                 color: color.bottom_left,
-                uv: vec2(0.0, 0.0), // vec2(0.0, 1.0),
+                uv: uvs.bottom_left,
               },
             ]);
           }
-        },
-        UiDrawCommand::Circle { .. } => {
-          todo!("circle draw command not implemented yet")
         },
         UiDrawCommand::Text { position, size, color, text, font: font_handle } => {
           if text.is_empty() {
@@ -226,16 +221,13 @@ impl UiDrawCall {
           );
           let glyphs = layout.glyphs();
 
-          //let mut rpos_x = 0.;
           for layout_glyph in glyphs {
             if !layout_glyph.char_data.rasterize() {
               continue
             }
-            let atlas_size = atlas.meta().size.as_vec2();
             let vidx = draw_call.vertices.len() as u32;
             let glyph = text_renderer.glyph(atlas, *font_handle, layout_glyph.parent, layout_glyph.key.px as u8);
-            let uv = atlas.get_uv(glyph.texture);
-            //rpos_x += glyph.metrics.advance_width;//glyph.metrics.advance_width;
+            let uv = atlas.get_uv(glyph.texture).unwrap();
             draw_call.indices.extend([vidx, vidx + 1, vidx + 2, vidx, vidx + 2, vidx + 3]);
             draw_call.vertices.extend([
               UiVertex {

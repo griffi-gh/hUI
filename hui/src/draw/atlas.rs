@@ -4,8 +4,7 @@ use nohash_hasher::BuildNoHashHasher;
 use rect_packer::DensePacker;
 use crate::rectangle::Corners;
 
-const CHANNEL_COUNT: u32 = 4;
-//TODO: make this work
+const RGBA_CHANNEL_COUNT: u32 = 4;
 const ALLOW_ROTATION: bool = false;
 
 pub struct TextureAtlasMeta<'a> {
@@ -14,16 +13,17 @@ pub struct TextureAtlasMeta<'a> {
   pub modified: bool,
 }
 
-#[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
 pub struct TextureHandle {
-  //TODO automatic cleanup when handle is dropped
-  //man: Weak<RefCell<TextureAtlasManager>>,
+  //pub(crate) rc: Rc<()>,
   pub(crate) index: u32
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Debug)]
 pub(crate) struct TextureAllocation {
-  /// Index of the texture allocation
+  //pub(crate) rc: Weak<()>,
+
+  /// Unique index of the texture allocation
   pub index: u32,
 
   /// Position in the texture atlas
@@ -44,6 +44,8 @@ pub(crate) struct TextureAtlasManager {
   size: UVec2,
   data: Vec<u8>,
   allocations: HashMap<u32, TextureAllocation, BuildNoHashHasher<u32>>,
+  /// Items that have been removed from the allocation list, but still affect
+  remove_queue: Vec<TextureAllocation>,
   /// True if the atlas has been modified in a way which requires a texture reupload
   /// since the beginning of the current frame
   modified: bool,
@@ -52,18 +54,16 @@ pub(crate) struct TextureAtlasManager {
 impl TextureAtlasManager {
   /// Create a new texture atlas with the specified size\
   /// 512x512 is a good default size for most applications, and the texture atlas can grow dynamically as needed
-  /// By default, the texture atlas gets initialized with a single white pixel texture
   pub fn new(size: UVec2) -> Self {
-    let mut tmp = Self {
+    Self {
       packer: DensePacker::new(size.x as i32, size.y as i32),
       count: 0,
       size,
-      data: vec![0; (size.x * size.y * CHANNEL_COUNT) as usize],
+      data: vec![0; (size.x * size.y * RGBA_CHANNEL_COUNT) as usize],
       allocations: HashMap::default(),
+      remove_queue: Vec::new(),
       modified: true,
-    };
-    tmp.add(1, &[255,255,255,255]);
-    tmp
+    }
   }
 
   /// Resize the texture atlas to the new size in-place, preserving the existing data
@@ -76,12 +76,12 @@ impl TextureAtlasManager {
     if new_size.x > self.size.x && new_size.y > self.size.y{
       self.packer.resize(new_size.x as i32, new_size.y as i32);
       //Resize the data array in-place
-      self.data.resize((new_size.x * new_size.y * CHANNEL_COUNT) as usize, 0);
+      self.data.resize((new_size.x * new_size.y * RGBA_CHANNEL_COUNT) as usize, 0);
       for y in (1..self.size.y).rev() {
         for x in (0..self.size.x).rev() {
-          let idx = ((y * self.size.x + x) * CHANNEL_COUNT) as usize;
-          let new_idx = ((y * new_size.x + x) * CHANNEL_COUNT) as usize;
-          for c in 0..(CHANNEL_COUNT as usize) {
+          let idx = ((y * self.size.x + x) * RGBA_CHANNEL_COUNT) as usize;
+          let new_idx = ((y * new_size.x + x) * RGBA_CHANNEL_COUNT) as usize;
+          for c in 0..(RGBA_CHANNEL_COUNT as usize) {
             self.data[new_idx + c] = self.data[idx + c];
           }
         }
@@ -92,6 +92,22 @@ impl TextureAtlasManager {
     }
     self.size = new_size;
     self.modified = true;
+  }
+
+  /// Ensure that a texture with specified size would fit without resizing on the next allocation attempt\
+  pub fn ensure_fits(&mut self, size: UVec2) {
+    // Plan A: try if any of the existing items in the remove queue would fit the texture
+    // Plan B: purge the remove queue, recreate the packer and try again (might be expensive...!)
+    // TODO: implement these
+    // Plan C: resize the atlas
+    let mut new_size = self.size;
+    while !self.packer.can_pack(size.x as i32, size.y as i32, true) {
+      new_size *= 2;
+      self.packer.resize(new_size.x as i32, new_size.y as i32);
+    }
+    if new_size != self.size {
+      self.resize(new_size);
+    }
   }
 
   /// Allocate a new texture region in the atlas and return a handle to it\
@@ -118,29 +134,22 @@ impl TextureAtlasManager {
   /// This function should never fail under normal circumstances.\
   /// May modify the texture data if the atlas is resized
   pub fn allocate(&mut self, size: UVec2) -> TextureHandle {
-    let mut new_size = self.size;
-    while !self.packer.can_pack(size.x as i32, size.y as i32, true) {
-      new_size *= 2;
-      self.packer.resize(new_size.x as i32, new_size.y as i32);
-    }
-    if new_size != self.size {
-      self.resize(new_size);
-    }
+    self.ensure_fits(size);
     self.try_allocate(size).unwrap()
   }
 
   /// Allocate a new texture region in the atlas and copy the data into it\
   /// This function may resize the atlas as needed, and should never fail under normal circumstances.
   pub fn add(&mut self, width: usize, data: &[u8]) -> TextureHandle {
-    let size = uvec2(width as u32, (data.len() / (width * CHANNEL_COUNT as usize)) as u32);
+    let size = uvec2(width as u32, (data.len() / (width * RGBA_CHANNEL_COUNT as usize)) as u32);
     let handle: TextureHandle = self.allocate(size);
     let allocation = self.allocations.get(&handle.index).unwrap();
     assert!(!allocation.rotated, "Rotated textures are not implemented yet");
     for y in 0..size.y {
       for x in 0..size.x {
-        let src_idx = (y * size.x + x) * CHANNEL_COUNT;
-        let dst_idx = ((allocation.position.y + y) * self.size.x + allocation.position.x + x) * CHANNEL_COUNT;
-        for c in 0..CHANNEL_COUNT as usize {
+        let src_idx = (y * size.x + x) * RGBA_CHANNEL_COUNT;
+        let dst_idx = ((allocation.position.y + y) * self.size.x + allocation.position.x + x) * RGBA_CHANNEL_COUNT;
+        for c in 0..RGBA_CHANNEL_COUNT as usize {
           self.data[dst_idx as usize + c] = data[src_idx as usize + c];
         }
       }
@@ -160,8 +169,8 @@ impl TextureAtlasManager {
     for y in 0..size.y {
       for x in 0..size.x {
         let src_idx = (y * size.x + x) as usize;
-        let dst_idx = (((allocation.position.y + y) * self.size.x + allocation.position.x + x) * CHANNEL_COUNT) as usize;
-        self.data[dst_idx..(dst_idx + CHANNEL_COUNT as usize)].copy_from_slice(&[255, 255, 255, data[src_idx]]);
+        let dst_idx = (((allocation.position.y + y) * self.size.x + allocation.position.x + x) * RGBA_CHANNEL_COUNT) as usize;
+        self.data[dst_idx..(dst_idx + RGBA_CHANNEL_COUNT as usize)].copy_from_slice(&[255, 255, 255, data[src_idx]]);
       }
     }
     self.modified = true;
@@ -180,19 +189,19 @@ impl TextureAtlasManager {
     self.allocations.get(&handle.index)
   }
 
-  pub(crate) fn get_uv(&self, handle: TextureHandle) -> Corners<Vec2> {
-    let info = self.get(handle).unwrap();
+  pub(crate) fn get_uv(&self, handle: TextureHandle) -> Option<Corners<Vec2>> {
+    let info = self.get(handle)?;
     let atlas_size = self.meta().size.as_vec2();
     let p0x = info.position.x as f32 / atlas_size.x;
     let p1x = (info.position.x as f32 + info.size.x as f32) / atlas_size.x;
     let p0y = info.position.y as f32 / atlas_size.y;
     let p1y = (info.position.y as f32 + info.size.y as f32) / atlas_size.y;
-    Corners {
+    Some(Corners {
       top_left: vec2(p0x, p0y),
       top_right: vec2(p1x, p0y),
       bottom_left: vec2(p0x, p1y),
       bottom_right: vec2(p1x, p1y),
-    }
+    })
   }
 
   /// Reset the `is_modified` flag

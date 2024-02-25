@@ -116,7 +116,7 @@ impl BufferPair {
 pub struct GliumUiRenderer {
   context: Rc<Context>,
   program: glium::Program,
-  ui_texture: Option<Rc<SrgbTexture2d>>,
+  ui_texture: Option<SrgbTexture2d>,
   buffer_pair: Option<BufferPair>,
 }
 
@@ -143,17 +143,17 @@ impl GliumUiRenderer {
 
   pub fn update_texture_atlas(&mut self, atlas: &TextureAtlasMeta) {
     log::trace!("updating ui atlas texture");
-    self.ui_texture = Some(Rc::new(SrgbTexture2d::new(
+    self.ui_texture = Some(SrgbTexture2d::new(
       &self.context,
       RawImage2d::from_raw_rgba(
         atlas.data.to_owned(),
         (atlas.size.x, atlas.size.y)
       )
-    ).unwrap()));
+    ).unwrap());
   }
 
   pub fn update(&mut self, hui: &UiInstance) {
-    if hui.atlas().modified {
+    if self.ui_texture.is_none() || hui.atlas().modified {
       self.update_texture_atlas(&hui.atlas());
     }
     if hui.draw_call().0 {
@@ -181,7 +181,7 @@ impl GliumUiRenderer {
         &self.program,
         &uniform! {
           resolution: resolution.to_array(),
-          tex: Sampler(self.ui_texture.as_ref().unwrap().as_ref(), SamplerBehavior {
+          tex: Sampler(self.ui_texture.as_ref().unwrap(), SamplerBehavior {
             wrap_function: (SamplerWrapFunction::Clamp, SamplerWrapFunction::Clamp, SamplerWrapFunction::Clamp),
             ..Default::default()
           }),

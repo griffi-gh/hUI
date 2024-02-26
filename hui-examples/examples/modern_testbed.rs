@@ -1,5 +1,5 @@
 use std::time::Instant;
-use glam::{UVec2, vec4};
+use glam::{vec3, vec4, UVec2};
 use glium::{backend::glutin::SimpleWindowBuilder, Surface};
 use winit::{
   event::{Event, WindowEvent},
@@ -44,6 +44,7 @@ fn main() {
           Container::default()
             .with_size((UiSize::Fraction(1.), UiSize::Fraction(1.)))
             .with_padding(Sides::all(5.))
+            .with_background(vec3(1., 0., 0.))
             .with_children(|ui: &mut ElementList| {
               Text::default()
                 .with_text("Hello, world")

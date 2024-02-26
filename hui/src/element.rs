@@ -92,8 +92,10 @@ impl ElementList {
 // }
 
 pub trait UiElementExt: UiElement {
+  /// Add element as a child/nested element.
   fn add_child(self, ui: &mut ElementList);
-  fn add_root(self, ui: &mut UiInstance, resolution: glam::Vec2);
+  /// Add element as a ui root.
+  fn add_root(self, ui: &mut UiInstance, max_size: glam::Vec2);
 }
 
 impl<T: UiElement + 'static> UiElementExt for T {

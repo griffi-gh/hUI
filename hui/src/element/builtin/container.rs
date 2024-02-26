@@ -4,7 +4,7 @@ use crate::{
   background::BackgroundColor,
   draw::{RoundedCorners, UiDrawCommand},
   element::{ElementList, MeasureContext, ProcessContext, UiElement},
-  layout::{Alignment, Alignment2d, LayoutInfo, UiDirection, UiSize},
+  layout::{Alignment, Alignment2d, LayoutInfo, UiDirection, UiSize, UiSize2d},
   measure::{Hints, Response},
   rectangle::{Corners, Sides}
 };
@@ -19,27 +19,56 @@ use crate::{
 //TODO: borders
 //TODO: min/max size
 
-#[derive(Setters)]
-#[setters(prefix = "with_")]
 pub struct Container {
-  pub size: (UiSize, UiSize),
+  pub size: UiSize2d,
   pub direction: UiDirection,
   pub gap: f32,
   pub padding: Sides<f32>,
-  #[setters(into)]
   pub align: Alignment2d,
-  #[setters(into)]
   pub background: BackgroundColor,
-  #[setters(into)]
   pub corner_radius: Corners<f32>,
-  #[setters(into)]
   pub children: ElementList,
+}
+
+impl Container {
+  pub fn with_size(self, size: impl Into<UiSize2d>) -> Self {
+    Self { size: size.into(), ..self }
+  }
+
+  pub fn with_direction(self, direction: UiDirection) -> Self {
+    Self { direction, ..self }
+  }
+
+  pub fn with_gap(self, gap: f32) -> Self {
+    Self { gap, ..self }
+  }
+
+  pub fn with_padding(self, padding: impl Into<Sides<f32>>) -> Self {
+    Self { padding: padding.into(), ..self }
+  }
+
+  pub fn with_align(self, align: impl Into<Alignment2d>) -> Self {
+    Self { align: align.into(), ..self }
+  }
+
+  pub fn with_background(self, background: impl Into<BackgroundColor>) -> Self {
+    Self { background: background.into(), ..self }
+  }
+
+  pub fn with_corner_radius(self, corner_radius: impl Into<Corners<f32>>) -> Self {
+    Self { corner_radius: corner_radius.into(), ..self }
+  }
+
+  pub fn with_children(mut self, ui: impl FnOnce(&mut ElementList)) -> Self {
+    self.children.0.extend(ElementList::from_callback(ui).0);
+    self
+  }
 }
 
 impl Default for Container {
   fn default() -> Self {
     Self {
-      size: (UiSize::Auto, UiSize::Auto),
+      size: (UiSize::Auto, UiSize::Auto).into(),
       direction: UiDirection::Vertical,
       gap: 0.,
       padding: Sides::all(0.),
@@ -53,12 +82,12 @@ impl Default for Container {
 
 impl Container {
   pub fn measure_max_inner_size(&self, layout: &LayoutInfo) -> Vec2 {
-    let outer_size_x = match self.size.0 {
+    let outer_size_x = match self.size.width {
       UiSize::Auto => layout.max_size.x,
       UiSize::Fraction(p) => layout.max_size.x * p,
       UiSize::Static(p) => p,
     };
-    let outer_size_y = match self.size.1 {
+    let outer_size_y = match self.size.height {
       UiSize::Auto => layout.max_size.y,
       UiSize::Fraction(p) => layout.max_size.y * p,
       UiSize::Static(p) => p,
@@ -106,12 +135,12 @@ impl UiElement for Container {
       self.padding.top + self.padding.bottom,
     );
 
-    match self.size.0 {
+    match self.size.width {
       UiSize::Auto => (),
       UiSize::Fraction(percentage) => size.x = ctx.layout.max_size.x * percentage,
       UiSize::Static(pixels) => size.x = pixels,
     }
-    match self.size.1 {
+    match self.size.height {
       UiSize::Auto => (),
       UiSize::Fraction(percentage) => size.y = ctx.layout.max_size.y * percentage,
       UiSize::Static(pixels) => size.y = pixels,

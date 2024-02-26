@@ -42,7 +42,7 @@ fn main() {
           gap: 5.,
           padding: Sides::all(5.),
           align: (Alignment::Begin, Alignment::Center).into(),
-          size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
+          size: (UiSize::Fraction(1.), UiSize::Fraction(1.)).into(),
           children: ElementList(vec![
             Box::new(ProgressBar {
               value: 0.5,
@@ -56,7 +56,7 @@ fn main() {
           gap: 5.,
           padding: Sides::all(5.),
           align: (Alignment::End, Alignment::Center).into(),
-          size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
+          size: (UiSize::Fraction(1.), UiSize::Fraction(1.)).into(),
           children: ElementList(vec![
             Box::new(ProgressBar {
               value: z,
@@ -64,7 +64,7 @@ fn main() {
               ..Default::default()
             }),
             Box::new(Container {
-              size: (UiSize::Fraction(1.), UiSize::Auto),
+              size: (UiSize::Fraction(1.), UiSize::Auto).into(),
               align: (Alignment::Center, Alignment::End).into(),
               padding: Sides::all(5.),
               gap: 10.,

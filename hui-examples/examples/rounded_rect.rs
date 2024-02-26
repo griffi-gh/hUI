@@ -40,11 +40,11 @@ fn main() {
         hui.add(Container {
           gap: 10.,
           align: Alignment::Center.into(),
-          size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
+          size: (UiSize::Fraction(1.), UiSize::Fraction(1.)).into(),
           children: ElementList(vec![
             Box::new(Container {
               align: Alignment::Center.into(),
-              size: (UiSize::Fraction(0.5), UiSize::Fraction(0.5)),
+              size: (UiSize::Fraction(0.5), UiSize::Fraction(0.5)).into(),
               background: vec4(1., 0., 0., 1.).into(),
               corner_radius: Corners {
                 top_left: 10.,
@@ -57,7 +57,7 @@ fn main() {
                   padding: Sides::all(20.),
                   direction: UiDirection::Horizontal,
                   align: Alignment::Center.into(),
-                  size: (UiSize::Auto, UiSize::Auto),
+                  size: (UiSize::Auto, UiSize::Auto).into(),
                   background: vec4(0.1, 0.1, 0.1, 0.5).into(),
                   corner_radius: Corners::all(8.),
                   children: ElementList(vec![
@@ -84,7 +84,7 @@ fn main() {
               direction: UiDirection::Horizontal,
               children: ElementList(vec![
                 Box::new(Container {
-                  size: (UiSize::Static(100.), UiSize::Static(100.)),
+                  size: (UiSize::Static(100.), UiSize::Static(100.)).into(),
                   background: Corners::left_right(
                     vec4(1., 0., 0., 1.),
                     vec4(0., 1., 0., 1.)
@@ -93,7 +93,7 @@ fn main() {
                   ..Default::default()
                 }),
                 Box::new(Container {
-                  size: (UiSize::Static(100.), UiSize::Static(100.)),
+                  size: (UiSize::Static(100.), UiSize::Static(100.)).into(),
                   background: Corners::left_right(
                     vec4(1., 0., 0., 1.),
                     vec4(0., 1., 0., 1.)
@@ -102,7 +102,7 @@ fn main() {
                   ..Default::default()
                 }),
                 Box::new(Container {
-                  size: (UiSize::Static(100.), UiSize::Static(100.)),
+                  size: (UiSize::Static(100.), UiSize::Static(100.)).into(),
                   background: Corners::left_right(
                     vec4(1., 0., 0., 1.),
                     vec4(0., 1., 0., 1.)
@@ -111,7 +111,7 @@ fn main() {
                   ..Default::default()
                 }),
                 Box::new(Container {
-                  size: (UiSize::Static(100.), UiSize::Static(100.)),
+                  size: (UiSize::Static(100.), UiSize::Static(100.)).into(),
                   background: Corners::left_right(
                     vec4(1., 0., 0., 1.),
                     vec4(0., 1., 0., 1.)

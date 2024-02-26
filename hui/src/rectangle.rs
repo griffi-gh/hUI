@@ -31,6 +31,24 @@ impl<T: Clone> Sides<T> {
   }
 }
 
+impl<T: Clone> From<T> for Sides<T> {
+  fn from(value: T) -> Self {
+    Self::all(value)
+  }
+}
+
+impl<T: Clone> From<(T, T)> for Sides<T> {
+  fn from((horizontal, vertical): (T, T)) -> Self {
+    Self::horizontal_vertical(horizontal, vertical)
+  }
+}
+
+impl<T> From<(T, T, T, T)> for Sides<T> {
+  fn from((top, bottom, left, right): (T, T, T, T)) -> Self {
+    Self { top, bottom, left, right }
+  }
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
 pub struct Corners<T> {
   pub top_left: T,

@@ -55,12 +55,12 @@ fn main() {
 
         hui.add(Container {
           align: Alignment::Center.into(),
-          size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
+          size: (UiSize::Fraction(1.), UiSize::Fraction(1.)).into(),
           background: vec4(0.1, 0.1, 0.1, 1.).into(),
           children: ElementList(vec![Box::new(Container {
             gap: 5.,
             padding: Sides::all(10.),
-            size: (UiSize::Static(450.), UiSize::Auto),
+            size: (UiSize::Static(450.), UiSize::Auto).into(),
             background: vec4(0.2, 0.2, 0.5, 1.).into(),
             corner_radius: Corners::all(8.),
             children: elements(|el| {
@@ -79,7 +79,7 @@ fn main() {
                 el.push(Box::new(Container {
                   direction: UiDirection::Horizontal,
                   align: (Alignment::End, Alignment::Center).into(),
-                  size: (UiSize::Fraction(1.), UiSize::Auto),
+                  size: (UiSize::Fraction(1.), UiSize::Auto).into(),
                   children: ElementList(vec![Box::new(Text {
                     text: format!("{:.2}% ({:.1} GB)", mom_ratio * 100., mom_ratio * 10000.).into(),
                     font: font_handle,

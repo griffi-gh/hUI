@@ -46,7 +46,7 @@ fn main() {
         hui.begin();
 
         hui.add(Container {
-          size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
+          size: (UiSize::Fraction(1.), UiSize::Fraction(1.)).into(),
           background: vec4(0.1, 0.1, 0.1, 1.).into(),
           children: elements(|elem| {
             elem.push(Box::new(Text {

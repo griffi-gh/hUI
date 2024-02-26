@@ -76,13 +76,83 @@ impl From<Alignment> for Alignment2d {
   }
 }
 
-#[derive(Default, Debug, Clone, Copy)]
+#[derive(Default, Debug, Clone, Copy, PartialEq)]
 pub enum UiSize {
   #[default]
+  /// Automatically calculate size based on content
   Auto,
+  /// Size as a ratio of parent size\
+  /// Valid range: 0.0-1.0 (0-100%)
   Fraction(f32),
+  /// Static size in pixels
   Static(f32),
 }
+
+impl From<f32> for UiSize {
+  #[inline]
+  fn from(value: f32) -> Self {
+    Self::Static(value)
+  }
+}
+
+#[derive(Default, Debug, Clone, Copy, PartialEq)]
+pub struct UiSize2d {
+  pub width: UiSize,
+  pub height: UiSize,
+}
+
+impl From<(UiSize, UiSize)> for UiSize2d {
+  #[inline]
+  fn from((width, height): (UiSize, UiSize)) -> Self {
+    Self { width, height }
+  }
+}
+
+//XXX: should this exist?
+impl From<UiSize> for UiSize2d {
+  #[inline]
+  fn from(size: UiSize) -> Self {
+    Self {
+      width: size,
+      height: size,
+    }
+  }
+}
+
+//TODO?: add `UiSize2d` from `(Into<UiSize>, Into<UiSize>)` or Into<UiSize> conversion
+
+/// Create a `UiSize` or `UiSize2d` from a literal
+/// # Syntax:
+/// - `auto` - `UiSize::Auto`
+/// - `x` - `UiSize::Static(x)`
+/// - `x%` - `UiSize::Fraction(x / 100.)`
+///
+/// If two values are provided, it creates a `UiSize2d` with the first value as width and the second as height
+#[macro_export]
+macro_rules! size {
+  (auto) => {
+    $crate::layout::UiSize::Auto
+  };
+  ($x:literal) => {
+    $crate::layout::UiSize::Static($x as f32)
+  };
+  ($x:literal %) => {
+    $crate::layout::UiSize::Fraction($x as f32 / 100.)
+  };
+  ($x:literal , $y:tt $($ys:tt)?) => {
+    $crate::layout::UiSize2d {
+      width: $crate::layout::size!($x),
+      height: $crate::layout::size!($y $($ys)?),
+    }
+  };
+  ($x:literal $($xs:tt)? , $y:tt $($ys:tt)?) => {
+    $crate::layout::UiSize2d {
+      width: $crate::layout::size!($x $($xs)?),
+      height: $crate::layout::size!($y $($ys)?),
+    }
+  };
+}
+pub use size;
 
 #[derive(Default, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
 pub enum UiDirection {

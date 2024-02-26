@@ -1,19 +1,16 @@
-use std::time::Instant;
-use glam::{vec3, vec4, UVec2};
+use glam::UVec2;
 use glium::{backend::glutin::SimpleWindowBuilder, Surface};
 use winit::{
   event::{Event, WindowEvent},
   event_loop::{EventLoopBuilder, ControlFlow}
 };
 use hui::{
-  UiInstance,
+  UiInstance, color, size,
+  layout::Alignment,
+  rectangle::Corners,
   element::{
-    ElementList, UiElementExt,
-    container::Container,
-    text::Text,
+    container::Container, text::Text, UiElementExt
   },
-  layout::{Alignment, UiDirection, UiSize},
-  rectangle::{Corners, Sides},
 };
 use hui_glium::GliumUiRenderer;
 
@@ -41,14 +38,27 @@ fn main() {
         hui.begin();
 
         Container::default()
-          .with_size((UiSize::Fraction(1.), UiSize::Fraction(1.)))
-          .with_padding(Sides::all(5.))
-          .with_background(vec3(1., 0., 0.))
-          .with_children(|ui: &mut ElementList| {
+          .with_size(size!(100%, 50%))
+          .with_align(Alignment::Center)
+          .with_padding(5.)
+          .with_corner_radius(10.)
+          .with_background(color::RED)
+          .with_children(|ui| {
             Text::default()
               .with_text("Hello, world")
-              .with_text_size(120)
-              .with_color(vec4(0., 0., 0., 1.))
+              .with_text_size(100)
+              .with_color(color::WHITE)
+              .add_child(ui);
+            Container::default()
+              .with_padding((10., 20.))
+              .with_corner_radius((10., 20., 30., 40.))
+              .with_background(color::DARK_RED)
+              .with_children(|ui| {
+                Text::default()
+                  .with_text("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
+                  .with_text_size(24)
+                  .add_child(ui);
+              })
               .add_child(ui);
           })
           .add_root(&mut hui, resolution);

@@ -63,21 +63,33 @@ impl ElementList {
   pub fn add(&mut self, element: impl UiElement + 'static) {
     self.0.push(Box::new(element))
   }
-}
 
-impl<T: FnOnce(&mut ElementList)> From<T> for ElementList {
-  fn from(cb: T) -> Self {
+  pub(crate) fn from_callback(cb: impl FnOnce(&mut ElementList)) -> Self {
     let mut list = ElementList(Vec::new());
     cb(&mut list);
     list
   }
 }
 
-impl From<Vec<Box<dyn UiElement>>> for ElementList {
-  fn from(value: Vec<Box<dyn UiElement>>) -> Self {
-    Self(value)
-  }
-}
+// impl<T: FnOnce(&mut ElementList)> From<T> for ElementList {
+//   fn from(cb: T) -> Self {
+//     let mut list = ElementList(Vec::new());
+//     cb(&mut list);
+//     list
+//   }
+// }
+
+// impl<T: UiElement + 'static> From<T> for ElementList {
+//   fn from(value: T) -> Self {
+//     ElementList(vec![Box::new(value)])
+//   }
+// }
+
+// impl From<Vec<Box<dyn UiElement>>> for ElementList {
+//   fn from(value: Vec<Box<dyn UiElement>>) -> Self {
+//     Self(value)
+//   }
+// }
 
 pub trait UiElementExt: UiElement {
   fn add_child(self, ui: &mut ElementList);

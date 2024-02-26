@@ -8,7 +8,7 @@ use winit::{
 use hui::{
   UiInstance,
   element::{
-    ElementList, UiElementListExt,
+    ElementList, UiElementExt,
     container::Container,
     text::Text,
   },
@@ -40,19 +40,18 @@ fn main() {
 
         hui.begin();
 
-        hui.add({
-          Container::default()
-            .with_size((UiSize::Fraction(1.), UiSize::Fraction(1.)))
-            .with_padding(Sides::all(5.))
-            .with_background(vec3(1., 0., 0.))
-            .with_children(|ui: &mut ElementList| {
-              Text::default()
-                .with_text("Hello, world")
-                .with_text_size(120)
-                .with_color(vec4(0., 0., 0., 1.))
-                .add_to(ui);
-            })
-        }, resolution);
+        Container::default()
+          .with_size((UiSize::Fraction(1.), UiSize::Fraction(1.)))
+          .with_padding(Sides::all(5.))
+          .with_background(vec3(1., 0., 0.))
+          .with_children(|ui: &mut ElementList| {
+            Text::default()
+              .with_text("Hello, world")
+              .with_text_size(120)
+              .with_color(vec4(0., 0., 0., 1.))
+              .add_child(ui);
+          })
+          .add_root(&mut hui, resolution);
 
         hui.end();
 

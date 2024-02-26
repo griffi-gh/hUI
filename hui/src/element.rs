@@ -1,10 +1,6 @@
 use std::any::Any;
 use crate::{
-  draw::UiDrawCommandList,
-  measure::Response,
-  state::StateRepo,
-  text::TextMeasure,
-  layout::LayoutInfo
+  draw::UiDrawCommandList, layout::LayoutInfo, measure::Response, state::StateRepo, text::TextMeasure, UiInstance
 };
 
 mod builtin;
@@ -64,7 +60,7 @@ pub trait UiElement {
 pub struct ElementList(pub Vec<Box<dyn UiElement>>);
 
 impl ElementList {
-  pub fn add<'a>(&mut self, element: impl UiElement + 'static) {
+  pub fn add(&mut self, element: impl UiElement + 'static) {
     self.0.push(Box::new(element))
   }
 }
@@ -83,12 +79,16 @@ impl From<Vec<Box<dyn UiElement>>> for ElementList {
   }
 }
 
-pub trait UiElementListExt {
-  fn add_to(self, ui: &mut ElementList);
+pub trait UiElementExt: UiElement {
+  fn add_child(self, ui: &mut ElementList);
+  fn add_root(self, ui: &mut UiInstance, resolution: glam::Vec2);
 }
 
-impl<T: UiElement + 'static> UiElementListExt for T {
-  fn add_to(self, ui: &mut ElementList) {
+impl<T: UiElement + 'static> UiElementExt for T {
+  fn add_child(self, ui: &mut ElementList) {
     ui.add(self)
+  }
+  fn add_root(self, ui: &mut UiInstance, max_size: glam::Vec2) {
+    ui.add(self, max_size);
   }
 }

@@ -25,6 +25,8 @@ pub struct UiInstance {
   text_renderer: TextRenderer,
   atlas: TextureAtlasManager,
   events: VecDeque<UiEvent>,
+  //True if in the middle of a laying out a frame
+  state: bool,
 }
 
 impl UiInstance {
@@ -50,6 +52,7 @@ impl UiInstance {
         atlas
       },
       events: VecDeque::new(),
+      state: false,
     }
   }
 
@@ -64,6 +67,7 @@ impl UiInstance {
   /// Use the `max_size` parameter to specify the maximum size of the element\
   /// (usually, the size of the window/screen)
   pub fn add<T: UiElement>(&mut self, element: T, max_size: Vec2) {
+    assert!(self.state, "must call UiInstance::begin before adding elements");
     let layout = LayoutInfo {
       position: Vec2::ZERO,
       max_size,
@@ -87,6 +91,8 @@ impl UiInstance {
   ///
   /// You must call this function at the beginning of the frame, before adding any elements
   pub fn begin(&mut self) {
+    assert!(!self.state, "must call UiInstance::end before calling UiInstance::begin again");
+    self.state = true;
     std::mem::swap(&mut self.prev_draw_commands, &mut self.draw_commands);
     self.draw_call_modified = false;
     self.draw_commands.commands.clear();
@@ -97,6 +103,8 @@ impl UiInstance {
   ///
   /// You must call this function at the end of the frame, before rendering the UI
   pub fn end(&mut self) {
+    assert!(self.state, "must call UiInstance::begin before calling UiInstance::end");
+    self.state = false;
     if self.draw_commands.commands == self.prev_draw_commands.commands {
       return
     }
@@ -111,6 +119,9 @@ impl UiInstance {
   ///
   /// Returns a tuple with a boolean indicating if the buffers have been modified since the last frame
   pub fn draw_call(&self) -> (bool, &UiDrawCall) {
+    if self.state {
+      log::warn!("UiInstance::draw_call called while in the middle of a frame, this is probably a mistake");
+    }
     (self.draw_call_modified, &self.draw_call)
   }
 
@@ -122,6 +133,9 @@ impl UiInstance {
   /// Make sure to check [`TextureAtlasMeta::modified`] to see if the texture has been modified
   /// since the beginning of the current frame before uploading it to the GPU
   pub fn atlas(&self) -> TextureAtlasMeta {
+    if self.state {
+      log::warn!("UiInstance::atlas called while in the middle of a frame, this is probably a mistake");
+    }
     self.atlas.meta()
   }
 
@@ -131,6 +145,9 @@ impl UiInstance {
   /// You should not call this directly unless you're implementing a custom platform backend
   /// or have a very specific usecase
   pub fn push_event(&mut self, event: UiEvent) {
+    if self.state {
+      log::warn!("UiInstance::push_event called while in the middle of a frame, this is probably a mistake");
+    }
     self.events.push_back(event);
   }
 }

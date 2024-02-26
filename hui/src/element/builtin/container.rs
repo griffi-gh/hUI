@@ -19,46 +19,26 @@ use crate::{
 //TODO: borders
 //TODO: min/max size
 
+#[derive(Setters)]
+#[setters(prefix = "with_")]
 pub struct Container {
+  #[setters(into)]
   pub size: UiSize2d,
   pub direction: UiDirection,
   pub gap: f32,
+  #[setters(into)]
   pub padding: Sides<f32>,
+  #[setters(into)]
   pub align: Alignment2d,
+  #[setters(into)]
   pub background: BackgroundColor,
+  #[setters(into)]
   pub corner_radius: Corners<f32>,
+  #[setters(skip)]
   pub children: ElementList,
 }
 
 impl Container {
-  pub fn with_size(self, size: impl Into<UiSize2d>) -> Self {
-    Self { size: size.into(), ..self }
-  }
-
-  pub fn with_direction(self, direction: UiDirection) -> Self {
-    Self { direction, ..self }
-  }
-
-  pub fn with_gap(self, gap: f32) -> Self {
-    Self { gap, ..self }
-  }
-
-  pub fn with_padding(self, padding: impl Into<Sides<f32>>) -> Self {
-    Self { padding: padding.into(), ..self }
-  }
-
-  pub fn with_align(self, align: impl Into<Alignment2d>) -> Self {
-    Self { align: align.into(), ..self }
-  }
-
-  pub fn with_background(self, background: impl Into<BackgroundColor>) -> Self {
-    Self { background: background.into(), ..self }
-  }
-
-  pub fn with_corner_radius(self, corner_radius: impl Into<Corners<f32>>) -> Self {
-    Self { corner_radius: corner_radius.into(), ..self }
-  }
-
   pub fn with_children(mut self, ui: impl FnOnce(&mut ElementList)) -> Self {
     self.children.0.extend(ElementList::from_callback(ui).0);
     self

@@ -1,4 +1,5 @@
-use glam::UVec2;
+use std::time::Instant;
+use glam::{UVec2, vec4};
 use glium::{backend::glutin::SimpleWindowBuilder, Surface};
 use winit::{
   event::{Event, WindowEvent},
@@ -6,12 +7,13 @@ use winit::{
 };
 use hui::{
   UiInstance,
-  rectangle::Sides,
-  layout::{UiSize, Alignment},
   element::{
+    ElementList, UiElementListExt,
     container::Container,
     text::Text,
-  }
+  },
+  layout::{Alignment, UiDirection, UiSize},
+  rectangle::{Corners, Sides},
 };
 use hui_glium::GliumUiRenderer;
 
@@ -23,6 +25,7 @@ fn main() {
 
   let mut hui = UiInstance::new();
   let mut backend = GliumUiRenderer::new(&display);
+
   event_loop.run(|event, window_target| {
     window_target.set_control_flow(ControlFlow::Poll);
     match event {
@@ -37,19 +40,15 @@ fn main() {
 
         hui.begin();
 
-        hui.add(Container {
-          gap: 5.,
-          padding: Sides::all(5.),
-          align: Alignment::Center.into(),
-          size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
-          elements: vec![
-            Box::new(Text {
-              text: "Hello, world!\nGoodbye, world!\nowo\nuwu".into(),
-              text_size: 120,
-              ..Default::default()
-            }),
-          ],
-          ..Default::default()
+        hui.add({
+          Container::default()
+            .with_padding(Sides::all(5.))
+            .with_children(|ui: &mut ElementList| {
+              Text::default()
+                .with_text("Hello, world")
+                .with_text_size(12)
+                .add_to(ui);
+            })
         }, resolution);
 
         hui.end();

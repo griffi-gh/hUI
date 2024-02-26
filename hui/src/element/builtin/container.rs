@@ -1,8 +1,9 @@
+use derive_setters::Setters;
 use glam::{Vec2, vec2};
 use crate::{
   background::BackgroundColor,
   draw::{RoundedCorners, UiDrawCommand},
-  element::{MeasureContext, ProcessContext, UiElement},
+  element::{ElementList, MeasureContext, ProcessContext, UiElement},
   layout::{Alignment, Alignment2d, LayoutInfo, UiDirection, UiSize},
   measure::{Hints, Response},
   rectangle::{Corners, Sides}
@@ -18,15 +19,21 @@ use crate::{
 //TODO: borders
 //TODO: min/max size
 
+#[derive(Setters)]
+#[setters(prefix = "with_")]
 pub struct Container {
   pub size: (UiSize, UiSize),
   pub direction: UiDirection,
   pub gap: f32,
   pub padding: Sides<f32>,
+  #[setters(into)]
   pub align: Alignment2d,
+  #[setters(into)]
   pub background: BackgroundColor,
+  #[setters(into)]
   pub corner_radius: Corners<f32>,
-  pub elements: Vec<Box<dyn UiElement>>,
+  #[setters(into)]
+  pub children: ElementList,
 }
 
 impl Default for Container {
@@ -38,7 +45,7 @@ impl Default for Container {
       padding: Sides::all(0.),
       align: Alignment2d::default(),
       background: Default::default(),
-      elements: Vec::new(),
+      children: ElementList(Vec::new()),
       corner_radius: Corners::all(0.),
     }
   }
@@ -67,7 +74,7 @@ impl UiElement for Container {
   fn measure(&self, ctx: MeasureContext) -> Response {
     let mut size = Vec2::ZERO;
     let mut leftover_gap = Vec2::ZERO;
-    for element in &self.elements {
+    for element in &self.children.0 {
       let measure = element.measure(MeasureContext{
         state: ctx.state,
         layout: &LayoutInfo {
@@ -164,7 +171,7 @@ impl UiElement for Container {
       }
     }
 
-    for element in &self.elements {
+    for element in &self.children.0 {
       //(passing max size from layout rather than actual bounds for the sake of consistency with measure() above)
 
       let mut el_layout = LayoutInfo {

@@ -60,3 +60,35 @@ pub trait UiElement {
   /// You should  process the user inputs and render the element here.
   fn process(&self, ctx: ProcessContext);
 }
+
+pub struct ElementList(pub Vec<Box<dyn UiElement>>);
+
+impl ElementList {
+  pub fn add<'a>(&mut self, element: impl UiElement + 'static) {
+    self.0.push(Box::new(element))
+  }
+}
+
+impl<T: FnOnce(&mut ElementList)> From<T> for ElementList {
+  fn from(cb: T) -> Self {
+    let mut list = ElementList(Vec::new());
+    cb(&mut list);
+    list
+  }
+}
+
+impl From<Vec<Box<dyn UiElement>>> for ElementList {
+  fn from(value: Vec<Box<dyn UiElement>>) -> Self {
+    Self(value)
+  }
+}
+
+pub trait UiElementListExt {
+  fn add_to(self, list: &mut ElementList);
+}
+
+impl<T: UiElement + 'static> UiElementListExt for T {
+  fn add_to(self, list: &mut ElementList) {
+    list.add(self)
+  }
+}

@@ -6,15 +6,9 @@ use winit::{
   event_loop::{EventLoopBuilder, ControlFlow}
 };
 use hui::{
-  UiInstance,
-  layout::{Alignment, UiSize, UiDirection},
-  rectangle::{Sides, Corners},
   element::{
-    UiElement,
-    progress_bar::ProgressBar,
-    container::Container,
-    rect::Rect
-  },
+    container::Container, progress_bar::ProgressBar, rect::Rect, ElementList, UiElement
+  }, layout::{Alignment, UiDirection, UiSize}, rectangle::{Corners, Sides}, UiInstance
 };
 use hui_glium::GliumUiRenderer;
 
@@ -49,12 +43,12 @@ fn main() {
           padding: Sides::all(5.),
           align: (Alignment::Begin, Alignment::Center).into(),
           size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
-          elements: vec![
+          children: ElementList(vec![
             Box::new(ProgressBar {
               value: 0.5,
               ..Default::default()
             }),
-          ],
+          ]),
           ..Default::default()
         }, resolution);
 
@@ -63,7 +57,7 @@ fn main() {
           padding: Sides::all(5.),
           align: (Alignment::End, Alignment::Center).into(),
           size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
-          elements: vec![
+          children: ElementList(vec![
             Box::new(ProgressBar {
               value: z,
               corner_radius: Corners::all(0.25 * ProgressBar::DEFAULT_HEIGHT),
@@ -74,7 +68,7 @@ fn main() {
               align: (Alignment::Center, Alignment::End).into(),
               padding: Sides::all(5.),
               gap: 10.,
-              elements: vec![
+              children: ElementList(vec![
                 Box::new(Rect {
                   size: (UiSize::Fraction(0.5), UiSize::Static(30.)),
                   color: vec4(0.75, 0., 0., 1.).into()
@@ -86,7 +80,7 @@ fn main() {
                     vec4(0., 1., 0., 1.)
                   ).into(),
                 }),
-              ],
+              ]),
               ..Default::default()
             }),
             Box::new(Rect {
@@ -98,7 +92,7 @@ fn main() {
               padding: Sides::all(5.),
               background: vec4(0., 0., 0., 0.5).into(),
               direction: UiDirection::Horizontal,
-              elements: {
+              children: {
                 let mut x: Vec<Box<dyn UiElement>> = vec![];
                 for i in 0..10 {
                   x.push(Box::new(Rect {
@@ -110,7 +104,7 @@ fn main() {
                     }
                   }));
                 }
-                x
+                ElementList(x)
               },
               ..Default::default()
             }),
@@ -128,15 +122,15 @@ fn main() {
                 bottom_left: 0.,
                 bottom_right: 0.,
               },
-              elements: vec![
+              children: ElementList(vec![
                 Box::new(Rect {
                   size: (UiSize::Static(50.), UiSize::Static(50.)),
                   color: vec4(1., 1., 1., 0.75).into()
                 }),
-              ],
+              ]),
               ..Default::default()
             }),
-          ],
+          ]),
           ..Default::default()
         }, resolution);
 

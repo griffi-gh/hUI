@@ -6,21 +6,21 @@ use winit::{
   event_loop::{EventLoopBuilder, ControlFlow}
 };
 use hui::{
-  UiInstance,
-  layout::{Alignment, UiDirection, UiSize},
-  rectangle::{Corners, Sides},
   element::{
     container::Container,
     progress_bar::ProgressBar,
-    text::Text,
+    text::Text, ElementList,
   },
+  layout::{Alignment, UiDirection, UiSize},
+  rectangle::{Corners, Sides},
+  UiInstance,
 };
 use hui_glium::GliumUiRenderer;
 
-fn elements(mut f: impl FnMut(&mut Vec<Box<dyn hui::element::UiElement>>)) -> Vec<Box<dyn hui::element::UiElement>> {
+fn elements(mut f: impl FnMut(&mut Vec<Box<dyn hui::element::UiElement>>)) -> ElementList {
   let mut e = vec![];
   f(&mut e);
-  e
+  ElementList(e)
 }
 
 fn main() {
@@ -57,13 +57,13 @@ fn main() {
           align: Alignment::Center.into(),
           size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
           background: vec4(0.1, 0.1, 0.1, 1.).into(),
-          elements: vec![Box::new(Container {
+          children: ElementList(vec![Box::new(Container {
             gap: 5.,
             padding: Sides::all(10.),
             size: (UiSize::Static(450.), UiSize::Auto),
             background: vec4(0.2, 0.2, 0.5, 1.).into(),
             corner_radius: Corners::all(8.),
-            elements: elements(|el| {
+            children: elements(|el| {
               if instant.elapsed().as_secs_f32() < 5. {
                 el.push(Box::new(Text {
                   text: "Downloading your mom...".into(),
@@ -80,12 +80,12 @@ fn main() {
                   direction: UiDirection::Horizontal,
                   align: (Alignment::End, Alignment::Center).into(),
                   size: (UiSize::Fraction(1.), UiSize::Auto),
-                  elements: vec![Box::new(Text {
+                  children: ElementList(vec![Box::new(Text {
                     text: format!("{:.2}% ({:.1} GB)", mom_ratio * 100., mom_ratio * 10000.).into(),
                     font: font_handle,
                     text_size: 16,
                     ..Default::default()
-                  })],
+                  })]),
                   ..Default::default()
                 }));
               } else if instant.elapsed().as_secs() < 10 {
@@ -107,7 +107,7 @@ fn main() {
               }
             }),
             ..Default::default()
-          })],
+          })]),
           ..Default::default()
         }, resolution);
 

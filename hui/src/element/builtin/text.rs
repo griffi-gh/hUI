@@ -1,4 +1,5 @@
 use std::borrow::Cow;
+use derive_setters::Setters;
 use glam::{vec2, Vec4};
 use crate::{
   draw::UiDrawCommand, element::{MeasureContext, ProcessContext, UiElement}, layout::UiSize, measure::Response, text::{FontHandle, DEFAULT_FONT}
@@ -12,7 +13,10 @@ use crate::{
 //   Constant(u8),
 // }
 
+#[derive(Setters)]
+#[setters(prefix = "with_")]
 pub struct Text {
+  #[setters(into)]
   pub text: Cow<'static, str>,
   pub size: (UiSize, UiSize),
   pub color: Vec4,

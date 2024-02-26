@@ -6,19 +6,16 @@ use winit::{
   event_loop::{EventLoopBuilder, ControlFlow}
 };
 use hui::{
-  UiInstance,
-  layout::UiSize,
   element::{
-    container::Container,
-    text::Text, rect::Rect, spacer::Spacer
-  },
+    container::Container, rect::Rect, spacer::Spacer, text::Text, ElementList
+  }, layout::UiSize, UiInstance
 };
 use hui_glium::GliumUiRenderer;
 
-fn elements(mut f: impl FnMut(&mut Vec<Box<dyn hui::element::UiElement>>)) -> Vec<Box<dyn hui::element::UiElement>> {
+fn elements(mut f: impl FnMut(&mut Vec<Box<dyn hui::element::UiElement>>)) -> ElementList {
   let mut e = vec![];
   f(&mut e);
-  e
+  ElementList(e)
 }
 
 fn main() {
@@ -51,7 +48,7 @@ fn main() {
         hui.add(Container {
           size: (UiSize::Fraction(1.), UiSize::Fraction(1.)),
           background: vec4(0.1, 0.1, 0.1, 1.).into(),
-          elements: elements(|elem| {
+          children: elements(|elem| {
             elem.push(Box::new(Text {
               text: "THIS LINE SHOULD BE SHARP!".into(),
               ..Default::default()

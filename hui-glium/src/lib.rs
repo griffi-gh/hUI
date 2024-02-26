@@ -156,9 +156,12 @@ impl GliumUiRenderer {
     if self.ui_texture.is_none() || hui.atlas().modified {
       self.update_texture_atlas(&hui.atlas());
     }
-    if self.buffer_pair.is_none() || hui.draw_call().0 {
-      self.update_buffers(hui.draw_call().1);
-    }
+    //HACK: modified is incorrect, this is a hack
+    self.update_buffers(hui.draw_call().1);
+    //FIXME before release
+    // if (self.buffer_pair.is_none() && !hui.draw_call().1.indices.is_empty()) || hui.draw_call().0 {
+    //   self.update_buffers(hui.draw_call().1);
+    // }
   }
 
   pub fn draw(&self, frame: &mut glium::Frame, resolution: Vec2) {

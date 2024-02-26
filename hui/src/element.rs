@@ -84,11 +84,11 @@ impl From<Vec<Box<dyn UiElement>>> for ElementList {
 }
 
 pub trait UiElementListExt {
-  fn add_to(self, list: &mut ElementList);
+  fn add_to(self, ui: &mut ElementList);
 }
 
 impl<T: UiElement + 'static> UiElementListExt for T {
-  fn add_to(self, list: &mut ElementList) {
-    list.add(self)
+  fn add_to(self, ui: &mut ElementList) {
+    ui.add(self)
   }
 }

@@ -42,11 +42,13 @@ fn main() {
 
         hui.add({
           Container::default()
+            .with_size((UiSize::Fraction(1.), UiSize::Fraction(1.)))
             .with_padding(Sides::all(5.))
             .with_children(|ui: &mut ElementList| {
               Text::default()
                 .with_text("Hello, world")
-                .with_text_size(12)
+                .with_text_size(120)
+                .with_color(vec4(0., 0., 0., 1.))
                 .add_to(ui);
             })
         }, resolution);

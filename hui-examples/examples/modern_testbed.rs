@@ -51,7 +51,7 @@ fn main() {
               .add_child(ui);
             Container::default()
               .with_padding((10., 20.))
-              .with_corner_radius((10., 20., 30., 40.))
+              .with_corner_radius((10., 20., 50., 10.))
               .with_background(color::DARK_RED)
               .with_children(|ui| {
                 Text::default()

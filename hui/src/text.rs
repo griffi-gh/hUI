@@ -1,3 +1,5 @@
+//! text rendering, styling, measuring
+
 use std::sync::Arc;
 
 mod font;

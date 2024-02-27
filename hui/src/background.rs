@@ -1,3 +1,5 @@
+//! background color, gradient and texturing
+
 use glam::{vec4, Vec3, Vec4};
 use crate::rectangle::Corners;
 

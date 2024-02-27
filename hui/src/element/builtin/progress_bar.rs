@@ -1,11 +1,11 @@
 use glam::{vec2, Vec4, vec4};
 use crate::{
-  draw::{RoundedCorners, UiDrawCommand}, element::{MeasureContext, ProcessContext, UiElement}, layout::UiSize, measure::Response, rectangle::Corners
+  draw::{RoundedCorners, UiDrawCommand}, element::{MeasureContext, ProcessContext, UiElement}, layout::Size, measure::Response, rectangle::Corners
 };
 
 #[derive(Debug, Clone, Copy)]
 pub struct ProgressBar {
-  pub size: (UiSize, UiSize),
+  pub size: (Size, Size),
   pub value: f32,
   pub color_foreground: Vec4,
   pub color_background: Vec4,
@@ -19,7 +19,7 @@ impl ProgressBar {
 impl Default for ProgressBar {
   fn default() -> Self {
     Self {
-      size: (UiSize::Auto, UiSize::Auto),
+      size: (Size::Auto, Size::Auto),
       value: 0.,
       color_foreground: vec4(0.0, 0.0, 1.0, 1.0),
       color_background: vec4(0.0, 0.0, 0.0, 1.0),
@@ -35,14 +35,14 @@ impl UiElement for ProgressBar {
     Response {
       size: vec2(
         match self.size.0 {
-          UiSize::Auto => ctx.layout.max_size.x.max(300.),
-          UiSize::Fraction(p) => ctx.layout.max_size.x * p,
-          UiSize::Static(p) => p,
+          Size::Auto => ctx.layout.max_size.x.max(300.),
+          Size::Fraction(p) => ctx.layout.max_size.x * p,
+          Size::Static(p) => p,
         },
         match self.size.1 {
-          UiSize::Auto => Self::DEFAULT_HEIGHT,
-          UiSize::Fraction(p) => ctx.layout.max_size.y * p,
-          UiSize::Static(p) => p,
+          Size::Auto => Self::DEFAULT_HEIGHT,
+          Size::Fraction(p) => ctx.layout.max_size.y * p,
+          Size::Static(p) => p,
         }
       ),
       hints: Default::default(),

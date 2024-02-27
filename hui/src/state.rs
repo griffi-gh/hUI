@@ -1,3 +1,5 @@
+//! state managment for stateful elements
+
 use hashbrown::{HashMap, HashSet};
 use nohash_hasher::BuildNoHashHasher;
 use std::any::Any;

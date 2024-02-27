@@ -1,3 +1,5 @@
+//! input, window events and event handling
+
 use glam::Vec2;
 
 /// Represents a mouse button.

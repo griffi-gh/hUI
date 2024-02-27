@@ -3,19 +3,19 @@ use crate::{
   background::BackgroundColor,
   draw::UiDrawCommand,
   element::{MeasureContext, ProcessContext, UiElement},
-  layout::UiSize,
+  layout::Size,
   measure::Response
 };
 
 pub struct Rect {
-  pub size: (UiSize, UiSize),
+  pub size: (Size, Size),
   pub color: BackgroundColor,
 }
 
 impl Default for Rect {
   fn default() -> Self {
     Self {
-      size: (UiSize::Static(10.), UiSize::Static(10.)),
+      size: (Size::Static(10.), Size::Static(10.)),
       color: Vec4::new(0., 0., 0., 0.5).into(),
     }
   }
@@ -26,14 +26,14 @@ impl UiElement for Rect {
     Response {
       size: vec2(
         match self.size.0 {
-          UiSize::Auto => ctx.layout.max_size.x,
-          UiSize::Fraction(percentage) => ctx.layout.max_size.x * percentage,
-          UiSize::Static(pixels) => pixels,
+          Size::Auto => ctx.layout.max_size.x,
+          Size::Fraction(percentage) => ctx.layout.max_size.x * percentage,
+          Size::Static(pixels) => pixels,
         },
         match self.size.1 {
-          UiSize::Auto => ctx.layout.max_size.y,
-          UiSize::Fraction(percentage) => ctx.layout.max_size.y * percentage,
-          UiSize::Static(pixels) => pixels,
+          Size::Auto => ctx.layout.max_size.y,
+          Size::Fraction(percentage) => ctx.layout.max_size.y * percentage,
+          Size::Static(pixels) => pixels,
         },
       ),
       hints: Default::default(),

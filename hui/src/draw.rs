@@ -1,4 +1,4 @@
-//! Stuff related to tesselation and UI rendering.
+//! draw commands, tesselation and UI rendering.
 
 use crate::{
   rectangle::Corners,

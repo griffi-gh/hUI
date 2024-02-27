@@ -4,7 +4,7 @@ use glam::{vec2, Vec4};
 use crate::{
   draw::UiDrawCommand,
   element::{MeasureContext, ProcessContext, UiElement},
-  layout::UiSize,
+  layout::Size,
   measure::Response,
   text::FontHandle,
 };
@@ -22,7 +22,7 @@ use crate::{
 pub struct Text {
   #[setters(into)]
   pub text: Cow<'static, str>,
-  pub size: (UiSize, UiSize),
+  pub size: (Size, Size),
   pub color: Vec4,
   pub font: FontHandle,
   pub text_size: u16,
@@ -32,7 +32,7 @@ impl Default for Text {
   fn default() -> Self {
     Self {
       text: "".into(),
-      size: (UiSize::Auto, UiSize::Auto),
+      size: (Size::Auto, Size::Auto),
       color: Vec4::new(1., 1., 1., 1.),
       font: FontHandle::default(),
       text_size: 16,
@@ -43,7 +43,7 @@ impl Default for Text {
 impl UiElement for Text {
   fn measure(&self, ctx: MeasureContext) -> Response {
     let mut size = (0., 0.);
-    if matches!(self.size.0, UiSize::Auto) || matches!(self.size.1, UiSize::Auto) {
+    if matches!(self.size.0, Size::Auto) || matches!(self.size.1, Size::Auto) {
       let res = ctx.text_measure.measure(self.font, self.text_size, &self.text);
       size.0 = res.max_width;
       size.1 = res.height;
@@ -51,14 +51,14 @@ impl UiElement for Text {
     Response {
       size: vec2(
         match self.size.0 {
-          UiSize::Auto => size.0,
-          UiSize::Fraction(percentage) => ctx.layout.max_size.x * percentage,
-          UiSize::Static(pixels) => pixels,
+          Size::Auto => size.0,
+          Size::Fraction(percentage) => ctx.layout.max_size.x * percentage,
+          Size::Static(pixels) => pixels,
         },
         match self.size.1 {
-          UiSize::Auto => size.1,
-          UiSize::Fraction(percentage) => ctx.layout.max_size.y * percentage,
-          UiSize::Static(pixels) => pixels,
+          Size::Auto => size.1,
+          Size::Fraction(percentage) => ctx.layout.max_size.y * percentage,
+          Size::Static(pixels) => pixels,
         },
       ),
       hints: Default::default(),

@@ -1,4 +1,4 @@
-//! Layout related types and functions
+//! element layout, alignment and sizing
 
 use glam::Vec2;
 
@@ -81,7 +81,7 @@ impl From<Alignment> for Alignment2d {
 /// Can be either a static size in pixels, a fraction the parent size or auto-calculated\
 /// (Meaning of `auto` is entirely dependent on the element).
 #[derive(Default, Debug, Clone, Copy, PartialEq)]
-pub enum UiSize {
+pub enum Size {
   #[default]
   /// Automatically calculate size based on content
   Auto,
@@ -95,7 +95,7 @@ pub enum UiSize {
   Static(f32),
 }
 
-impl From<f32> for UiSize {
+impl From<f32> for Size {
   #[inline]
   fn from(value: f32) -> Self {
     Self::Static(value)
@@ -103,93 +103,28 @@ impl From<f32> for UiSize {
 }
 
 #[derive(Default, Debug, Clone, Copy, PartialEq)]
-pub struct UiSize2d {
-  pub width: UiSize,
-  pub height: UiSize,
+pub struct Size2d {
+  pub width: Size,
+  pub height: Size,
 }
 
-impl From<(UiSize, UiSize)> for UiSize2d {
+impl From<(Size, Size)> for Size2d {
   #[inline]
-  fn from((width, height): (UiSize, UiSize)) -> Self {
+  fn from((width, height): (Size, Size)) -> Self {
     Self { width, height }
   }
 }
 
 //XXX: should this exist?
-impl From<UiSize> for UiSize2d {
+impl From<Size> for Size2d {
   #[inline]
-  fn from(size: UiSize) -> Self {
+  fn from(size: Size) -> Self {
     Self {
       width: size,
       height: size,
     }
   }
 }
-
-//TODO?: add `UiSize2d` from `(Into<UiSize>, Into<UiSize>)` or Into<UiSize> conversion
-
-/// Constructs a `UiSize` or `UiSize2d` from a literal or expression
-///
-/// # Syntax:
-/// - `auto` - `UiSize::Auto`
-/// - `x` - `UiSize::Static(x)`
-/// - `x%` - `UiSize::Fraction(x / 100.)` *(literal only)*
-/// - `x/` - `UiSize::Fraction(x)`
-///
-/// ...where `x` is a literal, identifier or an expression wrapped in parentheses
-///
-/// # Note:
-/// - If a single argument is provided, it creates a `UiSize` using the rules specified above\
-/// - If two arguments are provided, it creates a `UiSize2d` with the first value as width and the second as height\
-///   Example: `size!(100, 50%)` creates a `UiSize2d` with width `100` (`UiSize::Static(100.)`) and height `50%` (`UiSize::Fraction(0.5)`)
-/// - `%` syntax is only valid for literals (`50%`), not expressions or identidiers.\
-///   Use `/` instead (`(0.5 * x)/`, `x/`), but be aware of the different range (0.0-1.0) \
-/// - Expressions must be wrapped in parentheses (for example: `(x + 5)`).\
-///   This does not apply to single identifiers (`x`) or literals (`5`)
-#[macro_export]
-macro_rules! size {
-  (auto) => {
-    $crate::layout::UiSize::Auto
-  };
-
-  ($x:literal) => {
-    $crate::layout::UiSize::Static($x as f32)
-  };
-  ($x:literal %) => {
-    $crate::layout::UiSize::Fraction($x as f32 / 100.)
-  };
-  ($x:literal /) => {
-    $crate::layout::UiSize::Fraction($x as f32)
-  };
-
-  ($x:ident) => {
-    $crate::layout::UiSize::Static($x as f32)
-  };
-  ($x:ident /) => {
-    $crate::layout::UiSize::Fraction($x as f32)
-  };
-
-  (($x:expr)) => {
-    $crate::layout::UiSize::Static(($x) as f32)
-  };
-  (($x:expr) /) => {
-    $crate::layout::UiSize::Fraction(($x) as f32)
-  };
-
-  ($x:tt , $y:tt $($ys:tt)?) => {
-    $crate::layout::UiSize2d {
-      width: $crate::layout::size!($x),
-      height: $crate::layout::size!($y $($ys)?),
-    }
-  };
-  ($x:tt $($xs:tt)? , $y:tt $($ys:tt)?) => {
-    $crate::layout::UiSize2d {
-      width: $crate::layout::size!($x $($xs)?),
-      height: $crate::layout::size!($y $($ys)?),
-    }
-  };
-}
-pub use size;
 
 /// Represents the direction of the layout\
 /// (for example, the direction of a container's children)\

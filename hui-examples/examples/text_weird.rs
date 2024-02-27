@@ -8,7 +8,7 @@ use winit::{
 use hui::{
   element::{
     container::Container, rect::Rect, spacer::Spacer, text::Text, ElementList
-  }, layout::UiSize, UiInstance
+  }, layout::Size, UiInstance
 };
 use hui_glium::GliumUiRenderer;
 
@@ -46,7 +46,7 @@ fn main() {
         hui.begin();
 
         hui.add(Container {
-          size: (UiSize::Fraction(1.), UiSize::Fraction(1.)).into(),
+          size: (Size::Fraction(1.), Size::Fraction(1.)).into(),
           background: vec4(0.1, 0.1, 0.1, 1.).into(),
           children: elements(|elem| {
             elem.push(Box::new(Text {
@@ -70,11 +70,11 @@ fn main() {
               }));
             }
             elem.push(Box::new(Rect {
-              size: (UiSize::Fraction(1.), UiSize::Static(10.)),
+              size: (Size::Fraction(1.), Size::Static(10.)),
               color: vec4(0., 0., 1., 1.).into(),
             }));
             elem.push(Box::new(Rect {
-              size: (UiSize::Fraction(1.), UiSize::Static(10.)),
+              size: (Size::Fraction(1.), Size::Static(10.)),
               color: vec4(1., 1., 0., 1.).into(),
             }));
             elem.push(Box::new(Text {
@@ -85,11 +85,11 @@ fn main() {
             }));
             if instant.elapsed().as_secs() & 1 != 0 {
               elem.push(Box::new(Rect {
-                size: (UiSize::Fraction(1.), UiSize::Static(10.)),
+                size: (Size::Fraction(1.), Size::Static(10.)),
                 color: vec4(1., 0., 0., 1.).into(),
               }));
               elem.push(Box::new(Rect {
-                size: (UiSize::Fraction(1.), UiSize::Static(10.)),
+                size: (Size::Fraction(1.), Size::Static(10.)),
                 color: vec4(0., 0., 0., 1.).into(),
               }));
               elem.push(Box::new(Spacer(100.)));

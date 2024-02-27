@@ -1,3 +1,5 @@
+//! element measurement, hints and responses
+
 use glam::Vec2;
 
 #[derive(Default)]

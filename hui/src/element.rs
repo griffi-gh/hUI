@@ -1,3 +1,4 @@
+//! element API, built-in elements like `Container`, `Button`, `Text`, etc.
 use std::any::Any;
 use crate::{
   draw::UiDrawCommandList, layout::LayoutInfo, measure::Response, state::StateRepo, text::TextMeasure, UiInstance

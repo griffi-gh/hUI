@@ -4,7 +4,7 @@ use crate::{
   background::BackgroundColor,
   draw::{RoundedCorners, UiDrawCommand},
   element::{ElementList, MeasureContext, ProcessContext, UiElement},
-  layout::{Alignment, Alignment2d, LayoutInfo, UiDirection, UiSize, UiSize2d},
+  layout::{Alignment, Alignment2d, LayoutInfo, UiDirection, Size, Size2d},
   measure::{Hints, Response},
   rectangle::{Corners, Sides}
 };
@@ -23,7 +23,7 @@ use crate::{
 #[setters(prefix = "with_")]
 pub struct Container {
   #[setters(into)]
-  pub size: UiSize2d,
+  pub size: Size2d,
   pub direction: UiDirection,
   pub gap: f32,
   #[setters(into)]
@@ -48,7 +48,7 @@ impl Container {
 impl Default for Container {
   fn default() -> Self {
     Self {
-      size: (UiSize::Auto, UiSize::Auto).into(),
+      size: (Size::Auto, Size::Auto).into(),
       direction: UiDirection::Vertical,
       gap: 0.,
       padding: Sides::all(0.),
@@ -63,14 +63,14 @@ impl Default for Container {
 impl Container {
   pub fn measure_max_inner_size(&self, layout: &LayoutInfo) -> Vec2 {
     let outer_size_x = match self.size.width {
-      UiSize::Auto => layout.max_size.x,
-      UiSize::Fraction(p) => layout.max_size.x * p,
-      UiSize::Static(p) => p,
+      Size::Auto => layout.max_size.x,
+      Size::Fraction(p) => layout.max_size.x * p,
+      Size::Static(p) => p,
     };
     let outer_size_y = match self.size.height {
-      UiSize::Auto => layout.max_size.y,
-      UiSize::Fraction(p) => layout.max_size.y * p,
-      UiSize::Static(p) => p,
+      Size::Auto => layout.max_size.y,
+      Size::Fraction(p) => layout.max_size.y * p,
+      Size::Static(p) => p,
     };
     vec2(
       outer_size_x - (self.padding.left + self.padding.right),
@@ -116,14 +116,14 @@ impl UiElement for Container {
     );
 
     match self.size.width {
-      UiSize::Auto => (),
-      UiSize::Fraction(percentage) => size.x = ctx.layout.max_size.x * percentage,
-      UiSize::Static(pixels) => size.x = pixels,
+      Size::Auto => (),
+      Size::Fraction(percentage) => size.x = ctx.layout.max_size.x * percentage,
+      Size::Static(pixels) => size.x = pixels,
     }
     match self.size.height {
-      UiSize::Auto => (),
-      UiSize::Fraction(percentage) => size.y = ctx.layout.max_size.y * percentage,
-      UiSize::Static(pixels) => size.y = pixels,
+      Size::Auto => (),
+      Size::Fraction(percentage) => size.y = ctx.layout.max_size.y * percentage,
+      Size::Static(pixels) => size.y = pixels,
     }
 
     Response {

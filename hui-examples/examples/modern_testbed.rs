@@ -7,7 +7,6 @@ use winit::{
 use hui::{
   UiInstance, color, size,
   layout::Alignment,
-  rectangle::Corners,
   element::{
     container::Container, text::Text, UiElementExt
   },

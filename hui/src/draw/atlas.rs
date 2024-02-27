@@ -19,6 +19,15 @@ pub struct TextureAtlasMeta<'a> {
   pub modified: bool,
 }
 
+/// Texture handle, stores the internal index of a texture within the texture atlas and can be cheaply copied.
+///
+/// Only valid for the `UiInstance` that created it.\
+/// Using it with other instances may result in panics or unexpected behavior.
+///
+/// Handle values are not guaranteed to be valid.\
+/// Creating or transmuting an invalid handle is allowed and is *not* UB.
+///
+/// Internal value is an implementation detail and should not be relied upon.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
 pub struct TextureHandle {
   //pub(crate) rc: Rc<()>,
@@ -27,19 +36,14 @@ pub struct TextureHandle {
 
 #[derive(Clone, Debug)]
 pub(crate) struct TextureAllocation {
-  //pub(crate) rc: Weak<()>,
-
-  /// Unique index of the texture allocation
-  pub index: u32,
-
   /// Position in the texture atlas
-  pub(crate) position: UVec2,
+  pub position: UVec2,
 
   /// Requested texture size
   pub size: UVec2,
 
   /// True if the texture was rotated by 90 degrees
-  pub(crate) rotated: bool,
+  pub rotated: bool,
 }
 
 /// Manages a texture atlas and the allocation of space within it\
@@ -126,7 +130,6 @@ impl TextureAtlasManager {
     let index = self.count;
     self.count += 1;
     let allocation = TextureAllocation {
-      index,
       position: UVec2::new(result.x as u32, result.y as u32),
       size,
       //If the size does not match the requested size, the texture was rotated

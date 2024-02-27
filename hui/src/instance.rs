@@ -12,8 +12,10 @@ use crate::{
   text::{FontHandle, TextRenderer}
 };
 
-/// The main instance of the UI system.\
-/// In most cases, you should only have one instance of this struct.
+/// The main instance of the UI system.
+///
+/// In most cases, you should only have one instance of this struct, but multiple instances are allowed\
+/// (Please note that it's possible to render multiple UI "roots" using a single instance)
 pub struct UiInstance {
   //mouse_position: Vec2,
   stateful_state: StateRepo,
@@ -57,7 +59,9 @@ impl UiInstance {
   }
 
   /// Parse and add a font from a raw byte slice to the UI\
-  /// Returns a font handle.
+  /// TrueType (`.ttf`/`.ttc`) and OpenType (`.otf`) fonts are supported\
+  ///
+  /// Returns a font handle ([`FontHandle`]).
   pub fn add_font(&mut self, font: &[u8]) -> FontHandle {
     self.text_renderer.add_font_from_bytes(font)
   }
@@ -87,9 +91,12 @@ impl UiInstance {
     });
   }
 
-  /// Prepare the UI for layout and processing
+  /// Prepare the UI for layout and processing\
+  /// You must call this function at the beginning of the frame, before adding any elements\
   ///
-  /// You must call this function at the beginning of the frame, before adding any elements
+  /// # Panics
+  /// If called twice in a row (for example, if you forget to call [`UiInstance::end`])\
+  /// This is an indication of a bug in your code and should be fixed.
   pub fn begin(&mut self) {
     assert!(!self.state, "must call UiInstance::end before calling UiInstance::begin again");
     self.state = true;
@@ -99,9 +106,12 @@ impl UiInstance {
     self.atlas.reset_modified();
   }
 
-  /// End the frame and prepare the UI for rendering
-  ///
+  /// End the frame and prepare the UI for rendering\
   /// You must call this function at the end of the frame, before rendering the UI
+  ///
+  /// # Panics
+  /// If called without calling [`UiInstance::begin`] first.\
+  /// This is an indication of a bug in your code and should be fixed.
   pub fn end(&mut self) {
     assert!(self.state, "must call UiInstance::begin before calling UiInstance::end");
     self.state = false;
@@ -118,6 +128,12 @@ impl UiInstance {
   /// You should not call this directly unless you're implementing a custom render backend
   ///
   /// Returns a tuple with a boolean indicating if the buffers have been modified since the last frame
+  ///
+  /// You should only call this function *after* [`UiInstance::end`]\
+  /// Calling it in the middle of a frame will result in a warning but will not cause a panic\
+  /// (please note that doing so is probably a mistake and should be fixed in your code)\
+  /// Doing so anyway will return draw call data for the previous frame, but the `modified` flag will *always* be incorrect until [`UiInstance::end`] is called
+  ///
   pub fn draw_call(&self) -> (bool, &UiDrawCall) {
     if self.state {
       log::warn!("UiInstance::draw_call called while in the middle of a frame, this is probably a mistake");
@@ -130,6 +146,12 @@ impl UiInstance {
   /// This function should only be used by the render backend.\
   /// You should not call this directly unless you're implementing a custom render backend
   ///
+  /// You should only call this function *after* [`UiInstance::end`]\
+  /// Calling it in the middle of a frame will result in a warning but will not cause a panic\
+  /// (please note that doing so is probably a mistake and should be fixed in your code)\
+  /// Using this function in the middle of a frame will return partially modified atlas data that may be outdated or incomplete\
+  /// This will lead to rendering artifacts, 1-frame delays and flashes and is probably not what you want
+  ///
   /// Make sure to check [`TextureAtlasMeta::modified`] to see if the texture has been modified
   /// since the beginning of the current frame before uploading it to the GPU
   pub fn atlas(&self) -> TextureAtlasMeta {
@@ -140,6 +162,12 @@ impl UiInstance {
   }
 
   /// Push a platform event to the UI event queue
+  ///
+  /// You should call this function *before* calling [`UiInstance::begin`] or after calling [`UiInstance::end`]\
+  /// Calling it in the middle of a frame will result in a warning but will not cause a panic\
+  /// (please note that doing so is probably a mistake and should be fixed in your code)\
+  /// In this case, the event will be processed in the next frame, but in some cases may affect the current frame.\
+  /// (The exact behavior is not guaranteed and you should avoid doing this if possible)
   ///
   /// This function should only be used by the platform backend.\
   /// You should not call this directly unless you're implementing a custom platform backend

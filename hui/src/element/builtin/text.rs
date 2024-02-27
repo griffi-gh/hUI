@@ -2,7 +2,11 @@ use std::borrow::Cow;
 use derive_setters::Setters;
 use glam::{vec2, Vec4};
 use crate::{
-  draw::UiDrawCommand, element::{MeasureContext, ProcessContext, UiElement}, layout::UiSize, measure::Response, text::{FontHandle, DEFAULT_FONT}
+  draw::UiDrawCommand,
+  element::{MeasureContext, ProcessContext, UiElement},
+  layout::UiSize,
+  measure::Response,
+  text::FontHandle,
 };
 
 
@@ -30,7 +34,7 @@ impl Default for Text {
       text: "".into(),
       size: (UiSize::Auto, UiSize::Auto),
       color: Vec4::new(1., 1., 1., 1.),
-      font: DEFAULT_FONT,
+      font: FontHandle::default(),
       text_size: 16,
     }
   }

@@ -40,17 +40,18 @@ fn main() {
           .with_size(size!(100%, 50%))
           .with_align(Alignment::Center)
           .with_padding(5.)
+          .with_gap(10.)
           .with_corner_radius(10.)
-          .with_background(color::RED)
+          .with_background(color::WHITE)
           .with_children(|ui| {
             Text::default()
               .with_text("Hello, world")
               .with_text_size(100)
-              .with_color(color::WHITE)
+              .with_color(color::BLACK)
               .add_child(ui);
             Container::default()
               .with_padding((10., 20.))
-              .with_corner_radius((10., 20., 50., 10.))
+              .with_corner_radius((2.5, 30., 2.5, 2.5))
               .with_background(color::DARK_RED)
               .with_children(|ui| {
                 Text::default()

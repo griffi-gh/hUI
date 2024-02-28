@@ -25,8 +25,9 @@
 </table>
 
 <h2>Example</h2>
-
-<img src="https://raw.githubusercontent.com/griffi-gh/hui/master/.assets/exemplaris.png" width="400" align="right">
+<img src="https://raw.githubusercontent.com/griffi-gh/hui/master/.assets/exemplaris.png" height="200" align="right">
+<div>
+<img src="https://raw.githubusercontent.com/griffi-gh/hui/master/.assets/000000.png" width="300" height="0" align="left">
 <pre lang="rust">Container::default()
   .with_size(size!(100%, 50%))
   .with_align(Alignment::Center)
@@ -52,7 +53,7 @@
       })
       .add_child(ui);
   })
-  .add_root(&mut hui, resolution);</pre>
+  .add_root(&mut hui, resolution);</pre></div>
 
 <h2>Backends</h2>
 <p>

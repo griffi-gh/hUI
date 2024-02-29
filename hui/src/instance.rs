@@ -1,15 +1,9 @@
-use std::collections::VecDeque;
 use glam::Vec2;
 use crate::{
   draw::{
     atlas::{TextureAtlasManager, TextureAtlasMeta},
     UiDrawCall, UiDrawCommandList,
-  },
-  element::{MeasureContext, ProcessContext, UiElement},
-  event::UiEvent,
-  layout::{LayoutInfo, UiDirection},
-  state::StateRepo,
-  text::{FontHandle, TextRenderer}
+  }, element::{MeasureContext, ProcessContext, UiElement}, event::{EventQueue, UiEvent}, input::UiInputState, layout::{LayoutInfo, UiDirection}, state::StateRepo, text::{FontHandle, TextRenderer}
 };
 
 /// The main instance of the UI system.
@@ -26,7 +20,8 @@ pub struct UiInstance {
   draw_call_modified: bool,
   text_renderer: TextRenderer,
   atlas: TextureAtlasManager,
-  events: VecDeque<UiEvent>,
+  events: EventQueue,
+  input: UiInputState,
   //True if in the middle of a laying out a frame
   state: bool,
 }
@@ -53,7 +48,8 @@ impl UiInstance {
         atlas.add_grayscale(1, &[255]);
         atlas
       },
-      events: VecDeque::new(),
+      events: EventQueue::new(),
+      input: UiInputState::new(),
       state: false,
     }
   }
@@ -98,11 +94,19 @@ impl UiInstance {
   /// If called twice in a row (for example, if you forget to call [`UiInstance::end`])\
   /// This is an indication of a bug in your code and should be fixed.
   pub fn begin(&mut self) {
+    //check and update current state
     assert!(!self.state, "must call UiInstance::end before calling UiInstance::begin again");
     self.state = true;
+
+    //first, drain and process the event queue
+    self.input.update_state(&mut self.events);
+
+    //then, reset the draw commands
     std::mem::swap(&mut self.prev_draw_commands, &mut self.draw_commands);
-    self.draw_call_modified = false;
     self.draw_commands.commands.clear();
+    self.draw_call_modified = false;
+
+    //reset atlas modification flag
     self.atlas.reset_modified();
   }
 
@@ -110,14 +114,19 @@ impl UiInstance {
   /// You must call this function at the end of the frame, before rendering the UI
   ///
   /// # Panics
-  /// If called without calling [`UiInstance::begin`] first.\
+  /// If called without calling [`UiInstance::begin`] first. (or if called twice)\
   /// This is an indication of a bug in your code and should be fixed.
   pub fn end(&mut self) {
+    //check and update current state
     assert!(self.state, "must call UiInstance::begin before calling UiInstance::end");
     self.state = false;
+
+    //check if the draw commands have been modified
     if self.draw_commands.commands == self.prev_draw_commands.commands {
       return
     }
+
+    //if they have, rebuild the draw call and set the modified flag
     self.draw_call = UiDrawCall::build(&self.draw_commands, &mut self.atlas, &mut self.text_renderer);
     self.draw_call_modified = true;
   }
@@ -176,7 +185,7 @@ impl UiInstance {
     if self.state {
       log::warn!("UiInstance::push_event called while in the middle of a frame, this is probably a mistake");
     }
-    self.events.push_back(event);
+    self.events.push(event);
   }
 }
 

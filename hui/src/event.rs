@@ -16,3 +16,22 @@ pub enum UiEvent {
   },
   TextInput(char),
 }
+
+#[derive(Default)]
+pub(crate) struct EventQueue {
+  events: Vec<UiEvent>,
+}
+
+impl EventQueue {
+  pub(crate) fn new() -> Self {
+    Self::default()
+  }
+
+  pub(crate) fn push(&mut self, event: UiEvent) {
+    self.events.push(event);
+  }
+
+  pub(crate) fn drain(&mut self) -> std::vec::Drain<UiEvent> {
+    self.events.drain(..)
+  }
+}

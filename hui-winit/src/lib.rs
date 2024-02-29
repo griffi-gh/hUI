@@ -12,15 +12,15 @@ pub fn handle_winit_event<T>(ui: &mut UiInstance, event: &Event<T>) {
       WindowEvent::MouseInput { state, button, .. } => {
         ui.push_event(UiEvent::MouseButton {
           button: match button {
-            winit::event::MouseButton::Left => hui::event::MouseButton::Primary,
-            winit::event::MouseButton::Right => hui::event::MouseButton::Secondary,
-            winit::event::MouseButton::Middle => hui::event::MouseButton::Middle,
-            winit::event::MouseButton::Other(id) => hui::event::MouseButton::Other(*id as u8),
+            winit::event::MouseButton::Left => hui::input::MouseButton::Primary,
+            winit::event::MouseButton::Right => hui::input::MouseButton::Secondary,
+            winit::event::MouseButton::Middle => hui::input::MouseButton::Middle,
+            winit::event::MouseButton::Other(id) => hui::input::MouseButton::Other(*id as u8),
             _ => return,
           },
           state: match state {
-            winit::event::ElementState::Pressed => hui::event::ButtonState::Pressed,
-            winit::event::ElementState::Released => hui::event::ButtonState::Released,
+            winit::event::ElementState::Pressed => hui::input::ButtonState::Pressed,
+            winit::event::ElementState::Released => hui::input::ButtonState::Released,
           },
         })
       },

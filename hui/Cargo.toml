@@ -25,6 +25,8 @@ log = "0.4"
 nz = "0.3"
 document-features = "0.2"
 derive_setters = "0.1"
+#smallvec = "1.13"
+#tinyset = "0.4"
 
 [features]
 default = ["builtin_elements", "builtin_font", "pixel_perfect_text"]

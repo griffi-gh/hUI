@@ -28,6 +28,7 @@ pub fn ui(mut x: impl FnMut(&mut UiInstance, Vec2)) {
 
   event_loop.run(|event, window_target| {
     window_target.set_control_flow(ControlFlow::Poll);
+    hui_winit::handle_winit_event(&mut hui, &event);
     match event {
       Event::WindowEvent { event: WindowEvent::CloseRequested, .. } => {
         window_target.exit();

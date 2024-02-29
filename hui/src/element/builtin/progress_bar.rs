@@ -1,14 +1,25 @@
-use glam::{vec2, Vec4, vec4};
+use derive_setters::Setters;
+use glam::{vec2, vec4};
 use crate::{
-  draw::{RoundedCorners, UiDrawCommand}, element::{MeasureContext, ProcessContext, UiElement}, layout::Size, measure::Response, rectangle::Corners
+  background::RectBackground,
+  draw::{RoundedCorners, UiDrawCommand},
+  element::{MeasureContext, ProcessContext, UiElement},
+  layout::{Size, Size2d},
+  measure::Response,
+  rectangle::Corners
 };
 
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Setters)]
+#[setters(prefix = "with_")]
 pub struct ProgressBar {
-  pub size: (Size, Size),
   pub value: f32,
-  pub color_foreground: Vec4,
-  pub color_background: Vec4,
+  #[setters(into)]
+  pub size: Size2d,
+  #[setters(into)]
+  pub foreground: RectBackground,
+  #[setters(into)]
+  pub background: RectBackground,
+  #[setters(into)]
   pub corner_radius: Corners<f32>,
 }
 
@@ -19,10 +30,10 @@ impl ProgressBar {
 impl Default for ProgressBar {
   fn default() -> Self {
     Self {
-      size: (Size::Auto, Size::Auto),
       value: 0.,
-      color_foreground: vec4(0.0, 0.0, 1.0, 1.0),
-      color_background: vec4(0.0, 0.0, 0.0, 1.0),
+      size: Size::Auto.into(),
+      foreground: vec4(0.0, 0.0, 1.0, 1.0).into(),
+      background: vec4(0.0, 0.0, 0.0, 1.0).into(),
       corner_radius: Corners::all(0.),
     }
   }
@@ -34,12 +45,12 @@ impl UiElement for ProgressBar {
   fn measure(&self, ctx: MeasureContext) -> Response {
     Response {
       size: vec2(
-        match self.size.0 {
+        match self.size.width {
           Size::Auto => ctx.layout.max_size.x.max(300.),
           Size::Fraction(p) => ctx.layout.max_size.x * p,
           Size::Static(p) => p,
         },
-        match self.size.1 {
+        match self.size.height {
           Size::Auto => Self::DEFAULT_HEIGHT,
           Size::Fraction(p) => ctx.layout.max_size.y * p,
           Size::Static(p) => p,
@@ -71,7 +82,7 @@ impl UiElement for ProgressBar {
       ctx.draw.add(UiDrawCommand::Rectangle {
         position: ctx.layout.position,
         size: ctx.measure.size,
-        color: Corners::all(self.color_background),
+        color: self.background.corners().unwrap(),
         texture: None,
         rounded_corners
       });
@@ -80,7 +91,7 @@ impl UiElement for ProgressBar {
       ctx.draw.add(UiDrawCommand::Rectangle {
         position: ctx.layout.position,
         size: ctx.measure.size * vec2(value, 1.0),
-        color: Corners::all(self.color_foreground),
+        color: self.foreground.corners().unwrap(),
         texture: None,
         rounded_corners,
       });

@@ -1,3 +1,5 @@
+//WARNING: THIS EXAMPLE IS EXTREMELY OUTDATED AND USES DEPRECATED API
+
 use std::time::Instant;
 use glam::{UVec2, vec4};
 use glium::{backend::glutin::SimpleWindowBuilder, Surface};

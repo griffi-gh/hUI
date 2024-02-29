@@ -1,3 +1,5 @@
+//! Adds spacing between elements in a layout
+
 use glam::vec2;
 use crate::{
   element::{MeasureContext, ProcessContext, UiElement},
@@ -5,6 +7,8 @@ use crate::{
   layout::UiDirection
 };
 
+/// Adds spacing between elements in a layout\
+/// (depending on the current layout direction)
 pub struct Spacer(pub f32);
 
 impl Default for Spacer {

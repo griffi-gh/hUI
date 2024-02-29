@@ -4,6 +4,7 @@ use std::hash::{Hash, Hasher};
 use glam::Vec2;
 use hashbrown::HashMap;
 use nohash_hasher::BuildNoHashHasher;
+use tinyset::{SetU32, SetUsize};
 use crate::rectangle::Rect;
 
 /// Represents a mouse button.
@@ -110,6 +111,15 @@ pub(crate) enum Pointer {
   TouchFinger(TouchFinger),
 }
 
+impl Pointer {
+  pub fn current_position(&self) -> Vec2 {
+    match self {
+      Pointer::MousePointer(mouse) => mouse.current_position,
+      Pointer::TouchFinger(touch) => touch.current_position,
+    }
+  }
+}
+
 impl ActiveMouseButton {
   /// Check if the pointer (mouse or touch) was just pressed\
   /// (i.e. it was not pressed in the previous frame, but is pressed now)
@@ -128,8 +138,38 @@ impl ActiveMouseButton {
   }
 }
 
+pub struct PointerQuery<'a> {
+  pointers: &'a [Pointer],
+  /// Set of pointer IDs to filter **out**
+  filter_out: SetUsize,
+}
+
+impl<'a> PointerQuery<'a> {
+  fn new(pointers: &'a [Pointer]) -> Self {
+    Self {
+      pointers,
+      filter_out: SetUsize::new(),
+    }
+  }
+
+  /// Filter pointers that are *currently* located within the specified rectangle
+  pub fn within_rect(&mut self, rect: Rect) -> &mut Self {
+    for (idx, pointer) in self.pointers.iter().enumerate() {
+      if !rect.contains_point(pointer.current_position()) {
+        self.filter_out.insert(idx);
+      }
+    }
+    self
+  }
+
+  /// Check if any pointers matched the filter
+  pub fn any_matched(&self) -> bool {
+    self.filter_out.len() != self.pointers.len()
+  }
+}
+
 pub(crate) struct UiInputState {
-  pointers: Vec<ActiveMouseButton>,
+  pointers: Vec<Pointer>,
 }
 
 impl UiInputState {
@@ -139,7 +179,7 @@ impl UiInputState {
     }
   }
 
-  pub fn query_pointer(&self, area: Rect) -> bool {
-    todo!()
+  pub fn query_pointer(&self) -> PointerQuery {
+    PointerQuery::new(&self.pointers)
   }
 }

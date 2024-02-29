@@ -1,3 +1,5 @@
+//WARNING: THIS EXAMPLE IS EXTREMELY OUTDATED AND USES DEPRECATED API
+
 use glam::{vec4, UVec2};
 use glium::{backend::glutin::SimpleWindowBuilder, Surface};
 use winit::{

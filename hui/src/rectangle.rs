@@ -8,6 +8,11 @@ pub struct Rect {
   pub size: Vec2,
 }
 
+impl Rect {
+  pub fn contains_point(&self, point: Vec2) -> bool {
+    point.cmpge(self.position).all() && point.cmple(self.position + self.size).all()
+  }
+}
 /// Represents 4 sides of a rectangular shape.
 #[derive(Default, Clone, Copy, PartialEq, Eq, Debug)]
 pub struct Sides<T> {

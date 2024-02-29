@@ -9,27 +9,28 @@ use crate::rectangle::Corners;
 //   pub texture: Option<TextureH>
 // }
 
+//TODO: move this into the color module?
 #[derive(Clone, Copy, Default, Debug, PartialEq)]
-pub enum BackgroundColor {
+pub enum RectBackground {
   #[default]
   Transparent,
   Solid(Vec4),
   Gradient(Corners<Vec4>),
 }
 
-impl From<(f32, f32, f32, f32)> for BackgroundColor {
+impl From<(f32, f32, f32, f32)> for RectBackground {
   fn from(color: (f32, f32, f32, f32)) -> Self {
     Self::Solid(vec4(color.0, color.1, color.2, color.3))
   }
 }
 
-impl From<Corners<Vec4>> for BackgroundColor {
+impl From<Corners<Vec4>> for RectBackground {
   fn from(corners: Corners<Vec4>) -> Self {
     Self::Gradient(corners)
   }
 }
 
-impl From<Option<Vec4>> for BackgroundColor {
+impl From<Option<Vec4>> for RectBackground {
   fn from(color: Option<Vec4>) -> Self {
     match color {
       Some(color) => Self::Solid(color),
@@ -38,19 +39,19 @@ impl From<Option<Vec4>> for BackgroundColor {
   }
 }
 
-impl From<Vec4> for BackgroundColor {
+impl From<Vec4> for RectBackground {
   fn from(color: Vec4) -> Self {
     Self::Solid(color)
   }
 }
 
-impl From<(f32, f32, f32)> for BackgroundColor {
+impl From<(f32, f32, f32)> for RectBackground {
   fn from(color: (f32, f32, f32)) -> Self {
     Self::Solid(vec4(color.0, color.1, color.2, 1.))
   }
 }
 
-impl From<Corners<Vec3>> for BackgroundColor {
+impl From<Corners<Vec3>> for RectBackground {
   fn from(corners: Corners<Vec3>) -> Self {
     Self::Gradient(Corners {
       top_left: corners.top_left.extend(1.),
@@ -61,7 +62,7 @@ impl From<Corners<Vec3>> for BackgroundColor {
   }
 }
 
-impl From<Option<Vec3>> for BackgroundColor {
+impl From<Option<Vec3>> for RectBackground {
   fn from(color: Option<Vec3>) -> Self {
     match color {
       Some(color) => Self::Solid(color.extend(1.)),
@@ -70,13 +71,13 @@ impl From<Option<Vec3>> for BackgroundColor {
   }
 }
 
-impl From<Vec3> for BackgroundColor {
+impl From<Vec3> for RectBackground {
   fn from(color: Vec3) -> Self {
     Self::Solid(color.extend(1.))
   }
 }
 
-impl BackgroundColor {
+impl RectBackground {
   /// Currently, never returns None.\
   /// `Option` has been added in preparation for future changes.\
   /// (`Background::Texture` etc)

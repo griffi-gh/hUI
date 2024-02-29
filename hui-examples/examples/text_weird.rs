@@ -1,3 +1,5 @@
+//WARNING: THIS EXAMPLE IS EXTREMELY OUTDATED AND USES DEPRECATED API
+
 use std::time::Instant;
 use glam::{UVec2, vec4};
 use glium::{backend::glutin::SimpleWindowBuilder, Surface};
@@ -7,7 +9,7 @@ use winit::{
 };
 use hui::{
   element::{
-    container::Container, rect::Rect, spacer::Spacer, text::Text, ElementList
+    container::Container, fill_rect::FillRect, spacer::Spacer, text::Text, ElementList
   }, layout::Size, UiInstance
 };
 use hui_glium::GliumUiRenderer;
@@ -69,13 +71,15 @@ fn main() {
                 ..Default::default()
               }));
             }
-            elem.push(Box::new(Rect {
-              size: (Size::Fraction(1.), Size::Static(10.)),
-              color: vec4(0., 0., 1., 1.).into(),
+            elem.push(Box::new(FillRect {
+              size: (Size::Fraction(1.), Size::Static(10.)).into(),
+              background: vec4(0., 0., 1., 1.).into(),
+              ..Default::default()
             }));
-            elem.push(Box::new(Rect {
-              size: (Size::Fraction(1.), Size::Static(10.)),
-              color: vec4(1., 1., 0., 1.).into(),
+            elem.push(Box::new(FillRect {
+              size: (Size::Fraction(1.), Size::Static(10.)).into(),
+              background: vec4(1., 1., 0., 1.).into(),
+              ..Default::default()
             }));
             elem.push(Box::new(Text {
               text: "Hello, world!\nżółty liść. życie nie ma sensu i wszyscy zginemy;\nтест кирилиці їїїїїїїїїїї\njapanese text: テスト".into(),
@@ -84,13 +88,15 @@ fn main() {
               ..Default::default()
             }));
             if instant.elapsed().as_secs() & 1 != 0 {
-              elem.push(Box::new(Rect {
-                size: (Size::Fraction(1.), Size::Static(10.)),
-                color: vec4(1., 0., 0., 1.).into(),
+              elem.push(Box::new(FillRect {
+                size: (Size::Fraction(1.), Size::Static(10.)).into(),
+                background: vec4(1., 0., 0., 1.).into(),
+                ..Default::default()
               }));
-              elem.push(Box::new(Rect {
-                size: (Size::Fraction(1.), Size::Static(10.)),
-                color: vec4(0., 0., 0., 1.).into(),
+              elem.push(Box::new(FillRect {
+                size: (Size::Fraction(1.), Size::Static(10.)).into(),
+                background: vec4(0., 0., 0., 1.).into(),
+                ..Default::default()
               }));
               elem.push(Box::new(Spacer(100.)));
               elem.push(Box::new(Text {

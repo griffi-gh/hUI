@@ -1,3 +1,5 @@
+//WARNING: THIS EXAMPLE IS EXTREMELY OUTDATED AND USES DEPRECATED API
+
 use std::time::Instant;
 use glam::{UVec2, vec4};
 use glium::{backend::glutin::SimpleWindowBuilder, Surface};
@@ -7,7 +9,7 @@ use winit::{
 };
 use hui::{
   element::{
-    container::Container, progress_bar::ProgressBar, rect::Rect, ElementList, UiElement
+    container::Container, progress_bar::ProgressBar, fill_rect::FillRect, ElementList, UiElement
   }, layout::{Alignment, UiDirection, Size}, rectangle::{Corners, Sides}, UiInstance
 };
 use hui_glium::GliumUiRenderer;
@@ -69,23 +71,26 @@ fn main() {
               padding: Sides::all(5.),
               gap: 10.,
               children: ElementList(vec![
-                Box::new(Rect {
-                  size: (Size::Fraction(0.5), Size::Static(30.)),
-                  color: vec4(0.75, 0., 0., 1.).into()
+                Box::new(FillRect {
+                  size: (Size::Fraction(0.5), Size::Static(30.)).into(),
+                  background: vec4(0.75, 0., 0., 1.).into(),
+                  ..Default::default()
                 }),
-                Box::new(Rect {
-                  size: (Size::Fraction(z / 2. + 0.5), Size::Static(30.)),
-                  color: Corners::left_right(
+                Box::new(FillRect {
+                  size: (Size::Fraction(z / 2. + 0.5), Size::Static(30.)).into(),
+                  background: Corners::left_right(
                     vec4(1., 0., 0., 1.),
                     vec4(0., 1., 0., 1.)
                   ).into(),
+                  ..Default::default()
                 }),
               ]),
               ..Default::default()
             }),
-            Box::new(Rect {
-              size: (Size::Fraction(z / 2. + 0.5), Size::Static(30.)),
-              color: vec4(0., 0.75, 0., 1.).into()
+            Box::new(FillRect {
+              size: (Size::Fraction(z / 2. + 0.5), Size::Static(30.)).into(),
+              background: vec4(0., 0.75, 0., 1.).into(),
+              ..Default::default()
             }),
             Box::new(Container {
               gap: 5.,
@@ -95,13 +100,14 @@ fn main() {
               children: {
                 let mut x: Vec<Box<dyn UiElement>> = vec![];
                 for i in 0..10 {
-                  x.push(Box::new(Rect {
-                    size: (Size::Static(50.), Size::Static(50.)),
-                    color: if i == 1 {
+                  x.push(Box::new(FillRect {
+                    size: (Size::Static(50.), Size::Static(50.)).into(),
+                    background: if i == 1 {
                       vec4(0.75, 0.75, 0.75, 0.75).into()
                     } else {
                       vec4(0.5, 0.5, 0.5, 0.75).into()
-                    }
+                    },
+                    ..Default::default()
                   }));
                 }
                 ElementList(x)
@@ -123,9 +129,10 @@ fn main() {
                 bottom_right: 0.,
               },
               children: ElementList(vec![
-                Box::new(Rect {
-                  size: (Size::Static(50.), Size::Static(50.)),
-                  color: vec4(1., 1., 1., 0.75).into()
+                Box::new(FillRect {
+                  size: (Size::Static(50.), Size::Static(50.)).into(),
+                  background: vec4(1., 1., 1., 0.75).into(),
+                  ..Default::default()
                 }),
               ]),
               ..Default::default()

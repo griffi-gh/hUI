@@ -2,7 +2,7 @@
 pub mod container;
 
 #[cfg(feature = "builtin_elements")]
-pub mod rect;
+pub mod fill_rect;
 
 #[cfg(feature = "builtin_elements")]
 pub mod spacer;

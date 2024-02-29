@@ -1,7 +1,7 @@
 use derive_setters::Setters;
 use glam::{Vec2, vec2};
 use crate::{
-  background::BackgroundColor,
+  background::RectBackground,
   draw::{RoundedCorners, UiDrawCommand},
   element::{ElementList, MeasureContext, ProcessContext, UiElement},
   layout::{Alignment, Alignment2d, LayoutInfo, UiDirection, Size, Size2d},
@@ -31,7 +31,7 @@ pub struct Container {
   #[setters(into)]
   pub align: Alignment2d,
   #[setters(into)]
-  pub background: BackgroundColor,
+  pub background: RectBackground,
   #[setters(into)]
   pub corner_radius: Corners<f32>,
   #[setters(skip)]

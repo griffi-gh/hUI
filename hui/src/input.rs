@@ -4,6 +4,7 @@ use std::hash::{Hash, Hasher};
 use glam::Vec2;
 use hashbrown::HashMap;
 use nohash_hasher::BuildNoHashHasher;
+use crate::rectangle::Rect;
 
 /// Represents a mouse button.
 ///
@@ -81,17 +82,19 @@ pub enum KeyboardKey {
 }
 
 
-/// Information about a mouse buttons or a touchscreen input that's continuously held down
+/// Information about the state of a mouse button
 pub(crate) struct ActiveMouseButton {
+  /// Whether the input is currently active (i.e. the button is currently held down)
+  pub active: bool,
   /// The button that initiated the input
   pub button: MouseButton,
-  /// Position at which the input was initiated
-  pub start_position: Vec2,
+  /// Position at which the input was initiated (last time it was pressed **down**)
+  pub start_position: Option<Vec2>,
 }
 
 pub(crate) struct MousePointer {
   pub current_position: Vec2,
-  pub active_buttons: HashMap<ButtonState, ActiveMouseButton, BuildNoHashHasher<u16>>,
+  pub buttons: HashMap<ButtonState, ActiveMouseButton, BuildNoHashHasher<u16>>,
 }
 
 pub(crate) struct TouchFinger {
@@ -126,5 +129,17 @@ impl ActiveMouseButton {
 }
 
 pub(crate) struct UiInputState {
-  pub pointers: Vec<ActiveMouseButton>,
+  pointers: Vec<ActiveMouseButton>,
+}
+
+impl UiInputState {
+  pub fn new() -> Self {
+    Self {
+      pointers: Vec::new(),
+    }
+  }
+
+  pub fn query_pointer(&self, area: Rect) -> bool {
+    todo!()
+  }
 }

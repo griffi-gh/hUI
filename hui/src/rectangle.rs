@@ -1,5 +1,13 @@
 //! Contains types which represent the sides and corners of a rectangular shape.
 
+use glam::Vec2;
+
+#[derive(Clone, Copy, Debug, PartialEq, Default)]
+pub struct Rect {
+  pub position: Vec2,
+  pub size: Vec2,
+}
+
 /// Represents 4 sides of a rectangular shape.
 #[derive(Default, Clone, Copy, PartialEq, Eq, Debug)]
 pub struct Sides<T> {

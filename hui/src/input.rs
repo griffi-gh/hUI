@@ -119,7 +119,7 @@ impl_fits64_for_keyboard_key!(
 
 /// Information about the state of a mouse button
 #[derive(Default, Clone, Copy, Debug)]
-pub(crate) struct MouseButtonState {
+pub struct MouseButtonState {
   /// Whether the input is currently active (i.e. the button is currently held down)
   pub state: ButtonState,
   /// Position at which the input was initiated (last time it was pressed **down**)
@@ -127,20 +127,22 @@ pub(crate) struct MouseButtonState {
 }
 
 #[derive(Default)]
-pub(crate) struct MousePointer {
+pub struct MousePointer {
   pub current_position: Vec2,
   pub buttons: HashMap<MouseButton, MouseButtonState, BuildNoHashHasher<u16>>,
 }
 
-pub(crate) struct TouchFinger {
+pub struct TouchFinger {
   /// Unique identifier of the pointer (finger)
   pub id: u32,
   pub current_position: Vec2,
   pub start_position: Vec2,
 }
 
+pub type PointerId = u32;
+
 /// Represents a pointer (mouse or touch)
-pub(crate) enum Pointer {
+pub enum Pointer {
   MousePointer(MousePointer),
   TouchFinger(TouchFinger),
 }
@@ -173,24 +175,24 @@ impl MouseButtonState {
 }
 
 pub struct PointerQuery<'a> {
-  pointers: &'a HashMap<u32, Pointer, BuildNoHashHasher<u32>>,
-  /// Set of pointer IDs to filter **out**
-  filter_out: SetU32,
+  pointers: &'a HashMap<PointerId, Pointer, BuildNoHashHasher<PointerId>>,
+  /// Set of filtered pointer IDs
+  filtered: SetU32
 }
 
 impl<'a> PointerQuery<'a> {
-  fn new(pointers: &'a HashMap<u32, Pointer, BuildNoHashHasher<u32>>) -> Self {
+  fn new(pointers: &'a HashMap<PointerId, Pointer, BuildNoHashHasher<PointerId>>) -> Self {
     Self {
       pointers,
-      filter_out: SetU32::new(),
+      filtered: pointers.keys().copied().collect(),
     }
   }
 
   /// Filter pointers that are *currently* located within the specified rectangle
   pub fn within_rect(&mut self, rect: Rect) -> &mut Self {
     for (&idx, pointer) in self.pointers {
-      if !rect.contains_point(pointer.current_position()) {
-        self.filter_out.insert(idx);
+      if rect.contains_point(pointer.current_position()) {
+        self.filtered.insert(idx);
       }
     }
     self
@@ -198,7 +200,13 @@ impl<'a> PointerQuery<'a> {
 
   /// Check if any pointers matched the filter
   pub fn any_matched(&self) -> bool {
-    self.filter_out.len() != self.pointers.len()
+    !self.filtered.is_empty()
+  }
+
+  pub fn finish(&self) -> Vec<&'a Pointer> {
+    self.filtered.iter()
+      .map(|id| self.pointers.get(&id).unwrap())
+      .collect()
   }
 }
 

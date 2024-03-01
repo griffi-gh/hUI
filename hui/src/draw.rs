@@ -16,7 +16,7 @@ pub use corner_radius::RoundedCorners;
 
 use std::borrow::Cow;
 use fontdue::layout::{Layout, CoordinateSystem, TextStyle};
-use glam::{Vec2, Vec4, vec2};
+use glam::{vec2, Vec2, Affine2, Vec4};
 
 //TODO: circle draw command
 
@@ -51,6 +51,10 @@ pub enum UiDrawCommand {
     ///Font handle to use
     font: FontHandle,
   },
+  /// Push a transformation matrix to the stack
+  PushTransform(Affine2),
+  /// Pop a transformation matrix from the stack
+  PopTransform,
 }
 
 /// List of draw commands
@@ -91,9 +95,45 @@ pub struct UiDrawCall {
 impl UiDrawCall {
   /// Tesselate the UI and build a complete draw plan from a list of draw commands
   pub(crate) fn build(draw_commands: &UiDrawCommandList, atlas: &mut TextureAtlasManager, text_renderer: &mut TextRenderer) -> Self {
+    let mut trans_stack = Vec::new();
     let mut draw_call = UiDrawCall::default();
     for command in &draw_commands.commands {
       match command {
+        UiDrawCommand::PushTransform(trans) => {
+          //Take note of the current index, and the transformation matrix\
+          //We will actually apply the transformation matrix when we pop it,
+          //to all vertices between the current index and the index we pushed
+          trans_stack.push((trans, draw_call.vertices.len() as u32));
+        },
+        UiDrawCommand::PopTransform => {
+          //Pop the transformation matrix and apply it to all vertices between the current index and the index we pushed
+          let (&trans, idx) = trans_stack.pop().expect("Unbalanced push/pop transform");
+
+          //If Push is immediately followed by a pop (which is dumb but possible), we don't need to do anything
+          //(this can also happen if push and pop are separated by a draw command that doesn't add any vertices, like a text command with an empty string)
+          if idx == draw_call.vertices.len() as u32 {
+            continue
+          }
+
+          //Kinda a hack:
+          //We want to apply the transform aronnd the center, so we need to compute the center of the vertices
+          //We won't actually do that, we will compute the center of the bounding box of the vertices
+          let mut min = Vec2::splat(std::f32::INFINITY);
+          let mut max = Vec2::splat(std::f32::NEG_INFINITY);
+          for v in &draw_call.vertices[idx as usize..] {
+            min = min.min(v.position);
+            max = max.max(v.position);
+          }
+          //TODO: make the point of transform configurable
+          let center = (min + max) / 2.;
+
+          //Apply trans mtx to all vertices between idx and the current index
+          for v in &mut draw_call.vertices[idx as usize..] {
+            v.position -= center;
+            v.position = trans.transform_point2(v.position);
+            v.position += center;
+          }
+        },
         UiDrawCommand::Rectangle { position, size, color, texture, rounded_corners } => {
           let uvs = texture
             .map(|x| atlas.get_uv(x))
@@ -257,8 +297,11 @@ impl UiDrawCall {
               feature = "pixel_perfect_text",
               not(feature = "pixel_perfect")
             ))] {
-              for vtx in &mut draw_call.vertices[(vidx as usize)..] {
-                vtx.position = vtx.position.round()
+              //Round the position of the vertices to the nearest pixel, unless any transformations are active
+              if trans_stack.is_empty() {
+                for vtx in &mut draw_call.vertices[(vidx as usize)..] {
+                  vtx.position = vtx.position.round()
+                }
               }
             }
           }

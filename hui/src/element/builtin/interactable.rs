@@ -1,3 +1,7 @@
+//TODO this thing?
+//not sure if this is a good idea...
+//but having the ability to add a click event to any element would be nice, and this is a naive way to do it
+
 // use crate::element::{UiElement, MeasureContext, ProcessContext};
 
 // pub struct Interactable<T: UiElement> {

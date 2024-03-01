@@ -53,11 +53,11 @@ ui_main!(
               .with_font(FontHandle::default())
               .add_child(ui);
           })
+          .transform()
+          .scale(Vec2::splat(elapsed_sec.sin() * 0.1 + 1.))
+          .rotate(elapsed_sec * PI / 4.)
           .add_child(ui);
       })
-      .transform()
-      .scale(Vec2::splat(elapsed_sec.sin() * 0.1 + 1.))
-      .rotate(elapsed_sec * PI / 4.)
       .add_root(ui, size);
   }
 );

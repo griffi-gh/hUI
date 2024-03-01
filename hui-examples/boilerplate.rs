@@ -44,7 +44,7 @@ pub fn ui<T>(mut init: impl FnMut(&mut UiInstance) -> T, mut draw: impl FnMut(&m
         },
         WindowEvent::RedrawRequested => {
           let mut frame = display.draw();
-          frame.clear_color_srgb(0.5, 0.5, 0.5, 0.);
+          frame.clear_color_srgb(0.5, 0.5, 0.5, 1.);
 
           hui.begin();
 

@@ -132,7 +132,7 @@ impl GliumUiRenderer {
   }
 
   fn update_buffers(&mut self, call: &UiDrawCall) {
-    log::trace!("updating ui buffers (i={})", call.indices.len());
+    log::trace!("updating ui buffers (tris: {})", call.indices.len() / 3);
     let data_vtx = &call.vertices.iter().copied().map(Vertex::from).collect::<Vec<_>>()[..];
     let data_idx = &call.indices[..];
     if let Some(buffer) = &mut self.buffer_pair {

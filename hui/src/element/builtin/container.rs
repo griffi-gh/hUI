@@ -88,7 +88,7 @@ impl UiElement for Container {
         state: ctx.state,
         layout: &LayoutInfo {
           position: ctx.layout.position + size,
-          max_size: self.measure_max_inner_size(ctx.layout), // - size TODO
+          max_size: self.measure_max_inner_size(ctx.layout), //TODO: subtract size already taken by previous children
           direction: self.direction,
         },
         text_measure: ctx.text_measure,

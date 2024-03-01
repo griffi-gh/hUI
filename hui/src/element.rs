@@ -1,7 +1,12 @@
 //! element API, built-in elements like `Container`, `Button`, `Text`, etc.
 use std::any::Any;
 use crate::{
-  draw::UiDrawCommandList, layout::LayoutInfo, measure::Response, state::StateRepo, text::TextMeasure, UiInstance
+  draw::UiDrawCommandList,
+  layout::LayoutInfo,
+  measure::Response,
+  state::StateRepo,
+  text::{FontHandle, TextMeasure},
+  UiInstance
 };
 
 mod builtin;
@@ -12,6 +17,7 @@ pub struct MeasureContext<'a> {
   pub state: &'a StateRepo,
   pub layout: &'a LayoutInfo,
   pub text_measure: TextMeasure<'a>,
+  pub current_font: FontHandle,
 }
 
 /// Context for the `Element::process` function
@@ -21,6 +27,7 @@ pub struct ProcessContext<'a> {
   pub layout: &'a LayoutInfo,
   pub draw: &'a mut UiDrawCommandList,
   pub text_measure: TextMeasure<'a>,
+  pub current_font: FontHandle,
 }
 
 pub trait UiElement {
@@ -58,13 +65,18 @@ pub trait UiElement {
   fn process(&self, ctx: ProcessContext);
 }
 
+/// A list of elements\
+/// Use the [`add`](`ElementList::add`) method to add elements to the list
 pub struct ElementList(pub Vec<Box<dyn UiElement>>);
 
 impl ElementList {
+  /// Add an element to the list
   pub fn add(&mut self, element: impl UiElement + 'static) {
     self.0.push(Box::new(element))
   }
 
+  /// Create a new `ElementList` from a callback\
+  /// The callback will be called with a reference to the newly list
   pub(crate) fn from_callback(cb: impl FnOnce(&mut ElementList)) -> Self {
     let mut list = ElementList(Vec::new());
     cb(&mut list);
@@ -72,29 +84,10 @@ impl ElementList {
   }
 }
 
-// impl<T: FnOnce(&mut ElementList)> From<T> for ElementList {
-//   fn from(cb: T) -> Self {
-//     let mut list = ElementList(Vec::new());
-//     cb(&mut list);
-//     list
-//   }
-// }
-
-// impl<T: UiElement + 'static> From<T> for ElementList {
-//   fn from(value: T) -> Self {
-//     ElementList(vec![Box::new(value)])
-//   }
-// }
-
-// impl From<Vec<Box<dyn UiElement>>> for ElementList {
-//   fn from(value: Vec<Box<dyn UiElement>>) -> Self {
-//     Self(value)
-//   }
-// }
-
 pub trait UiElementExt: UiElement {
   /// Add element as a child/nested element.
   fn add_child(self, ui: &mut ElementList);
+
   /// Add element as a ui root.
   fn add_root(self, ui: &mut UiInstance, max_size: glam::Vec2);
 }

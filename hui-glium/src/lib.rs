@@ -59,8 +59,8 @@ impl BufferPair {
     Self {
       vertex_buffer: VertexBuffer::dynamic(facade, vtx).unwrap(),
       index_buffer: IndexBuffer::dynamic(facade, PrimitiveType::TrianglesList, idx).unwrap(),
-      vertex_count: 0,
-      index_count: 0,
+      vertex_count: vtx.len(),
+      index_count: idx.len(),
     }
   }
 
@@ -122,7 +122,7 @@ pub struct GliumUiRenderer {
 
 impl GliumUiRenderer {
   pub fn new<F: Facade>(facade: &F) -> Self {
-    log::info!("initializing hui glium backend");
+    log::info!("initializing hui-glium");
     Self {
       program: Program::from_source(facade, VERTEX_SHADER, FRAGMENT_SHADER, None).unwrap(),
       context: Rc::clone(facade.get_context()),
@@ -131,7 +131,8 @@ impl GliumUiRenderer {
     }
   }
 
-  pub fn update_buffers(&mut self, call: &UiDrawCall) {
+  fn update_buffers(&mut self, call: &UiDrawCall) {
+    log::trace!("updating ui buffers (i={})", call.indices.len());
     let data_vtx = &call.vertices.iter().copied().map(Vertex::from).collect::<Vec<_>>()[..];
     let data_idx = &call.indices[..];
     if let Some(buffer) = &mut self.buffer_pair {
@@ -141,7 +142,7 @@ impl GliumUiRenderer {
     }
   }
 
-  pub fn update_texture_atlas(&mut self, atlas: &TextureAtlasMeta) {
+  fn update_texture_atlas(&mut self, atlas: &TextureAtlasMeta) {
     log::trace!("updating ui atlas texture");
     self.ui_texture = Some(SrgbTexture2d::new(
       &self.context,
@@ -152,16 +153,13 @@ impl GliumUiRenderer {
     ).unwrap());
   }
 
-  pub fn update(&mut self, hui: &UiInstance) {
-    if self.ui_texture.is_none() || hui.atlas().modified {
-      self.update_texture_atlas(&hui.atlas());
+  pub fn update(&mut self, instance: &UiInstance) {
+    if self.ui_texture.is_none() || instance.atlas().modified {
+      self.update_texture_atlas(&instance.atlas());
     }
-    //HACK: modified is incorrect, this is a hack
-    self.update_buffers(hui.draw_call().1);
-    //FIXME before release
-    // if (self.buffer_pair.is_none() && !hui.draw_call().1.indices.is_empty()) || hui.draw_call().0 {
-    //   self.update_buffers(hui.draw_call().1);
-    // }
+    if self.buffer_pair.is_none() || instance.draw_call().0 {
+      self.update_buffers(instance.draw_call().1);
+    }
   }
 
   pub fn draw(&self, frame: &mut glium::Frame, resolution: Vec2) {

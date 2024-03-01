@@ -83,7 +83,7 @@ fn main() {
             }));
             elem.push(Box::new(Text {
               text: "Hello, world!\nżółty liść. życie nie ma sensu i wszyscy zginemy;\nтест кирилиці їїїїїїїїїїї\njapanese text: テスト".into(),
-              font: font_handle,
+              font: Some(font_handle),
               text_size: 32,
               ..Default::default()
             }));

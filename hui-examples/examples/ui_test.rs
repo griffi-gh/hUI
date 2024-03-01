@@ -8,7 +8,7 @@ use hui::{
 #[macro_use]
 mod boilerplate;
 
-ui_main!(|ui, size| {
+ui_main!(|ui, size, _| {
   Container::default()
     .with_size(size!(100%, 50%))
     .with_align(Alignment::Center)

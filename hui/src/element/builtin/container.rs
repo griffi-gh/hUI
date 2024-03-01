@@ -92,6 +92,7 @@ impl UiElement for Container {
           direction: self.direction,
         },
         text_measure: ctx.text_measure,
+        current_font: ctx.current_font,
       });
       match self.direction {
         UiDirection::Horizontal => {
@@ -160,7 +161,7 @@ impl UiElement for Container {
     //.0 = primary, .1 = secondary
     let pri_sec_align = match self.direction {
       UiDirection::Horizontal => (self.align.horizontal, self.align.vertical),
-      UiDirection::Vertical => (self.align.horizontal, self.align.vertical),
+      UiDirection::Vertical => (self.align.vertical, self.align.horizontal),
     };
 
     //alignment
@@ -194,6 +195,7 @@ impl UiElement for Container {
         state: ctx.state,
         layout: &el_layout,
         text_measure: ctx.text_measure,
+        current_font: ctx.current_font,
       });
 
       //align (on sec. axis)
@@ -206,10 +208,10 @@ impl UiElement for Container {
           el_layout.position.x += (ctx.measure.size.x - self.padding.left - self.padding.right - el_measure.size.x) / 2.;
         },
         (Alignment::End, UiDirection::Horizontal) => {
-          el_layout.position.y += ctx.measure.size.y - el_measure.size.y - self.padding.bottom;
+          el_layout.position.y += ctx.measure.size.y - el_measure.size.y - self.padding.bottom - self.padding.top;
         },
         (Alignment::End, UiDirection::Vertical) => {
-          el_layout.position.x += ctx.measure.size.x - el_measure.size.x - self.padding.right;
+          el_layout.position.x += ctx.measure.size.x - el_measure.size.x - self.padding.right - self.padding.left;
         }
       }
 
@@ -220,6 +222,7 @@ impl UiElement for Container {
         layout: &el_layout,
         draw: ctx.draw,
         text_measure: ctx.text_measure,
+        current_font: ctx.current_font,
       });
 
       //layout

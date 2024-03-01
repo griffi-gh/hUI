@@ -62,6 +62,28 @@ impl UiInstance {
     self.text_renderer.add_font_from_bytes(font)
   }
 
+  /// Push a font to the font stack\
+  /// The font will be used for all text rendering until it is popped
+  ///
+  /// This function is useful for replacing the default font, use sparingly\
+  /// (This library attempts to be stateless, however passing the font to every text element is not very practical)
+  pub fn push_font(&mut self, font: FontHandle) {
+    self.text_renderer.push_font(font);
+  }
+
+  /// Pop a font from the font stack\
+  ///
+  /// ## Panics:
+  /// If the font stack is empty
+  pub fn pop_font(&mut self) {
+    self.text_renderer.pop_font();
+  }
+
+  /// Get the current default font
+  pub fn current_font(&self) -> FontHandle {
+    self.text_renderer.current_font()
+  }
+
   /// Add an element or an element tree to the UI
   ///
   /// Use the `max_size` parameter to specify the maximum size of the element\
@@ -77,6 +99,7 @@ impl UiInstance {
       state: &self.stateful_state,
       layout: &layout,
       text_measure: self.text_renderer.to_measure(),
+      current_font: self.text_renderer.current_font(),
     });
     element.process(ProcessContext {
       measure: &measure,
@@ -84,6 +107,7 @@ impl UiInstance {
       layout: &layout,
       draw: &mut self.draw_commands,
       text_measure: self.text_renderer.to_measure(),
+      current_font: self.text_renderer.current_font(),
     });
   }
 

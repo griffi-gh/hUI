@@ -1,43 +1,59 @@
 //! text rendering, styling, measuring
 
 use std::sync::Arc;
+use fontdue::{Font, FontSettings};
+use crate::draw::atlas::TextureAtlasManager;
 
 mod font;
 mod ftm;
+mod stack;
 
-use font::FontManager;
-pub use font::FontHandle;
 #[cfg(feature="builtin_font")]
 pub use font::BUILTIN_FONT;
-use fontdue::{Font, FontSettings};
+pub use font::FontHandle;
+
+use font::FontManager;
 use ftm::FontTextureManager;
 use ftm::GlyphCacheEntry;
-
-use crate::draw::atlas::TextureAtlasManager;
+use stack::FontStack;
 
 pub struct TextRenderer {
-  fm: FontManager,
+  manager: FontManager,
   ftm: FontTextureManager,
+  stack: FontStack,
 }
 
 impl TextRenderer {
   pub fn new() -> Self {
     Self {
-      fm: FontManager::new(),
+      manager: FontManager::new(),
       ftm: FontTextureManager::default(),
+      stack: FontStack::new(),
     }
   }
 
   pub fn add_font_from_bytes(&mut self, font: &[u8]) -> FontHandle {
-    self.fm.add_font(Font::from_bytes(font, FontSettings::default()).unwrap())
+    self.manager.add_font(Font::from_bytes(font, FontSettings::default()).unwrap())
   }
 
   pub fn glyph(&mut self, atlas: &mut TextureAtlasManager, font_handle: FontHandle, character: char, size: u8) -> Arc<GlyphCacheEntry> {
-    self.ftm.glyph(atlas, &self.fm, font_handle, character, size)
+    self.ftm.glyph(atlas, &self.manager, font_handle, character, size)
+  }
+
+  pub fn push_font(&mut self, font: FontHandle) {
+    self.stack.push(font);
+  }
+
+  pub fn pop_font(&mut self) {
+    self.stack.pop();
+  }
+
+  pub fn current_font(&self) -> FontHandle {
+    self.stack.current_or_default()
   }
 
   pub(crate) fn internal_font(&self, handle: FontHandle) -> &Font {
-    self.fm.get(handle).unwrap()
+    self.manager.get(handle).unwrap()
   }
 }
 

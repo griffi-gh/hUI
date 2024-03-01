@@ -69,7 +69,7 @@ fn main() {
               if instant.elapsed().as_secs_f32() < 5. {
                 el.push(Box::new(Text {
                   text: "Downloading your mom...".into(),
-                  font: font_handle,
+                  font: Some(font_handle),
                   text_size: 24,
                   ..Default::default()
                 }));
@@ -84,7 +84,7 @@ fn main() {
                   size: (Size::Fraction(1.), Size::Auto).into(),
                   children: ElementList(vec![Box::new(Text {
                     text: format!("{:.2}% ({:.1} GB)", mom_ratio * 100., mom_ratio * 10000.).into(),
-                    font: font_handle,
+                    font: Some(font_handle),
                     text_size: 16,
                     ..Default::default()
                   })]),
@@ -93,14 +93,14 @@ fn main() {
               } else if instant.elapsed().as_secs() < 10 {
                 el.push(Box::new(Text {
                   text: "Error 413: Request Entity Too Large".into(),
-                  font: font_handle,
+                  font: Some(font_handle),
                   color: vec4(1., 0.125, 0.125, 1.),
                   text_size: 20,
                   ..Default::default()
                 }));
                 el.push(Box::new(Text {
                   text: format!("Exiting in {}...", 10 - instant.elapsed().as_secs()).into(),
-                  font: font_handle,
+                  font: Some(font_handle),
                   text_size: 16,
                   ..Default::default()
                 }));

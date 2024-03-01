@@ -1,6 +1,6 @@
 <p></p><p></p>
 <img src="https://raw.githubusercontent.com/griffi-gh/hui/master/.assets/hui.svg" width="120" align="left">
-<h1>hui</h1>
+<h1>hUI</h1>
 <div>
   <span>
     Simple UI library for games and other interactive applications
@@ -9,7 +9,7 @@
   </a><br><a href="./LICENSE.txt" align="right" float="right">
     <img alt="license" src="https://img.shields.io/github/license/griffi-gh/hui?style=flat-square" align="right" width="102" height="20">
   </a><span>
-    Formerly kubi-ui
+    (Formerly <code>kubi-ui</code>)
   </span>
 </div>
 <p></p>

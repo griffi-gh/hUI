@@ -159,29 +159,43 @@ impl UiDrawCall {
               let x = angle.sin();
               let y = angle.cos();
               //Top-right corner
-              draw_call.vertices.push(UiVertex {
-                position: *position + vec2(x, 1. - y) * corner.radius.top_right + vec2(size.x - corner.radius.top_right, 0.),
-                color: color.top_right,
-                uv: uvs.top_right,
-              });
+              let mut corner_impl = |rp: Vec2, color: &Corners<Vec4>, uv: Vec2| {
+                //TODO: also calculate proper uv
+                let rrp = rp / *size;
+                let color_at_point =
+                  color.bottom_right * rrp.x * rrp.y +
+                  color.top_right * rrp.x * (1. - rrp.y) +
+                  color.bottom_left * (1. - rrp.x) * rrp.y +
+                  color.top_left * (1. - rrp.x) * (1. - rrp.y);
+                draw_call.vertices.push(UiVertex {
+                  position: *position + rp,
+                  color: color_at_point,
+                  uv,
+                });
+              };
+              corner_impl(
+                vec2(x, 1. - y) * corner.radius.top_right + vec2(size.x - corner.radius.top_right, 0.),
+                color,
+                uvs.top_right,
+              );
               //Bottom-right corner
-              draw_call.vertices.push(UiVertex {
-                position: *position + vec2(x - 1., y) * corner.radius.bottom_right + vec2(size.x, size.y - corner.radius.bottom_right),
-                color: color.bottom_right,
-                uv: uvs.bottom_right,
-              });
+              corner_impl(
+                vec2(x - 1., y) * corner.radius.bottom_right + vec2(size.x, size.y - corner.radius.bottom_right),
+                color,
+                uvs.bottom_right,
+              );
               //Bottom-left corner
-              draw_call.vertices.push(UiVertex {
-                position: *position + vec2(1. - x, y) * corner.radius.bottom_left + vec2(0., size.y - corner.radius.bottom_left),
-                color: color.bottom_left,
-                uv: uvs.bottom_left,
-              });
+              corner_impl(
+                vec2(1. - x, y) * corner.radius.bottom_left + vec2(0., size.y - corner.radius.bottom_left),
+                color,
+                uvs.bottom_left,
+              );
               //Top-left corner
-              draw_call.vertices.push(UiVertex {
-                position: *position + vec2(1. - x, 1. - y) * corner.radius.top_left,
-                color: color.top_left,
-                uv: uvs.top_left,
-              });
+              corner_impl(
+                vec2(1. - x, 1. - y) * corner.radius.top_left,
+                color,
+                uvs.top_left,
+              );
               // mental illness:
               if i > 0 {
                 draw_call.indices.extend([

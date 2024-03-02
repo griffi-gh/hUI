@@ -12,13 +12,22 @@ use crate::{
 #[derive(Debug, Clone, Copy, Setters)]
 #[setters(prefix = "with_")]
 pub struct ProgressBar {
+  /// Current progress, should be in the range 0.0..=1.0
   pub value: f32,
+
+  /// Size of the progress bar element
   #[setters(into)]
   pub size: Size2d,
+
+  /// Foreground (bar) color
   #[setters(into)]
   pub foreground: RectBackground,
+
+  /// Background color
   #[setters(into)]
   pub background: RectBackground,
+
+  /// Corner radius of the progress bar
   #[setters(into)]
   pub corner_radius: Corners<f32>,
 }

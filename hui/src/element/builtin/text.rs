@@ -1,3 +1,5 @@
+//! simple text element, renders a string of text
+
 use std::borrow::Cow;
 use derive_setters::Setters;
 use glam::{vec2, Vec4};
@@ -17,17 +19,28 @@ use crate::{
 //   Constant(u8),
 // }
 
+/// Simple text element, renders a string of text
 #[derive(Setters)]
 #[setters(prefix = "with_")]
 pub struct Text {
+  /// Text to render
   #[setters(into)]
   pub text: Cow<'static, str>,
+
+  /// Size of the text element
   #[setters(into)]
   pub size: Size2d,
+
+  /// Color of the text
   #[setters(into)]
   pub color: Vec4,
+
+  /// Font to use for rendering the text\
+  /// If set to `None` either currently selected font or the default font will be used
   #[setters(into)]
   pub font: Option<FontHandle>,
+
+  /// Size of the text, in points (these are not pixels)
   pub text_size: u16,
 }
 

@@ -1,3 +1,5 @@
+//! a container element that can hold and layout multiple children elements
+
 use derive_setters::Setters;
 use glam::{Vec2, vec2};
 use crate::{
@@ -14,26 +16,42 @@ use crate::{
 //   pub width: f32,
 // }
 
-///XXX: add Order/Direction::Forward/Reverse or sth?
+//XXX: add Order/Direction::Forward/Reverse or sth?
 //TODO: clip children flag
 //TODO: borders
 //TODO: min/max size
 
+/// A container element that can hold and layout multiple children elements
 #[derive(Setters)]
 #[setters(prefix = "with_")]
 pub struct Container {
+  /// Size of the container
   #[setters(into)]
   pub size: Size2d,
+
+  /// Layout direction (horizontal/vertical)
   pub direction: UiDirection,
+
+  /// Gap between children elements
   pub gap: f32,
+
+  /// Padding inside the container (distance from the edges to the children elements)
   #[setters(into)]
   pub padding: Sides<f32>,
+
+  /// Alignment of the children elements on X and Y axis
   #[setters(into)]
   pub align: Alignment2d,
+
+  /// Background color of the container
   #[setters(into)]
   pub background: RectBackground,
+
+  /// Corner radius of the background rectangle
   #[setters(into)]
   pub corner_radius: Corners<f32>,
+
+  /// List of children elements
   #[setters(skip)]
   pub children: ElementList,
 }

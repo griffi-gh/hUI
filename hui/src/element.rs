@@ -1,4 +1,5 @@
-//! element API, built-in elements like `Container`, `Button`, `Text`, etc.
+//! element API and built-in elements like `Container`, `Button`, `Text`, etc.
+
 use std::any::Any;
 use crate::{
   draw::UiDrawCommandList,
@@ -84,6 +85,7 @@ impl ElementList {
   }
 }
 
+/// Extension trait for [`UiElement`] that adds the [`add_child`] and [`add_root`] methods
 pub trait UiElementExt: UiElement {
   /// Add element as a child/nested element.
   fn add_child(self, ui: &mut ElementList);
@@ -96,6 +98,7 @@ impl<T: UiElement + 'static> UiElementExt for T {
   fn add_child(self, ui: &mut ElementList) {
     ui.add(self)
   }
+
   fn add_root(self, ui: &mut UiInstance, max_size: glam::Vec2) {
     ui.add(self, max_size);
   }

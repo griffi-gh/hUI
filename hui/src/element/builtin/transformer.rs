@@ -1,3 +1,5 @@
+//! wrapper that allows applying various transformations to an element, such as translation, rotation, or scaling
+
 use glam::{Affine2, Vec2};
 use crate::{
   draw::UiDrawCommand, element::{MeasureContext, ProcessContext, UiElement}, measure::Response
@@ -8,6 +10,8 @@ pub struct Transformer {
   pub element: Box<dyn UiElement>,
 }
 
+/// Wrapper that allows applying various transformations to an element, such as translation, rotation, or scaling\
+/// Use sparingly, as this is an experimental feature and may not work as expected\
 impl Transformer {
   pub fn new(element: Box<dyn UiElement>) -> Self {
     Self {
@@ -52,16 +56,17 @@ impl UiElement for Transformer {
   }
 }
 
+/// Extension trait for [`UiElement`] that adds the [`transform`] method
 pub trait ElementTransformExt {
-  fn transform(self) -> Transformer;
-}
-
-impl<T: UiElement + 'static> ElementTransformExt for T {
   /// Wrap the element in a [`Transformer`]
   ///
   /// This allows you to apply various transformations to the element, such as translation, rotation, or scaling\
   /// Use sparingly, as this is an experimental feature and may not work as expected\
   /// Transform is applied around the center of the element's bounding box.
+  fn transform(self) -> Transformer;
+}
+
+impl<T: UiElement + 'static> ElementTransformExt for T {
   fn transform(self) -> Transformer {
     Transformer::new(Box::new(self))
   }

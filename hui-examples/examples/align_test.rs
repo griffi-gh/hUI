@@ -43,7 +43,7 @@ fn main() {
         hui.add(Container {
           gap: 5.,
           padding: Sides::all(5.),
-          align: (Alignment::Begin, Alignment::Center).into(),
+          align: (Alignment::Center, Alignment::Begin).into(),
           size: (Size::Fraction(1.), Size::Fraction(1.)).into(),
           children: ElementList(vec![
             Box::new(ProgressBar {
@@ -57,7 +57,7 @@ fn main() {
         hui.add(Container {
           gap: 5.,
           padding: Sides::all(5.),
-          align: (Alignment::End, Alignment::Center).into(),
+          align: (Alignment::Center, Alignment::End).into(),
           size: (Size::Fraction(1.), Size::Fraction(1.)).into(),
           children: ElementList(vec![
             Box::new(ProgressBar {
@@ -67,7 +67,7 @@ fn main() {
             }),
             Box::new(Container {
               size: (Size::Fraction(1.), Size::Auto).into(),
-              align: (Alignment::Center, Alignment::End).into(),
+              align: (Alignment::End, Alignment::Center).into(),
               padding: Sides::all(5.),
               gap: 10.,
               children: ElementList(vec![

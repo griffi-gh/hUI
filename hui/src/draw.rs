@@ -142,6 +142,8 @@ impl UiDrawCall {
           let vidx = draw_call.vertices.len() as u32;
           if let Some(corner) = rounded_corners.filter(|x| x.radius.max_f32() > 0.0) {
             //this code is stupid as fuck
+            //but it works... i think?
+            //maybe some verts end up missing, but it's close enough...
 
             //Random vert in the center for no reason
             //lol
@@ -158,8 +160,8 @@ impl UiDrawCall {
               let angle = cratio * std::f32::consts::PI * 0.5;
               let x = angle.sin();
               let y = angle.cos();
-              //Top-right corner
-              let mut corner_impl = |rp: Vec2, color: &Corners<Vec4>, uv: Vec2| {
+
+              let mut corner_impl = |rp: Vec2, color: &Corners<Vec4>| {
                 //TODO: also calculate proper uv
                 let rrp = rp / *size;
                 let color_at_point =
@@ -167,35 +169,39 @@ impl UiDrawCall {
                   color.top_right * rrp.x * (1. - rrp.y) +
                   color.bottom_left * (1. - rrp.x) * rrp.y +
                   color.top_left * (1. - rrp.x) * (1. - rrp.y);
+                let uv_at_point =
+                  uvs.bottom_right * rrp.x * rrp.y +
+                  uvs.top_right * rrp.x * (1. - rrp.y) +
+                  uvs.bottom_left * (1. - rrp.x) * rrp.y +
+                  uvs.top_left * (1. - rrp.x) * (1. - rrp.y);
                 draw_call.vertices.push(UiVertex {
                   position: *position + rp,
                   color: color_at_point,
-                  uv,
+                  uv: uv_at_point,
                 });
               };
+
+              //Top-right corner
               corner_impl(
                 vec2(x, 1. - y) * corner.radius.top_right + vec2(size.x - corner.radius.top_right, 0.),
                 color,
-                uvs.top_right,
               );
               //Bottom-right corner
               corner_impl(
                 vec2(x - 1., y) * corner.radius.bottom_right + vec2(size.x, size.y - corner.radius.bottom_right),
                 color,
-                uvs.bottom_right,
               );
               //Bottom-left corner
               corner_impl(
                 vec2(1. - x, y) * corner.radius.bottom_left + vec2(0., size.y - corner.radius.bottom_left),
                 color,
-                uvs.bottom_left,
               );
               //Top-left corner
               corner_impl(
                 vec2(1. - x, 1. - y) * corner.radius.top_left,
                 color,
-                uvs.top_left,
               );
+
               // mental illness:
               if i > 0 {
                 draw_call.indices.extend([
@@ -239,6 +245,7 @@ impl UiDrawCall {
               vidx + 2,
             ]);
           } else {
+            //...Normal rectangle
             draw_call.indices.extend([vidx, vidx + 1, vidx + 2, vidx, vidx + 2, vidx + 3]);
             draw_call.vertices.extend([
               UiVertex {

@@ -162,7 +162,6 @@ impl UiDrawCall {
               let y = angle.cos();
 
               let mut corner_impl = |rp: Vec2, color: &Corners<Vec4>| {
-                //TODO: also calculate proper uv
                 let rrp = rp / *size;
                 let color_at_point =
                   color.bottom_right * rrp.x * rrp.y +

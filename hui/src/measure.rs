@@ -2,8 +2,8 @@
 
 use glam::Vec2;
 
+// #[non_exhaustive]
 #[derive(Default)]
-#[non_exhaustive]
 pub struct Hints {
   pub inner_content_size: Option<Vec2>,
   pub inner_content_size_cache: Option<Vec<Vec2>>,
@@ -23,6 +23,7 @@ pub struct Response {
 
   /// If true, the element should always cause the content to wrap to the next line\
   /// (the element itself gets wrapped to the next line too)
-  /// You should almost never set this
+  ///
+  /// You should almost never set this, and the exact behavior may change in the future
   pub should_wrap: bool,
 }

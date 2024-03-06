@@ -15,6 +15,7 @@ use hui::{
 mod boilerplate;
 
 ui_main!{
+  "Mom downloader 2000",
   init: |ui| {
     let font_handle = ui.add_font(include_bytes!("../assets/roboto/Roboto-Regular.ttf"));
     ui.push_font(font_handle);

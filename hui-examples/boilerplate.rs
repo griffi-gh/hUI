@@ -37,6 +37,8 @@ pub fn ui<T>(
   let event_loop = EventLoopBuilder::new().build().unwrap();
   let (window, display) = SimpleWindowBuilder::new().build(&event_loop);
 
+  window.set_title(name);
+
   let mut hui = UiInstance::new();
   let mut backend = GliumUiRenderer::new(&display);
 

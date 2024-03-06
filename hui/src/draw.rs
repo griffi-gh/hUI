@@ -176,6 +176,7 @@ impl UiDrawCall {
             draw_call.vertices.push(UiVertex {
               position: *position + *size * vec2(0.5, 0.5),
               color: (color.bottom_left + color.bottom_right + color.top_left + color.top_right) / 4.,
+              //TODO: fix this uv
               uv: vec2(0., 0.),
             });
 

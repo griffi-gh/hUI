@@ -45,7 +45,7 @@ impl UiInstance {
       atlas: {
         let mut atlas = TextureAtlasManager::default();
         //HACK: Ensure that vec(0, 0) uv is white square
-        atlas.add_grayscale(1, &[255]);
+        atlas.add(1, &[255, 255, 255, 255]);
         atlas
       },
       events: EventQueue::new(),

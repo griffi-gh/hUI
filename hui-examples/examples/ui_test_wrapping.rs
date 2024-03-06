@@ -1,10 +1,12 @@
 use hui::{
-  color, element::{
+  color, size,
+  layout::UiDirection,
+  element::{
     container::Container,
     fill_rect::FillRect,
     text::Text,
     UiElementExt
-  }, layout::{Alignment, UiDirection}, size
+  },
 };
 
 #[path = "../boilerplate.rs"]
@@ -18,7 +20,7 @@ ui_main!(|ui, size, _| {
     .with_padding(5.)
     .with_gap(10.)
     .with_background(color::WHITE)
-    //.with_wrap(true)
+    .with_wrap(true)
     .with_children(|ui| {
       Text::default()
         .with_color(color::BLACK)

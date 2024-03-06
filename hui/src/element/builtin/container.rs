@@ -51,6 +51,10 @@ pub struct Container {
   #[setters(into)]
   pub corner_radius: Corners<f32>,
 
+  /// Should the elements wrap?\
+  /// TODO: NOT IMPLEMENTED YET, implement this
+  pub wrap: bool,
+
   /// List of children elements
   #[setters(skip)]
   pub children: ElementList,
@@ -73,6 +77,7 @@ impl Default for Container {
       align: Alignment2d::default(),
       background: Default::default(),
       children: ElementList(Vec::new()),
+      wrap: false,
       corner_radius: Corners::all(0.),
     }
   }

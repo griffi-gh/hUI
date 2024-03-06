@@ -21,6 +21,16 @@ use crate::{
 //TODO: borders
 //TODO: min/max size
 
+#[derive(Clone, Copy)]
+struct CudLine {
+  start_idx: usize,
+  content_size: Vec2,
+}
+
+struct ContainerUserData {
+  lines: Vec<CudLine>,
+}
+
 /// A container element that can hold and layout multiple children elements
 #[derive(Setters)]
 #[setters(prefix = "with_")]
@@ -31,6 +41,8 @@ pub struct Container {
 
   /// Layout direction (horizontal/vertical)
   pub direction: UiDirection,
+
+  //XXX: should we have separate gap value for primary and secondary (when wrapped, between lines of elements) axis?
 
   /// Gap between children elements
   pub gap: f32,
@@ -51,8 +63,8 @@ pub struct Container {
   #[setters(into)]
   pub corner_radius: Corners<f32>,
 
-  /// Should the elements wrap?\
-  /// TODO: NOT IMPLEMENTED YET, implement this
+  /// Set this to `true` to allow the elements wrap automatically\
+  /// This is an experimental feature and may not work as expected
   pub wrap: bool,
 
   /// List of children elements
@@ -108,63 +120,193 @@ impl UiElement for Container {
   }
 
   fn measure(&self, ctx: MeasureContext) -> Response {
-    let mut size = Vec2::ZERO;
+    // XXX: If both axes are NOT set to auto, we should be able quickly return the size
+    // ... but we can't, because we need to measure the children to get the inner_content_size and user_data values
+    // this is a potential optimization opportunity, maybe we could postpone this to the process call
+    // as it's guaranteed to be called only ONCE, while measure is assumed to be cheap and called multiple times
+    // ... we could also implement some sort of "global" caching for the measure call (to prevent traversal of the same tree multiple times),
+    // but that's a bit more complex and probably impossible with the current design of the measure/process calls
+
+    // In case wrapping is enabled, elements cannot exceed this size on the primary axis
+    let max_line_pri = match self.direction {
+      UiDirection::Horizontal => match self.size.width {
+        Size::Auto => ctx.layout.max_size.x,
+        Size::Fraction(p) => ctx.layout.max_size.x * p,
+        Size::Static(p) => p,
+      },
+      UiDirection::Vertical => match self.size.height {
+        Size::Auto => ctx.layout.max_size.y,
+        Size::Fraction(p) => ctx.layout.max_size.y * p,
+        Size::Static(p) => p,
+      }
+    };
+
+    //size of AABB containing all lines
+    let mut total_size = Vec2::ZERO;
+
+    //Size of the current row/column (if wrapping)
+    let mut line_size = Vec2::ZERO;
+
+    //Size of previous sec. axes combined
+    //(basically, in case of the horizontal layout, this is the height of the tallest element in the line)
+    //This is a vec2, but only one axis is used, depending on the layout direction
+    let mut line_sec_offset: Vec2 = Vec2::ZERO;
+
+    //Amount of elements in the current line
+    let mut line_element_count = 0;
+
+    //Leftover gap from the previous element on the primary axis
     let mut leftover_gap = Vec2::ZERO;
-    for element in &self.children.0 {
+
+    //line metadata for the user_data
+    let mut lines = vec![
+      CudLine {
+        start_idx: 0,
+        content_size: Vec2::ZERO,
+      }
+    ];
+
+    for (idx, element) in self.children.0.iter().enumerate() {
       let measure = element.measure(MeasureContext{
         state: ctx.state,
         layout: &LayoutInfo {
-          position: ctx.layout.position + size,
-          max_size: self.measure_max_inner_size(ctx.layout), //TODO: subtract size already taken by previous children
+          //XXX: if the element gets wrapped, this will be inaccurate.
+          //But, we cant know the size of the line until we measure it, and also
+          //We dont make any guarantees about this value being valid during the `measure` call
+          //For all intents and purposes, this is just a *hint* for the element to use
+          //(and could be just set to 0 for all we care)
+          position: ctx.layout.position + line_size + line_sec_offset,
+          //TODO: subtract size already taken by previous children
+          max_size: self.measure_max_inner_size(ctx.layout),
           direction: self.direction,
         },
         text_measure: ctx.text_measure,
         current_font: ctx.current_font,
       });
+
+      //Check the position of the side of element closest to the end on the primary axis
+      let end_pos_pri = match self.direction {
+        UiDirection::Horizontal => line_size.x + measure.size.x + self.padding.left + self.padding.right,
+        UiDirection::Vertical => line_size.y + measure.size.y + self.padding.top + self.padding.bottom,
+      };
+
+      //Wrap the element if it exceeds container's size and is not the first element in the line
+      if self.wrap && (end_pos_pri > max_line_pri) && (line_element_count > 0) {
+        // >>>>>>> WRAP THAT B*TCH!
+
+        //Negate the leftover gap from the previous element
+        line_size -= leftover_gap;
+
+        //update the previous line metadata
+        lines.last_mut().unwrap().content_size = line_size;
+
+        //push the line metadata
+        lines.push(CudLine {
+          start_idx: idx,
+          content_size: Vec2::ZERO,
+        });
+
+        //Update the total size accordingly
+        match self.direction {
+          UiDirection::Horizontal => {
+            total_size.x = total_size.x.max(line_size.x);
+            total_size.y += line_size.y + self.gap;
+          },
+          UiDirection::Vertical => {
+            total_size.x += line_size.x + self.gap;
+            total_size.y = total_size.y.max(line_size.y);
+          }
+        }
+
+        //Now, update line_sec_offset
+        match self.direction {
+          UiDirection::Horizontal => {
+            line_sec_offset.y += measure.size.y + self.gap;
+          },
+          UiDirection::Vertical => {
+            line_sec_offset.x += measure.size.x + self.gap;
+          }
+        };
+
+        //Reset the line size and element count
+        line_size = Vec2::ZERO;
+        line_element_count = 0;
+      }
+
+      //Increment element count
+      line_element_count += 1;
+
+      //Sset the leftover gap in case this is the last element in the line
       match self.direction {
         UiDirection::Horizontal => {
-          size.x += measure.size.x + self.gap;
-          size.y = size.y.max(measure.size.y);
-          leftover_gap.x = self.gap;
+          line_size.x += measure.size.x + self.gap;
+          line_size.y = line_size.y.max(measure.size.y);
+          leftover_gap = vec2(self.gap, 0.);
         },
         UiDirection::Vertical => {
-          size.x = size.x.max(measure.size.x);
-          size.y += measure.size.y + self.gap;
-          leftover_gap.y = self.gap;
+          line_size.x = line_size.x.max(measure.size.x);
+          line_size.y += measure.size.y + self.gap;
+          leftover_gap = vec2(0., self.gap);
         }
       }
     }
-    size -= leftover_gap;
 
-    let inner_content_size = Some(size);
+    line_size -= leftover_gap;
 
-    size += vec2(
+    //Update the content size of the last line
+    lines.last_mut().unwrap().content_size = line_size;
+
+    //Update the total size according to the size of the last line
+    match self.direction {
+      UiDirection::Horizontal => {
+        total_size.x = total_size.x.max(line_size.x);
+        total_size.y += line_size.y;
+      },
+      UiDirection::Vertical => {
+        total_size.x += line_size.x;
+        total_size.y = total_size.y.max(line_size.y);
+      }
+    }
+
+    //Now, total_size should hold the size of the AABB containing all lines
+    //This is exactly what inner_content_size hint should be set to
+    let inner_content_size = Some(total_size);
+
+    //After setting the inner_content_size, we can calculate the size of the container
+    //Including padding, and in case the size is set to non-auto, override the size
+
+    total_size += vec2(
       self.padding.left + self.padding.right,
       self.padding.top + self.padding.bottom,
     );
 
     match self.size.width {
       Size::Auto => (),
-      Size::Fraction(percentage) => size.x = ctx.layout.max_size.x * percentage,
-      Size::Static(pixels) => size.x = pixels,
+      Size::Fraction(percentage) => total_size.x = ctx.layout.max_size.x * percentage,
+      Size::Static(pixels) => total_size.x = pixels,
     }
     match self.size.height {
       Size::Auto => (),
-      Size::Fraction(percentage) => size.y = ctx.layout.max_size.y * percentage,
-      Size::Static(pixels) => size.y = pixels,
+      Size::Fraction(percentage) => total_size.y = ctx.layout.max_size.y * percentage,
+      Size::Static(pixels) => total_size.y = pixels,
     }
 
     Response {
-      size,
+      size: total_size,
       hints: Hints {
         inner_content_size,
         ..Default::default()
       },
+      user_data: Some(Box::new(ContainerUserData { lines })),
       ..Default::default()
     }
   }
 
   fn process(&self, ctx: ProcessContext) {
+    let user_data: &ContainerUserData = ctx.measure.user_data
+      .as_ref().expect("no user data attached to container")
+      .downcast_ref().expect("invalid user data type");
+
     let mut position = ctx.layout.position;
 
     //background
@@ -191,76 +333,134 @@ impl UiElement for Container {
       UiDirection::Vertical => (self.align.vertical, self.align.horizontal),
     };
 
-    //alignment
-    match (pri_sec_align.0, self.direction) {
-      (Alignment::Begin, _) => (),
-      (Alignment::Center, UiDirection::Horizontal) => {
-        position.x += (ctx.measure.size.x - ctx.measure.hints.inner_content_size.unwrap().x) / 2. - self.padding.left;
-      },
-      (Alignment::Center, UiDirection::Vertical) => {
-        position.y += (ctx.measure.size.y - ctx.measure.hints.inner_content_size.unwrap().y) / 2. - self.padding.top;
-      },
-      (Alignment::End, UiDirection::Horizontal) => {
-        position.x += ctx.measure.size.x - ctx.measure.hints.inner_content_size.unwrap().x - self.padding.right - self.padding.left;
-      },
-      (Alignment::End, UiDirection::Vertical) => {
-        position.y += ctx.measure.size.y - ctx.measure.hints.inner_content_size.unwrap().y - self.padding.bottom - self.padding.top;
-      }
-    }
+    //alignment (on sec. axis)
+    // match pri_sec_align.1 {
+    //   Alignment::Begin => (),
+    //   Alignment::Center => {
+    //     position += match self.direction {
+    //       UiDirection::Horizontal => vec2(0., (ctx.measure.size.y - self.padding.top - self.padding.bottom - user_data.lines.last().unwrap().content_size.y) / 2.),
+    //       UiDirection::Vertical => vec2((ctx.measure.size.x - self.padding.left - self.padding.right - user_data.lines.last().unwrap().content_size.x) / 2., 0.),
+    //     };
+    //   },
+    //   Alignment::End => {
+    //     position += match self.direction {
+    //       UiDirection::Horizontal => vec2(0., ctx.measure.size.y - user_data.lines.last().unwrap().content_size.y - self.padding.bottom - self.padding.top),
+    //       UiDirection::Vertical => vec2(ctx.measure.size.x - user_data.lines.last().unwrap().content_size.x - self.padding.right - self.padding.left, 0.),
+    //     };
+    //   }
+    // }
 
-    for element in &self.children.0 {
-      //(passing max size from layout rather than actual bounds for the sake of consistency with measure() above)
+    for (line_idx, cur_line) in user_data.lines.iter().enumerate() {
+      let mut local_position = position;
 
-      let mut el_layout = LayoutInfo {
-        position,
-        max_size: self.measure_max_inner_size(ctx.layout),
-        direction: self.direction,
-      };
-
-      //measure
-      let el_measure = element.measure(MeasureContext {
-        state: ctx.state,
-        layout: &el_layout,
-        text_measure: ctx.text_measure,
-        current_font: ctx.current_font,
-      });
-
-      //align (on sec. axis)
-      match (pri_sec_align.1, self.direction) {
+      //alignment on primary axis
+      match (pri_sec_align.0, self.direction) {
         (Alignment::Begin, _) => (),
         (Alignment::Center, UiDirection::Horizontal) => {
-          el_layout.position.y += (ctx.measure.size.y - self.padding.bottom - self.padding.top - el_measure.size.y) / 2.;
+          local_position.x += (ctx.measure.size.x - cur_line.content_size.x) / 2. - self.padding.left;
         },
         (Alignment::Center, UiDirection::Vertical) => {
-          el_layout.position.x += (ctx.measure.size.x - self.padding.left - self.padding.right - el_measure.size.x) / 2.;
+          local_position.y += (ctx.measure.size.y - cur_line.content_size.y) / 2. - self.padding.top;
         },
         (Alignment::End, UiDirection::Horizontal) => {
-          el_layout.position.y += ctx.measure.size.y - el_measure.size.y - self.padding.bottom - self.padding.top;
+          local_position.x += ctx.measure.size.x - cur_line.content_size.x - self.padding.right - self.padding.left;
         },
         (Alignment::End, UiDirection::Vertical) => {
-          el_layout.position.x += ctx.measure.size.x - el_measure.size.x - self.padding.right - self.padding.left;
+          local_position.y += ctx.measure.size.y - cur_line.content_size.y - self.padding.bottom - self.padding.top;
         }
       }
 
-      //process
-      element.process(ProcessContext {
-        measure: &el_measure,
-        state: ctx.state,
-        layout: &el_layout,
-        draw: ctx.draw,
-        text_measure: ctx.text_measure,
-        current_font: ctx.current_font,
-      });
+      let next_line_begin = user_data.lines
+        .get(line_idx + 1)
+        .map(|l| l.start_idx)
+        .unwrap_or(self.children.0.len());
 
-      //layout
+      for element_idx in cur_line.start_idx..next_line_begin {
+        let element = &self.children.0[element_idx];
+
+        //(passing max size from layout rather than actual known bounds for the sake of consistency with measure() above)
+        //... as this must match!
+
+        let mut el_layout = LayoutInfo {
+          position: local_position,
+          max_size: self.measure_max_inner_size(ctx.layout),
+          direction: self.direction,
+        };
+
+        //measure
+        let el_measure = element.measure(MeasureContext {
+          state: ctx.state,
+          layout: &el_layout,
+          text_measure: ctx.text_measure,
+          current_font: ctx.current_font,
+        });
+
+        //align (on sec. axis)
+        //TODO separate align withing the line and align of the whole line
+        let inner_content_size = ctx.measure.hints.inner_content_size.unwrap();
+        match (pri_sec_align.1, self.direction) {
+          (Alignment::Begin, _) => (),
+          (Alignment::Center, UiDirection::Horizontal) => {
+            //Align whole row
+            el_layout.position.y += ((ctx.measure.size.y - self.padding.bottom - self.padding.top) - inner_content_size.y) / 2.;
+            //Align within row
+            el_layout.position.y += (cur_line.content_size.y - el_measure.size.y) / 2.;
+          },
+          (Alignment::Center, UiDirection::Vertical) => {
+            //Align whole row
+            el_layout.position.x += ((ctx.measure.size.x - self.padding.left - self.padding.right) - inner_content_size.x) / 2.;
+            //Align within row
+            el_layout.position.x += (cur_line.content_size.x - el_measure.size.x) / 2.;
+          },
+          //TODO update these two cases:
+          (Alignment::End, UiDirection::Horizontal) => {
+            //Align whole row
+            el_layout.position.y += (ctx.measure.size.y - self.padding.bottom - self.padding.top) - inner_content_size.y;
+            //Align within row
+            el_layout.position.y += cur_line.content_size.y - el_measure.size.y;
+          },
+          (Alignment::End, UiDirection::Vertical) => {
+            //Align whole row
+            el_layout.position.x += (ctx.measure.size.x - self.padding.right - self.padding.left) - inner_content_size.x;
+            //Align within row
+            el_layout.position.x += cur_line.content_size.x - el_measure.size.x;
+          }
+        }
+
+        //process
+        element.process(ProcessContext {
+          measure: &el_measure,
+          state: ctx.state,
+          layout: &el_layout,
+          draw: ctx.draw,
+          text_measure: ctx.text_measure,
+          current_font: ctx.current_font,
+        });
+
+        //layout
+        match self.direction {
+          UiDirection::Horizontal => {
+            local_position.x += el_measure.size.x + self.gap;
+          },
+          UiDirection::Vertical => {
+            local_position.y += el_measure.size.y + self.gap;
+          }
+        }
+      }
+
+      //Move to the next line
       match self.direction {
         UiDirection::Horizontal => {
-          position.x += el_measure.size.x + self.gap;
-        },
-        UiDirection::Vertical => {
-          position.y += el_measure.size.y + self.gap;
+          position.y += cur_line.content_size.y + self.gap;
+          //position.x -= cur_line.content_size.x;
+          // leftover_line_gap = vec2(0., self.gap);
         }
-      }
+        UiDirection::Vertical => {
+          position.x += cur_line.content_size.x + self.gap;
+          //position.y -= cur_line.content_size.y;
+          // leftover_line_gap = vec2(self.gap, 0.);
+        }
+      };
     }
   }
 }

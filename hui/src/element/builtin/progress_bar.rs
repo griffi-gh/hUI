@@ -1,7 +1,7 @@
 use derive_setters::Setters;
 use glam::{vec2, vec4};
 use crate::{
-  background::RectBackground,
+  background::BackgroundColor,
   draw::{RoundedCorners, UiDrawCommand},
   element::{MeasureContext, ProcessContext, UiElement},
   layout::{Size, Size2d},
@@ -21,11 +21,11 @@ pub struct ProgressBar {
 
   /// Foreground (bar) color
   #[setters(into)]
-  pub foreground: RectBackground,
+  pub foreground: BackgroundColor,
 
   /// Background color
   #[setters(into)]
-  pub background: RectBackground,
+  pub background: BackgroundColor,
 
   /// Corner radius of the progress bar
   #[setters(into)]
@@ -94,7 +94,7 @@ impl UiElement for ProgressBar {
       ctx.draw.add(UiDrawCommand::Rectangle {
         position: ctx.layout.position,
         size: ctx.measure.size,
-        color: self.background.corners().unwrap(),
+        color: self.background.corners(),
         texture: None,
         rounded_corners
       });
@@ -103,7 +103,7 @@ impl UiElement for ProgressBar {
       ctx.draw.add(UiDrawCommand::Rectangle {
         position: ctx.layout.position,
         size: ctx.measure.size * vec2(value, 1.0),
-        color: self.foreground.corners().unwrap(),
+        color: self.foreground.corners(),
         texture: None,
         rounded_corners,
       });

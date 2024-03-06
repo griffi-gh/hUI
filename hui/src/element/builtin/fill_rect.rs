@@ -3,7 +3,7 @@
 use derive_setters::Setters;
 use glam::{vec2, Vec4};
 use crate::{
-  background::RectBackground,
+  background::BackgroundColor,
   draw::{UiDrawCommand, RoundedCorners},
   element::{UiElement, MeasureContext, ProcessContext},
   layout::{Size, Size2d},
@@ -22,7 +22,7 @@ pub struct FillRect {
 
   /// Background color of the rectangle
   #[setters(into)]
-  pub background: RectBackground,
+  pub background: BackgroundColor,
 
   /// Corner radius of the rectangle
   #[setters(into)]
@@ -67,7 +67,7 @@ impl UiElement for FillRect {
       ctx.draw.add(UiDrawCommand::Rectangle {
         position: ctx.layout.position,
         size: ctx.measure.size,
-        color: self.background.corners().unwrap(),
+        color: self.background.corners(),
         texture: None,
         rounded_corners: (self.corner_radius.max_f32() > 0.).then_some({
           RoundedCorners::from_radius(self.corner_radius)

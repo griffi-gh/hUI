@@ -3,7 +3,7 @@
 use derive_setters::Setters;
 use glam::{Vec2, vec2};
 use crate::{
-  background::RectBackground,
+  background::BackgroundColor,
   draw::{RoundedCorners, UiDrawCommand},
   element::{ElementList, MeasureContext, ProcessContext, UiElement},
   layout::{Alignment, Alignment2d, LayoutInfo, UiDirection, Size, Size2d},
@@ -57,7 +57,7 @@ pub struct Container {
 
   /// Background color of the container
   #[setters(into)]
-  pub background: RectBackground,
+  pub background: BackgroundColor,
 
   /// Corner radius of the background rectangle
   #[setters(into)]
@@ -311,7 +311,7 @@ impl UiElement for Container {
 
     //background
     if !self.background.is_transparent() {
-      let corner_colors = self.background.corners().unwrap();
+      let corner_colors = self.background.corners();
       ctx.draw.add(UiDrawCommand::Rectangle {
         position,
         size: ctx.measure.size,

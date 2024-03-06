@@ -11,26 +11,26 @@ use crate::rectangle::Corners;
 
 //TODO: move this into the color module?
 #[derive(Clone, Copy, Default, Debug, PartialEq)]
-pub enum RectBackground {
+pub enum BackgroundColor {
   #[default]
   Transparent,
   Solid(Vec4),
   Gradient(Corners<Vec4>),
 }
 
-impl From<(f32, f32, f32, f32)> for RectBackground {
+impl From<(f32, f32, f32, f32)> for BackgroundColor {
   fn from(color: (f32, f32, f32, f32)) -> Self {
     Self::Solid(vec4(color.0, color.1, color.2, color.3))
   }
 }
 
-impl From<Corners<Vec4>> for RectBackground {
+impl From<Corners<Vec4>> for BackgroundColor {
   fn from(corners: Corners<Vec4>) -> Self {
     Self::Gradient(corners)
   }
 }
 
-impl From<Option<Vec4>> for RectBackground {
+impl From<Option<Vec4>> for BackgroundColor {
   fn from(color: Option<Vec4>) -> Self {
     match color {
       Some(color) => Self::Solid(color),
@@ -39,19 +39,19 @@ impl From<Option<Vec4>> for RectBackground {
   }
 }
 
-impl From<Vec4> for RectBackground {
+impl From<Vec4> for BackgroundColor {
   fn from(color: Vec4) -> Self {
     Self::Solid(color)
   }
 }
 
-impl From<(f32, f32, f32)> for RectBackground {
+impl From<(f32, f32, f32)> for BackgroundColor {
   fn from(color: (f32, f32, f32)) -> Self {
     Self::Solid(vec4(color.0, color.1, color.2, 1.))
   }
 }
 
-impl From<Corners<Vec3>> for RectBackground {
+impl From<Corners<Vec3>> for BackgroundColor {
   fn from(corners: Corners<Vec3>) -> Self {
     Self::Gradient(Corners {
       top_left: corners.top_left.extend(1.),
@@ -62,7 +62,7 @@ impl From<Corners<Vec3>> for RectBackground {
   }
 }
 
-impl From<Option<Vec3>> for RectBackground {
+impl From<Option<Vec3>> for BackgroundColor {
   fn from(color: Option<Vec3>) -> Self {
     match color {
       Some(color) => Self::Solid(color.extend(1.)),
@@ -71,21 +71,19 @@ impl From<Option<Vec3>> for RectBackground {
   }
 }
 
-impl From<Vec3> for RectBackground {
+impl From<Vec3> for BackgroundColor {
   fn from(color: Vec3) -> Self {
     Self::Solid(color.extend(1.))
   }
 }
 
-impl RectBackground {
-  /// Currently, never returns None.\
-  /// `Option` has been added in preparation for future changes.\
-  /// (`Background::Texture` etc)
-  pub fn corners(&self) -> Option<Corners<Vec4>> {
+impl BackgroundColor {
+  /// Returns the colors of individual corners
+  pub fn corners(&self) -> Corners<Vec4> {
     match *self {
-      Self::Transparent => Some(Corners::all(Vec4::ZERO)),
-      Self::Solid(color) => Some(Corners::all(color)),
-      Self::Gradient(corners) => Some(corners),
+      Self::Transparent => Corners::all(Vec4::ZERO),
+      Self::Solid(color) => Corners::all(color),
+      Self::Gradient(corners) => corners,
     }
   }
 
@@ -105,9 +103,3 @@ impl RectBackground {
     }
   }
 }
-
-// impl From<(GradientDirection, Vec4, Vec4)> for Background {
-//   fn from(gradient: (GradientDirection, Vec4, Vec4)) -> Self {
-//     Self::Gradient(gradient.0, gradient.1, gradient.2)
-//   }
-// }

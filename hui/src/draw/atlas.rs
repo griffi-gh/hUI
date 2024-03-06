@@ -59,6 +59,10 @@ pub(crate) struct TextureAtlasManager {
   /// True if the atlas has been modified in a way which requires a texture reupload
   /// since the beginning of the current frame
   modified: bool,
+
+  /// If true, attempting to modify the atlas in a way which invalidates UVs will cause a panic\
+  /// Used internally to ensure that the UVs do not become invalidated mid-render
+  pub(crate) lock_atlas: bool,
 }
 
 impl TextureAtlasManager {
@@ -73,11 +77,15 @@ impl TextureAtlasManager {
       allocations: HashMap::default(),
       remove_queue: Vec::new(),
       modified: true,
+      lock_atlas: false,
     }
   }
 
   /// Resize the texture atlas to the new size in-place, preserving the existing data
   pub fn resize(&mut self, new_size: UVec2) {
+    if self.lock_atlas {
+      panic!("Attempted to resize the texture atlas while the atlas is locked");
+    }
     log::trace!("resizing texture atlas to {:?}", new_size);
     if self.size == new_size {
       log::warn!("Texture atlas is already the requested size");

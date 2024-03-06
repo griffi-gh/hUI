@@ -97,6 +97,32 @@ impl UiDrawCall {
   pub(crate) fn build(draw_commands: &UiDrawCommandList, atlas: &mut TextureAtlasManager, text_renderer: &mut TextRenderer) -> Self {
     let mut trans_stack = Vec::new();
     let mut draw_call = UiDrawCall::default();
+
+    //HACK: atlas may get resized while creating new glyphs,
+    //which invalidates all uvs, causing corrupted-looking texture
+    //so we need to pregenerate font textures before generating any vertices
+    //we are doing *a lot* of double work here, but it's the easiest way to avoid the issue
+    for comamnd in &draw_commands.commands {
+      if let UiDrawCommand::Text { text, font: font_handle, size, .. } = comamnd {
+        let mut layout = Layout::new(CoordinateSystem::PositiveYDown);
+        layout.append(
+          &[text_renderer.internal_font(*font_handle)],
+          &TextStyle::new(text, *size as f32, 0)
+        );
+        let glyphs = layout.glyphs();
+        for layout_glyph in glyphs {
+          if !layout_glyph.char_data.rasterize() { continue }
+          text_renderer.glyph(atlas, *font_handle, layout_glyph.parent, layout_glyph.key.px as u8);
+        }
+      }
+    }
+
+    //note to future self:
+    //RESIZING OR ADDING STUFF TO ATLAS AFTER THIS POINT IS A BIG NO-NO,
+    //DON'T DO IT EVER AGAIN UNLESS YOU WANT TO SPEND HOURS DEBUGGING
+
+    atlas.lock_atlas = true;
+
     for command in &draw_commands.commands {
       match command {
         UiDrawCommand::PushTransform(trans) => {
@@ -328,10 +354,14 @@ impl UiDrawCall {
         }
       }
     }
+
+    atlas.lock_atlas = false;
+
     #[cfg(feature = "pixel_perfect")]
     draw_call.vertices.iter_mut().for_each(|v| {
       v.position = v.position.round()
     });
+
     draw_call
   }
 }

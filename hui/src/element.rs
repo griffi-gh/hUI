@@ -33,7 +33,7 @@ pub struct ProcessContext<'a> {
 
 pub trait UiElement {
   /// Get the name of the element, for example "Button" or "ProgressBar"
-  fn name(&self) -> &'static str { "UiElement" }
+  fn name(&self) -> &'static str;
 
   /// Get the unique id used for internal state management\
   /// This value must be unique for each instance of the element
@@ -41,11 +41,13 @@ pub trait UiElement {
   /// If the element is stateless, this function should return `None`
   fn state_id(&self) -> Option<u64> { None }
 
-  /// Check if the element has state
+  /// Check if the element has state.\
+  /// Should not be overridden
   fn is_stateful(&self) -> bool { self.state_id().is_some() }
 
-  /// Check if the element has no state
-  fn is_stateless(&self) -> bool { self.state_id().is_none() }
+  /// Check if the element has no state\
+  /// Should not be overridden
+  fn is_stateless(&self) -> bool { !self.is_stateful() }
 
   /// Initialize the state of the element\
   /// This function should be called exactly once during the lifetime of the element,

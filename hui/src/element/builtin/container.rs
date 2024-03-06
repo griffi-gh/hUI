@@ -103,6 +103,10 @@ impl Container {
 }
 
 impl UiElement for Container {
+  fn name(&self) -> &'static str {
+    "Container"
+  }
+
   fn measure(&self, ctx: MeasureContext) -> Response {
     let mut size = Vec2::ZERO;
     let mut leftover_gap = Vec2::ZERO;
@@ -156,7 +160,7 @@ impl UiElement for Container {
         inner_content_size,
         ..Default::default()
       },
-      user_data: None
+      ..Default::default()
     }
   }
 

@@ -63,6 +63,10 @@ impl Text {
 }
 
 impl UiElement for Text {
+  fn name(&self) -> &'static str {
+    "Text"
+  }
+
   fn measure(&self, ctx: MeasureContext) -> Response {
     let mut size = (0., 0.);
     if matches!(self.size.width, Size::Auto) || matches!(self.size.height, Size::Auto) {
@@ -84,8 +88,7 @@ impl UiElement for Text {
           Size::Static(pixels) => pixels,
         },
       ),
-      hints: Default::default(),
-      user_data: None
+      ..Default::default()
     }
   }
 

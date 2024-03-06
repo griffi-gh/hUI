@@ -11,7 +11,18 @@ pub struct Hints {
 
 #[derive(Default)]
 pub struct Response {
+  /// Computed size of the element
   pub size: Vec2,
+
+  /// Hints for the layout system, can be used to optimize the layout engine.\
+  /// These will never cause the UI to be rendered differently (assuming the values are correct)
   pub hints: Hints,
+
+  /// Arbitrary user data, can be used to pass data (for example, cache) between measure and process stages
   pub user_data: Option<Box<dyn std::any::Any>>,
+
+  /// If true, the element should always cause the content to wrap to the next line\
+  /// (the element itself gets wrapped to the next line too)
+  /// You should almost never set this
+  pub should_wrap: bool,
 }

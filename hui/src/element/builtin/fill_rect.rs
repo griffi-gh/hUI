@@ -40,6 +40,10 @@ impl Default for FillRect {
 }
 
 impl UiElement for FillRect {
+  fn name(&self) -> &'static str {
+    "FillRect"
+  }
+
   fn measure(&self, ctx: MeasureContext) -> Response {
     Response {
       size: vec2(
@@ -54,8 +58,7 @@ impl UiElement for FillRect {
           Size::Static(pixels) => pixels,
         },
       ),
-      hints: Default::default(),
-      user_data: None
+      ..Default::default()
     }
   }
 

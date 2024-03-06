@@ -49,7 +49,9 @@ impl Default for ProgressBar {
 }
 
 impl UiElement for ProgressBar {
-  fn name(&self) -> &'static str { "Progress bar" }
+  fn name(&self) -> &'static str {
+    "ProgressBar"
+  }
 
   fn measure(&self, ctx: MeasureContext) -> Response {
     Response {
@@ -67,6 +69,7 @@ impl UiElement for ProgressBar {
       ),
       hints: Default::default(),
       user_data: None,
+      ..Default::default()
     }
   }
 

@@ -18,14 +18,17 @@ impl Default for Spacer {
 }
 
 impl UiElement for Spacer {
+  fn name(&self) -> &'static str {
+    "Spacer"
+  }
+
   fn measure(&self, ctx: MeasureContext) -> Response {
     Response {
       size: match ctx.layout.direction {
         UiDirection::Horizontal => vec2(self.0, 0.),
         UiDirection::Vertical => vec2(0., self.0),
       },
-      hints: Default::default(),
-      user_data: None
+      ..Default::default()
     }
   }
 

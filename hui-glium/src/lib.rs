@@ -95,10 +95,9 @@ impl BufferPair {
     self.vertex_count = vtx.len();
     self.index_count = idx.len();
 
-    // self.vertex_buffer.invalidate();
-    // self.index_buffer.invalidate();
-
     if self.vertex_count == 0 || self.index_count == 0 {
+      self.vertex_buffer.invalidate();
+      self.index_buffer.invalidate();
       return
     }
 

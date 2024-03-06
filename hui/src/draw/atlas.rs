@@ -83,12 +83,12 @@ impl TextureAtlasManager {
       log::warn!("Texture atlas is already the requested size");
       return
     }
-    if new_size.x > self.size.x && new_size.y > self.size.y{
+    if new_size.x > self.size.x && new_size.y > self.size.y {
       self.packer.resize(new_size.x as i32, new_size.y as i32);
       //Resize the data array in-place
       self.data.resize((new_size.x * new_size.y * RGBA_CHANNEL_COUNT) as usize, 0);
-      for y in (1..self.size.y).rev() {
-        for x in (0..self.size.x).rev() {
+      for y in (0..self.size.y).rev() {
+        for x in (1..self.size.x).rev() {
           let idx = ((y * self.size.x + x) * RGBA_CHANNEL_COUNT) as usize;
           let new_idx = ((y * new_size.x + x) * RGBA_CHANNEL_COUNT) as usize;
           for c in 0..(RGBA_CHANNEL_COUNT as usize) {
@@ -111,7 +111,7 @@ impl TextureAtlasManager {
     // TODO: implement these
     // Plan C: resize the atlas
     let mut new_size = self.size;
-    while !self.packer.can_pack(size.x as i32, size.y as i32, true) {
+    while !self.packer.can_pack(size.x as i32, size.y as i32, ALLOW_ROTATION) {
       new_size *= 2;
       self.packer.resize(new_size.x as i32, new_size.y as i32);
     }

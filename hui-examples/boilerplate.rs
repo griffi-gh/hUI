@@ -9,20 +9,29 @@ use hui_glium::GliumUiRenderer;
 
 /// Generates a `main` function that initializes glium renderer, `UiInstance`, and runs the event loop.
 macro_rules! ui_main {
-  (init: $closure0: expr, run: $closure1: expr) => {
+  ($name:literal, init: $closure0:expr, run: $closure1:expr) => {
     fn main() {
-      $crate::boilerplate::ui($closure0, $closure1);
+      $crate::boilerplate::ui($closure0, $closure1, $name);
+    }
+  };
+  (init: $closure0:expr, run: $closure1:expr) => {
+    fn main() {
+      $crate::boilerplate::ui($closure0, $closure1, "hUI example");
     }
   };
   ($closure: expr) => {
     fn main() {
-      $crate::boilerplate::ui(|_|(), $closure);
+      $crate::boilerplate::ui(|_|(), $closure, "hUI example");
     }
   };
 }
 
 /// Initializes glium renderer, `UiInstance`, and runs the event loop.
-pub fn ui<T>(mut init: impl FnMut(&mut UiInstance) -> T, mut draw: impl FnMut(&mut UiInstance, Vec2, &T)) {
+pub fn ui<T>(
+  mut init: impl FnMut(&mut UiInstance) -> T,
+  mut draw: impl FnMut(&mut UiInstance, Vec2, &T),
+  name: &'static str
+) {
   kubi_logging::init();
 
   let event_loop = EventLoopBuilder::new().build().unwrap();

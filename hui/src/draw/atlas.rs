@@ -219,6 +219,14 @@ impl TextureAtlasManager {
     }
   }
 
+  pub(crate) fn add_dummy(&mut self) {
+    let handle = self.allocate((1, 1).into());
+    assert!(handle.index == 0, "Dummy texture handle is not 0");
+    assert!(self.get(handle).unwrap().position == (0, 0).into(), "Dummy texture position is not (0, 0)");
+    self.data[0..4].copy_from_slice(&[255, 255, 255, 255]);
+    self.modified = true;
+  }
+
   pub fn modify(&mut self, handle: ImageHandle) {
     todo!()
   }

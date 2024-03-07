@@ -165,6 +165,7 @@ impl UiDrawCall {
             .map(|x| atlas.get_uv(x))
             .flatten()
             .unwrap_or(Corners::all(Vec2::ZERO));
+
           let vidx = draw_call.vertices.len() as u32;
           if let Some(corner) = rounded_corners.filter(|x| x.radius.max_f32() > 0.0) {
             //this code is stupid as fuck

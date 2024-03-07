@@ -43,8 +43,7 @@ impl UiInstance {
       text_renderer: TextRenderer::new(),
       atlas: {
         let mut atlas = TextureAtlasManager::default();
-        //HACK: Ensure that vec(0, 0) uv is white square
-        atlas.add_rgba(1, &[255, 255, 255, 255]);
+        atlas.add_dummy();
         atlas
       },
       events: EventQueue::new(),

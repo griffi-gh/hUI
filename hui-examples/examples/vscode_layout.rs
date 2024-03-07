@@ -39,7 +39,7 @@ ui_main!(
           .with_size(size!(100%, auto))
           .with_direction(Direction::Horizontal)
           .with_align((Alignment::Begin, Alignment::Center))
-          .with_padding((5., 8.))
+          .with_padding(8.)
           .with_gap(15.)
           .with_background(color::rgb_hex(0x3d3c3e))
           .with_wrap(true) //XXX: not authentic but great for demostration
@@ -47,7 +47,6 @@ ui_main!(
             Image::new(stuff.vscode_icon)
               .with_size(size!(auto, 24))
               .add_child(ui);
-            Spacer(1.).add_child(ui);
             for item in ["File", "Edit", "Selection", "View", "Go", "Run", "Terminal", "Help"] {
               Text::new(item)
                 .with_text_size(15)
@@ -64,7 +63,7 @@ ui_main!(
           .with_direction(Direction::Horizontal)
           .with_children(|ui| {
             Container::default()
-              .with_size(size!(48, 100%))
+              .with_size(size!(54, 100%))
               .with_background(color::rgb_hex(0x343334))
               .add_child(ui);
             FillRect::default()
@@ -74,16 +73,47 @@ ui_main!(
             Container::default()
               .with_size(size!(200, 100%))
               .with_padding((15., 8.))
-              .with_background(color::rgb_hex(0x1e1e1e))
+              .with_background(color::rgb_hex(0x262526))
               .with_children(|ui| {
                 Text::new("EXPLORER")
                   .add_child(ui);
               })
               .add_child(ui);
+            Container::default()
+              .with_size(size!(100%, 100%))
+              .with_background(color::rgb_hex(0x1f1e1f))
+              .add_child(ui);
           })
           .add_child(ui);
-
       })
       .add_root(ui, size);
+
+      //Bottom bar (yeah, it's basically fake/overlay)
+      Container::default()
+        .with_size(size!(100%))
+        .with_align((Alignment::Begin, Alignment::End))
+        .with_children(|ui| {
+          Container::default()
+            .with_size(size!(100%, auto))
+            .with_background(color::rgb_hex(0x0079cc))
+            .with_direction(Direction::Horizontal)
+            .with_gap(5.)
+            .with_children(|ui| {
+              Container::default()
+                .with_background(color::rgb_hex(0x16815e))
+                .with_padding((10., 2.))
+                .with_children(|ui| {
+                  Text::new("><")
+                    .with_text_size(13)
+                    .add_child(ui);
+                })
+                .add_child(ui);
+              Text::new("master")
+                .with_text_size(15)
+                .add_child(ui);
+            })
+            .add_child(ui);
+        })
+        .add_root(ui, size);
   }
 );

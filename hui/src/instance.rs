@@ -1,8 +1,7 @@
 use glam::Vec2;
 use crate::{
   draw::{
-    atlas::{TextureAtlasManager, TextureAtlasMeta},
-    UiDrawCall, UiDrawCommandList,
+    atlas::{TextureAtlasManager, TextureAtlasMeta}, TextureFormat, TextureHandle, UiDrawCall, UiDrawCommandList
   }, element::{MeasureContext, ProcessContext, UiElement}, event::{EventQueue, UiEvent}, input::UiInputState, layout::{LayoutInfo, UiDirection}, state::StateRepo, text::{FontHandle, TextRenderer}
 };
 
@@ -45,7 +44,7 @@ impl UiInstance {
       atlas: {
         let mut atlas = TextureAtlasManager::default();
         //HACK: Ensure that vec(0, 0) uv is white square
-        atlas.add(1, &[255, 255, 255, 255]);
+        atlas.add_rgba(1, &[255, 255, 255, 255]);
         atlas
       },
       events: EventQueue::new(),
@@ -58,8 +57,21 @@ impl UiInstance {
   /// TrueType (`.ttf`/`.ttc`) and OpenType (`.otf`) fonts are supported\
   ///
   /// Returns a font handle ([`FontHandle`]).
+  ///
+  /// ## Panics:
+  /// If the font data is invalid or corrupt
   pub fn add_font(&mut self, font: &[u8]) -> FontHandle {
     self.text_renderer.add_font_from_bytes(font)
+  }
+
+  /// Add an image to the texture atlas\
+  /// Accepted texture formats are `Rgba` and `Grayscale`
+  ///
+  /// Returns a texture handle ([`TextureHandle`])\
+  /// This handle can be used to reference the texture in draw commands\
+  /// It's a light reference and can be cloned/copied freely, but will not be cleaned up even when dropped
+  pub fn add_image(&mut self, format: TextureFormat, data: &[u8], width: usize) -> TextureHandle {
+    self.atlas.add(width, data, format)
   }
 
   /// Push a font to the font stack\
@@ -88,6 +100,9 @@ impl UiInstance {
   ///
   /// Use the `max_size` parameter to specify the maximum size of the element\
   /// (usually, the size of the window/screen)
+  ///
+  /// ## Panics:
+  /// If called while the UI is not active (call [`UiInstance::begin`] first)
   pub fn add<T: UiElement>(&mut self, element: T, max_size: Vec2) {
     assert!(self.state, "must call UiInstance::begin before adding elements");
     let layout = LayoutInfo {
@@ -114,7 +129,7 @@ impl UiInstance {
   /// Prepare the UI for layout and processing\
   /// You must call this function at the beginning of the frame, before adding any elements\
   ///
-  /// # Panics
+  /// ## Panics:
   /// If called twice in a row (for example, if you forget to call [`UiInstance::end`])\
   /// This is an indication of a bug in your code and should be fixed.
   pub fn begin(&mut self) {
@@ -137,7 +152,7 @@ impl UiInstance {
   /// End the frame and prepare the UI for rendering\
   /// You must call this function at the end of the frame, before rendering the UI
   ///
-  /// # Panics
+  /// ## Panics:
   /// If called without calling [`UiInstance::begin`] first. (or if called twice)\
   /// This is an indication of a bug in your code and should be fixed.
   pub fn end(&mut self) {

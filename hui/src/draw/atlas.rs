@@ -5,8 +5,25 @@ use rect_packer::DensePacker;
 use crate::rectangle::Corners;
 
 const RGBA_CHANNEL_COUNT: u32 = 4;
+//TODO make this work
 const ALLOW_ROTATION: bool = false;
 
+/// Texture format of the source texture data
+#[derive(Default, Clone, Copy, PartialEq, Eq)]
+pub enum TextureFormat {
+  /// The data is stored in RGBA format, with 1 byte (8 bits) per channel
+  #[default]
+  Rgba,
+
+  /// The data is copied into the Alpha channel, with 1 byte (8 bits) per channel\
+  /// Remaining channels are set to 255 (which can be easily shaded to any color)
+  ///
+  /// This format is useful for storing grayscale textures such as icons\
+  /// (Please note that the internal representation is still RGBA, this is just a convenience feature)
+  Grayscale,
+}
+
+/// Contains a reference to the texture data, and metadata associated with it
 pub struct TextureAtlasMeta<'a> {
   /// Texture data\
   /// The data is stored in RGBA format, with 1 byte (8 bits) per channel
@@ -157,7 +174,7 @@ impl TextureAtlasManager {
 
   /// Allocate a new texture region in the atlas and copy the data into it\
   /// This function may resize the atlas as needed, and should never fail under normal circumstances.
-  pub fn add(&mut self, width: usize, data: &[u8]) -> TextureHandle {
+  pub(crate) fn add_rgba(&mut self, width: usize, data: &[u8]) -> TextureHandle {
     let size = uvec2(width as u32, (data.len() / (width * RGBA_CHANNEL_COUNT as usize)) as u32);
     let handle: TextureHandle = self.allocate(size);
     let allocation = self.allocations.get(&handle.index).unwrap();
@@ -178,7 +195,7 @@ impl TextureAtlasManager {
   /// Works the same way as [`TextureAtlasManager::add`], but the input data is assumed to be grayscale (1 channel per pixel)\
   /// The data is copied into the alpha channel of the texture, while all the other channels are set to 255\
   /// May resize the atlas as needed, and should never fail under normal circumstances.
-  pub fn add_grayscale(&mut self, width: usize, data: &[u8]) -> TextureHandle {
+  pub(crate) fn add_grayscale(&mut self, width: usize, data: &[u8]) -> TextureHandle {
     let size = uvec2(width as u32, (data.len() / width) as u32);
     let handle = self.allocate(size);
     let allocation = self.allocations.get(&handle.index).unwrap();
@@ -192,6 +209,13 @@ impl TextureAtlasManager {
     }
     self.modified = true;
     handle
+  }
+
+  pub fn add(&mut self, width: usize, data: &[u8], format: TextureFormat) -> TextureHandle {
+    match format {
+      TextureFormat::Rgba => self.add_rgba(width, data),
+      TextureFormat::Grayscale => self.add_grayscale(width, data),
+    }
   }
 
   pub fn modify(&mut self, handle: TextureHandle) {

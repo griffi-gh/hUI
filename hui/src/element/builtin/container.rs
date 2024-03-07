@@ -4,9 +4,9 @@ use derive_setters::Setters;
 use glam::{Vec2, vec2};
 use crate::{
   background::BackgroundColor,
-  draw::{RoundedCorners, UiDrawCommand},
+  draw::{RoundedCorners, TextureHandle, UiDrawCommand},
   element::{ElementList, MeasureContext, ProcessContext, UiElement},
-  layout::{Alignment, Alignment2d, LayoutInfo, UiDirection, Size, Size2d},
+  layout::{Alignment, Alignment2d, LayoutInfo, Size, Size2d, UiDirection},
   measure::{Hints, Response},
   rectangle::{Corners, Sides}
 };
@@ -55,9 +55,18 @@ pub struct Container {
   #[setters(into)]
   pub align: Alignment2d,
 
-  /// Background color of the container
+  /// Background color of the container\
+  ///
+  /// If the container has a background texture, it will be multiplied by this color
   #[setters(into)]
   pub background: BackgroundColor,
+
+  /// Background texture of the container
+  ///
+  /// Can be used in conjunction with the background color\
+  /// In this case, the texture will be shaded by the color
+  #[setters(into)]
+  pub background_image: Option<TextureHandle>,
 
   /// Corner radius of the background rectangle
   #[setters(into)]
@@ -88,6 +97,7 @@ impl Default for Container {
       padding: Sides::all(0.),
       align: Alignment2d::default(),
       background: Default::default(),
+      background_image: None,
       children: ElementList(Vec::new()),
       wrap: false,
       corner_radius: Corners::all(0.),

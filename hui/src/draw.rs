@@ -9,7 +9,7 @@ use crate::{
 
 pub(crate) mod atlas;
 use atlas::TextureAtlasManager;
-pub use atlas::{TextureHandle, TextureAtlasMeta};
+pub use atlas::{TextureHandle, TextureAtlasMeta, TextureFormat};
 
 mod corner_radius;
 pub use corner_radius::RoundedCorners;
@@ -85,7 +85,7 @@ pub struct UiVertex {
   pub uv: Vec2,
 }
 
-/// Represents a single draw call, should be handled by the render backend
+/// Represents a single draw call (vertices + indices), should be handled by the render backend
 #[derive(Default)]
 pub struct UiDrawCall {
   pub vertices: Vec<UiVertex>,

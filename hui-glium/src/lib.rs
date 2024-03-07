@@ -4,7 +4,7 @@ use glium::{
   Surface, DrawParameters, Blend,
   Program, VertexBuffer, IndexBuffer,
   backend::{Facade, Context},
-  texture::{SrgbTexture2d, RawImage2d},
+  texture::{Texture2d, RawImage2d},
   index::PrimitiveType,
   implement_vertex,
   uniform, uniforms::{Sampler, SamplerBehavior, SamplerWrapFunction},
@@ -115,7 +115,7 @@ impl BufferPair {
 pub struct GliumUiRenderer {
   context: Rc<Context>,
   program: glium::Program,
-  ui_texture: Option<SrgbTexture2d>,
+  ui_texture: Option<Texture2d>,
   buffer_pair: Option<BufferPair>,
 }
 
@@ -143,7 +143,7 @@ impl GliumUiRenderer {
 
   fn update_texture_atlas(&mut self, atlas: &TextureAtlasMeta) {
     log::trace!("updating ui atlas texture");
-    self.ui_texture = Some(SrgbTexture2d::new(
+    self.ui_texture = Some(Texture2d::new(
       &self.context,
       RawImage2d::from_raw_rgba(
         atlas.data.to_owned(),

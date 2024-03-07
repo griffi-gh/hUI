@@ -132,7 +132,7 @@ impl From<Size> for Size2d {
 /// - `Vertical` - Children are laid out from top to bottom\
 /// - `Horizontal` - Children are laid out from left to right
 #[derive(Default, Clone, Copy, Debug, PartialEq, Eq, PartialOrd, Ord)]
-pub enum UiDirection {
+pub enum Direction {
   /// Children are laid out from top to bottom
   #[default]
   Vertical,
@@ -154,5 +154,5 @@ pub struct LayoutInfo {
 
   /// Current direction of the layout\
   /// (Usually matches direction of the parent container)
-  pub direction: UiDirection,
+  pub direction: Direction,
 }

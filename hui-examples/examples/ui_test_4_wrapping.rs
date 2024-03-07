@@ -1,7 +1,7 @@
 use std::time::Instant;
 use hui::{
   color, size,
-  layout::{Alignment, UiDirection},
+  layout::{Alignment, Direction},
   element::{
     container::Container,
     fill_rect::FillRect,
@@ -22,7 +22,7 @@ ui_main!(
     let width_ratio = 0.5 + 0.5 * instant.elapsed().as_secs_f32().sin().powi(2);
     Container::default()
       .with_size(size!(width_ratio/, 100%))
-      .with_direction(UiDirection::Horizontal)
+      .with_direction(Direction::Horizontal)
       .with_align(Alignment::Center)
       .with_padding(5.)
       .with_gap(10.)

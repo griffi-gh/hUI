@@ -10,7 +10,7 @@ use winit::{
 use hui::{
   element::{
     container::Container, progress_bar::ProgressBar, fill_rect::FillRect, ElementList, UiElement
-  }, layout::{Alignment, UiDirection, Size}, rectangle::{Corners, Sides}, UiInstance
+  }, layout::{Alignment, Direction, Size}, rectangle::{Corners, Sides}, UiInstance
 };
 use hui_glium::GliumUiRenderer;
 
@@ -96,7 +96,7 @@ fn main() {
               gap: 5.,
               padding: Sides::all(5.),
               background: vec4(0., 0., 0., 0.5).into(),
-              direction: UiDirection::Horizontal,
+              direction: Direction::Horizontal,
               children: {
                 let mut x: Vec<Box<dyn UiElement>> = vec![];
                 for i in 0..10 {

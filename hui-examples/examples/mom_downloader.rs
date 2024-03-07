@@ -1,7 +1,7 @@
 use std::time::Instant;
 use hui::{
   size,
-  layout::{Alignment, UiDirection},
+  layout::{Alignment, Direction},
   element::{
     container::Container,
     progress_bar::ProgressBar,
@@ -46,7 +46,7 @@ ui_main!{
                 .with_corner_radius(0.125 * ProgressBar::DEFAULT_HEIGHT)
                 .add_child(ui);
               Container::default()
-                .with_direction(UiDirection::Horizontal)
+                .with_direction(Direction::Horizontal)
                 .with_align((Alignment::End, Alignment::Center))
                 .with_size(size!(100%, auto))
                 .with_children(|ui| {

@@ -11,7 +11,7 @@ use hui::{
     container::Container,
     text::Text, ElementList
   },
-  layout::{Alignment, UiDirection, Size},
+  layout::{Alignment, Direction, Size},
   rectangle::{Corners, Sides},
   UiInstance
 };
@@ -57,7 +57,7 @@ fn main() {
               children: ElementList(vec![
                 Box::new(Container {
                   padding: Sides::all(20.),
-                  direction: UiDirection::Horizontal,
+                  direction: Direction::Horizontal,
                   align: Alignment::Center.into(),
                   size: (Size::Auto, Size::Auto).into(),
                   background: vec4(0.1, 0.1, 0.1, 0.5).into(),
@@ -83,7 +83,7 @@ fn main() {
             }),
             Box::new(Container {
               gap: 10.,
-              direction: UiDirection::Horizontal,
+              direction: Direction::Horizontal,
               children: ElementList(vec![
                 Box::new(Container {
                   size: (Size::Static(100.), Size::Static(100.)).into(),

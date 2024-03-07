@@ -6,7 +6,7 @@ use crate::{
   background::BackgroundColor,
   draw::{RoundedCorners, ImageHandle, UiDrawCommand},
   element::{ElementList, MeasureContext, ProcessContext, UiElement},
-  layout::{Alignment, Alignment2d, LayoutInfo, Size, Size2d, UiDirection},
+  layout::{Alignment, Alignment2d, LayoutInfo, Size, Size2d, Direction},
   measure::{Hints, Response},
   rectangle::{Corners, Sides}
 };
@@ -40,7 +40,7 @@ pub struct Container {
   pub size: Size2d,
 
   /// Layout direction (horizontal/vertical)
-  pub direction: UiDirection,
+  pub direction: Direction,
 
   //XXX: should we have separate gap value for primary and secondary (when wrapped, between lines of elements) axis?
 
@@ -96,7 +96,7 @@ impl Default for Container {
   fn default() -> Self {
     Self {
       size: (Size::Auto, Size::Auto).into(),
-      direction: UiDirection::Vertical,
+      direction: Direction::Vertical,
       gap: 0.,
       padding: Sides::all(0.),
       align: Alignment2d::default(),
@@ -143,12 +143,12 @@ impl UiElement for Container {
 
     // In case wrapping is enabled, elements cannot exceed this size on the primary axis
     let max_line_pri = match self.direction {
-      UiDirection::Horizontal => match self.size.width {
+      Direction::Horizontal => match self.size.width {
         Size::Auto => ctx.layout.max_size.x,
         Size::Fraction(p) => ctx.layout.max_size.x * p,
         Size::Static(p) => p,
       },
-      UiDirection::Vertical => match self.size.height {
+      Direction::Vertical => match self.size.height {
         Size::Auto => ctx.layout.max_size.y,
         Size::Fraction(p) => ctx.layout.max_size.y * p,
         Size::Static(p) => p,
@@ -201,8 +201,8 @@ impl UiElement for Container {
 
       //Check the position of the side of element closest to the end on the primary axis
       let end_pos_pri = match self.direction {
-        UiDirection::Horizontal => line_size.x + measure.size.x + self.padding.left + self.padding.right,
-        UiDirection::Vertical => line_size.y + measure.size.y + self.padding.top + self.padding.bottom,
+        Direction::Horizontal => line_size.x + measure.size.x + self.padding.left + self.padding.right,
+        Direction::Vertical => line_size.y + measure.size.y + self.padding.top + self.padding.bottom,
       };
 
       //Wrap the element if it exceeds container's size and is not the first element in the line
@@ -223,11 +223,11 @@ impl UiElement for Container {
 
         //Update the total size accordingly
         match self.direction {
-          UiDirection::Horizontal => {
+          Direction::Horizontal => {
             total_size.x = total_size.x.max(line_size.x);
             total_size.y += line_size.y + self.gap;
           },
-          UiDirection::Vertical => {
+          Direction::Vertical => {
             total_size.x += line_size.x + self.gap;
             total_size.y = total_size.y.max(line_size.y);
           }
@@ -235,10 +235,10 @@ impl UiElement for Container {
 
         //Now, update line_sec_offset
         match self.direction {
-          UiDirection::Horizontal => {
+          Direction::Horizontal => {
             line_sec_offset.y += measure.size.y + self.gap;
           },
-          UiDirection::Vertical => {
+          Direction::Vertical => {
             line_sec_offset.x += measure.size.x + self.gap;
           }
         };
@@ -253,12 +253,12 @@ impl UiElement for Container {
 
       //Sset the leftover gap in case this is the last element in the line
       match self.direction {
-        UiDirection::Horizontal => {
+        Direction::Horizontal => {
           line_size.x += measure.size.x + self.gap;
           line_size.y = line_size.y.max(measure.size.y);
           leftover_gap = vec2(self.gap, 0.);
         },
-        UiDirection::Vertical => {
+        Direction::Vertical => {
           line_size.x = line_size.x.max(measure.size.x);
           line_size.y += measure.size.y + self.gap;
           leftover_gap = vec2(0., self.gap);
@@ -273,11 +273,11 @@ impl UiElement for Container {
 
     //Update the total size according to the size of the last line
     match self.direction {
-      UiDirection::Horizontal => {
+      Direction::Horizontal => {
         total_size.x = total_size.x.max(line_size.x);
         total_size.y += line_size.y;
       },
-      UiDirection::Vertical => {
+      Direction::Vertical => {
         total_size.x += line_size.x;
         total_size.y = total_size.y.max(line_size.y);
       }
@@ -344,8 +344,8 @@ impl UiElement for Container {
     //convert alignment to pri/sec axis based
     //.0 = primary, .1 = secondary
     let pri_sec_align = match self.direction {
-      UiDirection::Horizontal => (self.align.horizontal, self.align.vertical),
-      UiDirection::Vertical => (self.align.vertical, self.align.horizontal),
+      Direction::Horizontal => (self.align.horizontal, self.align.vertical),
+      Direction::Vertical => (self.align.vertical, self.align.horizontal),
     };
 
     //alignment (on sec. axis)
@@ -371,16 +371,16 @@ impl UiElement for Container {
       //alignment on primary axis
       match (pri_sec_align.0, self.direction) {
         (Alignment::Begin, _) => (),
-        (Alignment::Center, UiDirection::Horizontal) => {
+        (Alignment::Center, Direction::Horizontal) => {
           local_position.x += (ctx.measure.size.x - cur_line.content_size.x) / 2. - self.padding.left;
         },
-        (Alignment::Center, UiDirection::Vertical) => {
+        (Alignment::Center, Direction::Vertical) => {
           local_position.y += (ctx.measure.size.y - cur_line.content_size.y) / 2. - self.padding.top;
         },
-        (Alignment::End, UiDirection::Horizontal) => {
+        (Alignment::End, Direction::Horizontal) => {
           local_position.x += ctx.measure.size.x - cur_line.content_size.x - self.padding.right - self.padding.left;
         },
-        (Alignment::End, UiDirection::Vertical) => {
+        (Alignment::End, Direction::Vertical) => {
           local_position.y += ctx.measure.size.y - cur_line.content_size.y - self.padding.bottom - self.padding.top;
         }
       }
@@ -416,26 +416,26 @@ impl UiElement for Container {
         let inner_content_size = ctx.measure.hints.inner_content_size.unwrap();
         match (pri_sec_align.1, self.direction) {
           (Alignment::Begin, _) => (),
-          (Alignment::Center, UiDirection::Horizontal) => {
+          (Alignment::Center, Direction::Horizontal) => {
             //Align whole row
             el_layout.position.y += ((ctx.measure.size.y - self.padding.bottom - self.padding.top) - inner_content_size.y) / 2.;
             //Align within row
             el_layout.position.y += (cur_line.content_size.y - el_measure.size.y) / 2.;
           },
-          (Alignment::Center, UiDirection::Vertical) => {
+          (Alignment::Center, Direction::Vertical) => {
             //Align whole row
             el_layout.position.x += ((ctx.measure.size.x - self.padding.left - self.padding.right) - inner_content_size.x) / 2.;
             //Align within row
             el_layout.position.x += (cur_line.content_size.x - el_measure.size.x) / 2.;
           },
           //TODO update these two cases:
-          (Alignment::End, UiDirection::Horizontal) => {
+          (Alignment::End, Direction::Horizontal) => {
             //Align whole row
             el_layout.position.y += (ctx.measure.size.y - self.padding.bottom - self.padding.top) - inner_content_size.y;
             //Align within row
             el_layout.position.y += cur_line.content_size.y - el_measure.size.y;
           },
-          (Alignment::End, UiDirection::Vertical) => {
+          (Alignment::End, Direction::Vertical) => {
             //Align whole row
             el_layout.position.x += (ctx.measure.size.x - self.padding.right - self.padding.left) - inner_content_size.x;
             //Align within row
@@ -456,10 +456,10 @@ impl UiElement for Container {
 
         //layout
         match self.direction {
-          UiDirection::Horizontal => {
+          Direction::Horizontal => {
             local_position.x += el_measure.size.x + self.gap;
           },
-          UiDirection::Vertical => {
+          Direction::Vertical => {
             local_position.y += el_measure.size.y + self.gap;
           }
         }
@@ -467,12 +467,12 @@ impl UiElement for Container {
 
       //Move to the next line
       match self.direction {
-        UiDirection::Horizontal => {
+        Direction::Horizontal => {
           position.y += cur_line.content_size.y + self.gap;
           //position.x -= cur_line.content_size.x;
           // leftover_line_gap = vec2(0., self.gap);
         }
-        UiDirection::Vertical => {
+        Direction::Vertical => {
           position.x += cur_line.content_size.x + self.gap;
           //position.y -= cur_line.content_size.y;
           // leftover_line_gap = vec2(self.gap, 0.);

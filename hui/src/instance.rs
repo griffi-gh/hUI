@@ -2,7 +2,7 @@ use glam::Vec2;
 use crate::{
   draw::{
     atlas::{TextureAtlasManager, TextureAtlasMeta}, TextureFormat, ImageHandle, UiDrawCall, UiDrawCommandList
-  }, element::{MeasureContext, ProcessContext, UiElement}, event::{EventQueue, UiEvent}, input::UiInputState, layout::{LayoutInfo, UiDirection}, state::StateRepo, text::{FontHandle, TextRenderer}
+  }, element::{MeasureContext, ProcessContext, UiElement}, event::{EventQueue, UiEvent}, input::UiInputState, layout::{LayoutInfo, Direction}, state::StateRepo, text::{FontHandle, TextRenderer}
 };
 
 /// The main instance of the UI system.
@@ -108,7 +108,7 @@ impl UiInstance {
     let layout = LayoutInfo {
       position: Vec2::ZERO,
       max_size,
-      direction: UiDirection::Vertical,
+      direction: Direction::Vertical,
     };
     let measure = element.measure(MeasureContext {
       state: &self.stateful_state,

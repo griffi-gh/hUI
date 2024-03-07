@@ -4,7 +4,7 @@ use glam::vec2;
 use crate::{
   element::{MeasureContext, ProcessContext, UiElement},
   measure::Response,
-  layout::UiDirection
+  layout::Direction
 };
 
 /// Adds spacing between elements in a layout\
@@ -25,8 +25,8 @@ impl UiElement for Spacer {
   fn measure(&self, ctx: MeasureContext) -> Response {
     Response {
       size: match ctx.layout.direction {
-        UiDirection::Horizontal => vec2(self.0, 0.),
-        UiDirection::Vertical => vec2(0., self.0),
+        Direction::Horizontal => vec2(self.0, 0.),
+        Direction::Vertical => vec2(0., self.0),
       },
       ..Default::default()
     }

@@ -4,7 +4,7 @@ use crate::{
   background::BackgroundColor,
   draw::{ImageHandle, RoundedCorners, UiDrawCommand},
   element::{MeasureContext, ProcessContext, UiElement},
-  layout::{Size, Size2d},
+  layout::{compute_size, Size, Size2d},
   measure::Response,
   rectangle::Corners,
 };
@@ -57,31 +57,18 @@ impl UiElement for Image {
 
   fn measure(&self, ctx: MeasureContext) -> Response {
     let dim = ctx.images.get_size(self.image).expect("invalid image handle");
+    let pre_size = compute_size(ctx.layout, self.size, dim.as_vec2());
     Response {
-      size: vec2(
-        match self.size.width {
-          Size::Auto => {
-            match self.size.height {
-              Size::Auto => dim.x as f32,
-              Size::Fraction(f) => ((f * ctx.layout.max_size.y) / dim.y as f32) * dim.x as f32,
-              Size::Static(pixels) => (pixels / dim.y as f32) * dim.x as f32,
-            }
-          },
-          Size::Fraction(percentage) => ctx.layout.max_size.x * percentage,
-          Size::Static(pixels) => pixels,
+      size: compute_size(ctx.layout, self.size, vec2(
+        match self.size.height {
+          Size::Auto => dim.x as f32,
+          _ => (pre_size.y / dim.y as f32) * dim.x as f32,
         },
         match self.size.height {
-          Size::Auto => {
-            match self.size.width {
-              Size::Auto => dim.y as f32,
-              Size::Fraction(f) => ((f * ctx.layout.max_size.x) / dim.x as f32) * dim.y as f32,
-              Size::Static(pixels) => (pixels / dim.x as f32) * dim.y as f32,
-            }
-          },
-          Size::Fraction(percentage) => ctx.layout.max_size.y * percentage,
-          Size::Static(pixels) => pixels,
+          Size::Auto => dim.x as f32,
+          _ => (pre_size.y / dim.y as f32) * dim.x as f32,
         },
-      ),
+      )),
       ..Default::default()
     }
   }

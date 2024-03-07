@@ -4,7 +4,7 @@ use crate::{
   background::BackgroundColor,
   draw::{RoundedCorners, UiDrawCommand},
   element::{MeasureContext, ProcessContext, UiElement},
-  layout::{Size, Size2d},
+  layout::{compute_size, Size, Size2d},
   measure::Response,
   rectangle::Corners
 };
@@ -55,18 +55,10 @@ impl UiElement for ProgressBar {
 
   fn measure(&self, ctx: MeasureContext) -> Response {
     Response {
-      size: vec2(
-        match self.size.width {
-          Size::Auto => ctx.layout.max_size.x.max(300.),
-          Size::Fraction(p) => ctx.layout.max_size.x * p,
-          Size::Static(p) => p,
-        },
-        match self.size.height {
-          Size::Auto => Self::DEFAULT_HEIGHT,
-          Size::Fraction(p) => ctx.layout.max_size.y * p,
-          Size::Static(p) => p,
-        }
-      ),
+      size: compute_size(ctx.layout, self.size, vec2(
+        ctx.layout.max_size.x.max(300.),
+        Self::DEFAULT_HEIGHT,
+      )),
       hints: Default::default(),
       user_data: None,
       ..Default::default()

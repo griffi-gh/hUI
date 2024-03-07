@@ -1,6 +1,6 @@
 //! element layout, alignment and sizing
 
-use glam::Vec2;
+use glam::{vec2, Vec2};
 
 /// Alignment along a single axis
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Default, PartialOrd, Ord)]
@@ -159,4 +159,20 @@ pub struct LayoutInfo {
   /// Current direction of the layout\
   /// (Usually matches direction of the parent container)
   pub direction: Direction,
+}
+
+/// Helper function to calculate the size of an element based on its layout and size information\
+/// Used to help reduce code duplication in the `measure` method of UI elements
+pub fn compute_size(layout: &LayoutInfo, size: Size2d, comfy_size: Vec2) -> Vec2 {
+  let width = match size.width {
+    Size::Auto => comfy_size.x,
+    Size::Fraction(fraction) => layout.max_size.x * fraction,
+    Size::Static(size) => size,
+  };
+  let height = match size.height {
+    Size::Auto => comfy_size.y,
+    Size::Fraction(fraction) => layout.max_size.y * fraction,
+    Size::Static(size) => size,
+  };
+  vec2(width, height)
 }

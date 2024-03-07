@@ -14,6 +14,7 @@ use hui::{
 mod boilerplate;
 
 ui_main!(
+  "hUI: Wrapping demo",
   init: |_| {
     Instant::now()
   },

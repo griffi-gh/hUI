@@ -1,6 +1,33 @@
-//! various predefined color constants
+//! various predefined color constants and helper functions
 
 use glam::{vec4, Vec4};
+
+/// Create a color from red, green, blue components
+pub fn rgb(r: u8, g: u8, b: u8) -> Vec4 {
+  vec4(r as f32 / 255.0, g as f32 / 255.0, b as f32 / 255.0, 1.0)
+}
+
+/// Create a color from red, green, blue, alpha components
+pub fn rgba(r: u8, g: u8, b: u8, a: u8) -> Vec4 {
+  vec4(r as f32 / 255.0, g as f32 / 255.0, b as f32 / 255.0, a as f32 / 255.0)
+}
+
+/// Create an RGB color from a u32 (/hex) value
+pub fn rgb_hex(value: u32) -> Vec4 {
+  let r = (value >> 16) & 0xff;
+  let g = (value >> 8) & 0xff;
+  let b = value & 0xff;
+  vec4(r as f32 / 255.0, g as f32 / 255.0, b as f32 / 255.0, 1.0)
+}
+
+/// Create an RGBA color from a u32 (/hex) value
+pub fn rgba_hex(value: u32) -> Vec4 {
+  let r = (value >> 16) & 0xff;
+  let g = (value >> 8) & 0xff;
+  let b = value & 0xff;
+  let a = (value >> 24) & 0xff;
+  vec4(r as f32 / 255.0, g as f32 / 255.0, b as f32 / 255.0, a as f32 / 255.0)
+}
 
 #[cfg_attr(doc, doc="<span style='display: inline-block; background: repeating-conic-gradient(grey 0 25%,darkgrey 0 50%) 50%/8px 8px; width: 1em; height: 1em; border-radius: 50%; border: 1px solid black; vertical-align: -7%'></span>")]
 /// `#00000000` Transparent

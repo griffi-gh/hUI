@@ -42,6 +42,7 @@ ui_main!(
           .with_padding((5., 8.))
           .with_gap(15.)
           .with_background(color::rgb_hex(0x3d3c3e))
+          .with_wrap(true) //XXX: not authentic but great for demostration
           .with_children(|ui| {
             Image::new(stuff.vscode_icon)
               .with_size(size!(auto, 24))

@@ -1,7 +1,7 @@
 use glam::Vec2;
 use crate::{
   draw::{
-    atlas::{TextureAtlasManager, TextureAtlasMeta}, TextureFormat, TextureHandle, UiDrawCall, UiDrawCommandList
+    atlas::{TextureAtlasManager, TextureAtlasMeta}, TextureFormat, ImageHandle, UiDrawCall, UiDrawCommandList
   }, element::{MeasureContext, ProcessContext, UiElement}, event::{EventQueue, UiEvent}, input::UiInputState, layout::{LayoutInfo, UiDirection}, state::StateRepo, text::{FontHandle, TextRenderer}
 };
 
@@ -67,10 +67,10 @@ impl UiInstance {
   /// Add an image to the texture atlas\
   /// Accepted texture formats are `Rgba` and `Grayscale`
   ///
-  /// Returns a texture handle ([`TextureHandle`])\
+  /// Returns an image handle ([`ImageHandle`])\
   /// This handle can be used to reference the texture in draw commands\
   /// It's a light reference and can be cloned/copied freely, but will not be cleaned up even when dropped
-  pub fn add_image(&mut self, format: TextureFormat, data: &[u8], width: usize) -> TextureHandle {
+  pub fn add_image(&mut self, format: TextureFormat, data: &[u8], width: usize) -> ImageHandle {
     self.atlas.add(width, data, format)
   }
 
@@ -115,6 +115,7 @@ impl UiInstance {
       layout: &layout,
       text_measure: self.text_renderer.to_measure(),
       current_font: self.text_renderer.current_font(),
+      images: self.atlas.context(),
     });
     element.process(ProcessContext {
       measure: &measure,
@@ -123,6 +124,7 @@ impl UiInstance {
       draw: &mut self.draw_commands,
       text_measure: self.text_renderer.to_measure(),
       current_font: self.text_renderer.current_font(),
+      images: self.atlas.context(),
     });
   }
 

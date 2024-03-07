@@ -46,21 +46,22 @@ pub struct TextureAtlasMeta<'a> {
 ///
 /// Internal value is an implementation detail and should not be relied upon.
 #[derive(Debug, Clone, Copy, Default, PartialEq, Eq, Hash)]
-pub struct TextureHandle {
-  //pub(crate) rc: Rc<()>,
-  pub(crate) index: u32
+pub struct ImageHandle {
+  pub(crate) index: u32,
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub(crate) struct TextureAllocation {
-  /// Position in the texture atlas
-  pub position: UVec2,
+  /// Position in the texture atlas\
+  /// (This is an implementation detail and should not be exposed to the user)
+  pub(crate) position: UVec2,
 
   /// Requested texture size
   pub size: UVec2,
 
-  /// True if the texture was rotated by 90 degrees
-  pub rotated: bool,
+  /// True if the texture was rotated by 90 degrees\
+  /// (This is an implementation detail and should not be exposed to the user)
+  pub(crate) rotated: bool,
 }
 
 /// Manages a texture atlas and the allocation of space within it\
@@ -149,7 +150,7 @@ impl TextureAtlasManager {
   /// Returns None if the texture could not be allocated due to lack of space\
   /// Use `allocate` to allocate a texture and resize the atlas if necessary\
   /// Does not modify the texture data
-  fn try_allocate(&mut self, size: UVec2) -> Option<TextureHandle> {
+  fn try_allocate(&mut self, size: UVec2) -> Option<ImageHandle> {
     log::trace!("Allocating texture of size {:?}", size);
     let result = self.packer.pack(size.x as i32, size.y as i32, ALLOW_ROTATION)?;
     let index = self.count;
@@ -161,22 +162,22 @@ impl TextureAtlasManager {
       rotated: ALLOW_ROTATION && (result.width != size.x as i32),
     };
     self.allocations.insert_unique_unchecked(index, allocation);
-    Some(TextureHandle { index })
+    Some(ImageHandle { index })
   }
 
   /// Allocate a new texture region in the atlas and resize the atlas if necessary\
   /// This function should never fail under normal circumstances.\
   /// May modify the texture data if the atlas is resized
-  pub fn allocate(&mut self, size: UVec2) -> TextureHandle {
+  pub fn allocate(&mut self, size: UVec2) -> ImageHandle {
     self.ensure_fits(size);
     self.try_allocate(size).unwrap()
   }
 
   /// Allocate a new texture region in the atlas and copy the data into it\
   /// This function may resize the atlas as needed, and should never fail under normal circumstances.
-  pub(crate) fn add_rgba(&mut self, width: usize, data: &[u8]) -> TextureHandle {
+  pub(crate) fn add_rgba(&mut self, width: usize, data: &[u8]) -> ImageHandle {
     let size = uvec2(width as u32, (data.len() / (width * RGBA_CHANNEL_COUNT as usize)) as u32);
-    let handle: TextureHandle = self.allocate(size);
+    let handle: ImageHandle = self.allocate(size);
     let allocation = self.allocations.get(&handle.index).unwrap();
     assert!(!allocation.rotated, "Rotated textures are not implemented yet");
     for y in 0..size.y {
@@ -195,7 +196,7 @@ impl TextureAtlasManager {
   /// Works the same way as [`TextureAtlasManager::add`], but the input data is assumed to be grayscale (1 channel per pixel)\
   /// The data is copied into the alpha channel of the texture, while all the other channels are set to 255\
   /// May resize the atlas as needed, and should never fail under normal circumstances.
-  pub(crate) fn add_grayscale(&mut self, width: usize, data: &[u8]) -> TextureHandle {
+  pub(crate) fn add_grayscale(&mut self, width: usize, data: &[u8]) -> ImageHandle {
     let size = uvec2(width as u32, (data.len() / width) as u32);
     let handle = self.allocate(size);
     let allocation = self.allocations.get(&handle.index).unwrap();
@@ -211,26 +212,26 @@ impl TextureAtlasManager {
     handle
   }
 
-  pub fn add(&mut self, width: usize, data: &[u8], format: TextureFormat) -> TextureHandle {
+  pub fn add(&mut self, width: usize, data: &[u8], format: TextureFormat) -> ImageHandle {
     match format {
       TextureFormat::Rgba => self.add_rgba(width, data),
       TextureFormat::Grayscale => self.add_grayscale(width, data),
     }
   }
 
-  pub fn modify(&mut self, handle: TextureHandle) {
+  pub fn modify(&mut self, handle: ImageHandle) {
     todo!()
   }
 
-  pub fn remove(&mut self, handle: TextureHandle) {
+  pub fn remove(&mut self, handle: ImageHandle) {
     todo!()
   }
 
-  pub fn get(&self, handle: TextureHandle) -> Option<&TextureAllocation> {
+  pub fn get(&self, handle: ImageHandle) -> Option<&TextureAllocation> {
     self.allocations.get(&handle.index)
   }
 
-  pub(crate) fn get_uv(&self, handle: TextureHandle) -> Option<Corners<Vec2>> {
+  pub(crate) fn get_uv(&self, handle: ImageHandle) -> Option<Corners<Vec2>> {
     let info = self.get(handle)?;
     let atlas_size = self.meta().size.as_vec2();
     let p0x = info.position.x as f32 / atlas_size.x;
@@ -257,11 +258,30 @@ impl TextureAtlasManager {
       modified: self.modified,
     }
   }
+
+  pub fn context(&self) -> ImageCtx {
+    ImageCtx { atlas: self }
+  }
 }
 
 impl Default for TextureAtlasManager {
   /// Create a new texture atlas with a default size of 512x512
   fn default() -> Self {
     Self::new(UVec2::new(512, 512))
+  }
+}
+
+/// Context that allows read-only accss to image metadata
+#[derive(Clone, Copy)]
+pub struct ImageCtx<'a> {
+  pub(crate) atlas: &'a TextureAtlasManager,
+}
+
+impl ImageCtx<'_> {
+  /// Get size of the image with the specified handle
+  ///
+  /// Returns None if the handle is invalid for the current context
+  pub fn get_size(&self, handle: ImageHandle) -> Option<UVec2> {
+    self.atlas.get(handle).map(|a| a.size)
   }
 }

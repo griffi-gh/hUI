@@ -2,7 +2,7 @@
 
 use std::any::Any;
 use crate::{
-  draw::UiDrawCommandList,
+  draw::{atlas::ImageCtx, UiDrawCommandList},
   layout::LayoutInfo,
   measure::Response,
   state::StateRepo,
@@ -19,6 +19,7 @@ pub struct MeasureContext<'a> {
   pub layout: &'a LayoutInfo,
   pub text_measure: TextMeasure<'a>,
   pub current_font: FontHandle,
+  pub images: ImageCtx<'a>,
 }
 
 /// Context for the `Element::process` function
@@ -29,6 +30,7 @@ pub struct ProcessContext<'a> {
   pub draw: &'a mut UiDrawCommandList,
   pub text_measure: TextMeasure<'a>,
   pub current_font: FontHandle,
+  pub images: ImageCtx<'a>,
 }
 
 pub trait UiElement {

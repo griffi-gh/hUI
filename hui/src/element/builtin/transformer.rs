@@ -55,6 +55,7 @@ impl UiElement for Transformer {
       draw: ctx.draw,
       text_measure: ctx.text_measure,
       current_font: ctx.current_font,
+      images: ctx.images,
     });
     ctx.draw.add(UiDrawCommand::PopTransform);
   }

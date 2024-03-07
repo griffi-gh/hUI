@@ -4,7 +4,7 @@ use derive_setters::Setters;
 use glam::{Vec2, vec2};
 use crate::{
   background::BackgroundColor,
-  draw::{RoundedCorners, TextureHandle, UiDrawCommand},
+  draw::{RoundedCorners, ImageHandle, UiDrawCommand},
   element::{ElementList, MeasureContext, ProcessContext, UiElement},
   layout::{Alignment, Alignment2d, LayoutInfo, Size, Size2d, UiDirection},
   measure::{Hints, Response},
@@ -65,8 +65,12 @@ pub struct Container {
   ///
   /// Can be used in conjunction with the background color\
   /// In this case, the texture will be shaded by the color
+  ///
+  /// Please note that if the background color is NOT set (or set to transparent), the texture will NOT be visible\
+  /// This is because the texture is multiplied by the color, and if the color is transparent, the texture will be too\
+  //TODO: fix this flaw, if background_image is called for the first time, bg wasnt explicitly set and background is transparent, set it to white
   #[setters(into)]
-  pub background_image: Option<TextureHandle>,
+  pub background_image: Option<ImageHandle>,
 
   /// Corner radius of the background rectangle
   #[setters(into)]
@@ -192,6 +196,7 @@ impl UiElement for Container {
         },
         text_measure: ctx.text_measure,
         current_font: ctx.current_font,
+        images: ctx.images,
       });
 
       //Check the position of the side of element closest to the end on the primary axis
@@ -403,6 +408,7 @@ impl UiElement for Container {
           layout: &el_layout,
           text_measure: ctx.text_measure,
           current_font: ctx.current_font,
+          images: ctx.images,
         });
 
         //align (on sec. axis)
@@ -445,6 +451,7 @@ impl UiElement for Container {
           draw: ctx.draw,
           text_measure: ctx.text_measure,
           current_font: ctx.current_font,
+          images: ctx.images,
         });
 
         //layout

@@ -9,7 +9,7 @@ use crate::{
 
 pub(crate) mod atlas;
 use atlas::TextureAtlasManager;
-pub use atlas::{TextureHandle, TextureAtlasMeta, TextureFormat};
+pub use atlas::{ImageHandle, TextureAtlasMeta, TextureFormat, ImageCtx};
 
 mod corner_radius;
 pub use corner_radius::RoundedCorners;
@@ -34,7 +34,7 @@ pub enum UiDrawCommand {
     ///Color (RGBA)
     color: Corners<Vec4>,
     ///Texture
-    texture: Option<TextureHandle>,
+    texture: Option<ImageHandle>,
     ///Rounded corners
     rounded_corners: Option<RoundedCorners>,
   },

@@ -1,7 +1,7 @@
 use std::sync::Arc;
 use fontdue::Metrics;
 use hashbrown::HashMap;
-use crate::draw::atlas::{TextureAtlasManager, TextureHandle};
+use crate::draw::atlas::{TextureAtlasManager, ImageHandle};
 
 use super::font::{FontHandle, FontManager};
 
@@ -14,7 +14,7 @@ struct GlyphCacheKey {
 
 pub struct GlyphCacheEntry {
   pub metrics: Metrics,
-  pub texture: TextureHandle,
+  pub texture: ImageHandle,
 }
 
 pub struct FontTextureManager {

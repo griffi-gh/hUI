@@ -57,6 +57,13 @@ impl Default for Text {
 }
 
 impl Text {
+  pub fn new(text: impl Into<Cow<'static, str>>) -> Self {
+    Self {
+      text: text.into(),
+      ..Default::default()
+    }
+  }
+
   fn font(&self, f: FontHandle) -> FontHandle {
     self.font.unwrap_or(f)
   }

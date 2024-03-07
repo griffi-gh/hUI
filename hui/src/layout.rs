@@ -82,15 +82,19 @@ impl From<Alignment> for Alignment2d {
 /// (Meaning of `auto` is entirely dependent on the element).
 #[derive(Default, Debug, Clone, Copy, PartialEq)]
 pub enum Size {
-  #[default]
   /// Automatically calculate size based on content
+  #[default]
   Auto,
+
   /// Size as a ratio of parent size\
   /// Valid range: 0.0-1.0 (0-100%)
   ///
   /// Out of range values are allowed, but are not guaranteed to work as expected\
   /// (especially with negative values)
   Fraction(f32),
+
+  //TODO FractionRemaining(f32),
+
   /// Static size in pixels
   Static(f32),
 }

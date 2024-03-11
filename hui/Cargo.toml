@@ -27,6 +27,7 @@ document-features = "0.2"
 derive_setters = "0.1"
 #smallvec = "1.13"
 tinyset = "0.4"
+#mopa = "0.2"
 
 [features]
 default = ["builtin_elements", "builtin_font", "pixel_perfect_text"]

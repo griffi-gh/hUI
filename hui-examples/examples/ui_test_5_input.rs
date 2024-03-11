@@ -1,14 +1,20 @@
-use std::time::Instant;
 use hui::{
   color, size,
   layout::{Alignment, Direction},
   element::{
     container::Container,
-    fill_rect::FillRect,
+    text::Text,
     interactable::ElementInteractableExt,
     UiElementExt
   },
+  signal::UiSignal,
 };
+
+enum CounterSignal {
+  Increment,
+  Decrement,
+}
+impl UiSignal for CounterSignal {}
 
 #[path = "../boilerplate.rs"]
 #[macro_use]
@@ -19,16 +25,39 @@ ui_main!(
   init: |_| {
     0
   },
-  run: |ui, size, n| {
+  run: |ui, size, counter| {
     Container::default()
       .with_size(size!(100%))
       .with_align(Alignment::Center)
+      .with_direction(Direction::Horizontal)
+      .with_gap(5.)
       .with_background(color::WHITE)
       .with_children(|ui| {
-        FillRect::default()
-          .with_size(size!(40))
+        Container::default()
+          .with_padding(10.)
           .with_corner_radius(8.)
           .with_background(color::DARK_RED)
+          .with_children(|ui| {
+            Text::new("-")
+              .add_child(ui);
+          })
+          .into_interactable()
+          .on_click(|| {
+            println!("clicked");
+          })
+          .add_child(ui);
+        Text::new(counter.to_string())
+          .with_color(color::BLACK)
+          .with_text_size(32)
+          .add_child(ui);
+        Container::default()
+          .with_padding(10.)
+          .with_corner_radius(8.)
+          .with_background(color::DARK_RED)
+          .with_children(|ui| {
+            Text::new("+")
+              .add_child(ui);
+          })
           .into_interactable()
           .on_click(|| {
             println!("clicked");
@@ -36,5 +65,12 @@ ui_main!(
           .add_child(ui);
       })
       .add_root(ui, size);
+
+    ui.process_signals(|sig| {
+      match sig {
+        CounterSignal::Increment => *counter += 1,
+        CounterSignal::Decrement => *counter -= 1,
+      }
+    });
   }
 );

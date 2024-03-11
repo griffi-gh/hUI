@@ -6,6 +6,7 @@ use crate::{
   input::InputCtx,
   layout::LayoutInfo,
   measure::Response,
+  signal::SignalCtx,
   state::StateRepo,
   text::{FontHandle, TextMeasure},
   UiInstance,
@@ -35,6 +36,7 @@ pub struct ProcessContext<'a> {
   pub current_font: FontHandle,
   pub images: ImageCtx<'a>,
   pub input: InputCtx<'a>,
+  //pub signal: SignalCtx<'a>,
 }
 
 pub trait UiElement {

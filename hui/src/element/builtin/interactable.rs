@@ -3,24 +3,29 @@
 // not sure if this is a good idea...
 // but having the ability to add a click event to any element would be nice, and this is a naive way to do it
 
-use crate::element::{UiElement, MeasureContext, ProcessContext};
+use crate::{
+  element::{MeasureContext, ProcessContext, UiElement},
+  signal::{DummySignal, UiSignal},
+};
 use std::cell::RefCell;
 
 /// Wrapper that allows adding click and hover events to any element
-pub struct Interactable {
+pub struct Interactable<H: UiSignal + 'static = DummySignal, C: UiSignal + 'static = DummySignal> {
   /// The wrapped element that will be interactable
   pub element: Box<dyn UiElement>,
-  /// Function that will be called if the element is hovered in the current frame
+
+  /// Signal that will be called if the element is hovered in the current frame
   ///
   /// Will be consumed after the first time it's called
-  pub hovered: RefCell<Option<Box<dyn FnOnce()>>>,
-  /// Function that will be called if the element was clicked in the current frame
+  pub hovered: RefCell<Option<H>>,
+
+  /// Signal that will be called if the element was clicked in the current frame
   ///
   /// Will be consumed after the first time it's called
-  pub clicked: RefCell<Option<Box<dyn FnOnce()>>>,
+  pub clicked: RefCell<Option<C>>,
 }
 
-impl Interactable {
+impl<H: UiSignal, C: UiSignal> Interactable<H, C> {
   pub fn new(element: Box<dyn UiElement>) -> Self {
     Self {
       element,
@@ -29,16 +34,16 @@ impl Interactable {
     }
   }
 
-  pub fn on_click(self, clicked: impl FnOnce() + 'static) -> Self {
+  pub fn on_hover(self, hover: H) -> Self {
     Self {
-      clicked: RefCell::new(Some(Box::new(clicked))),
+      hovered: RefCell::new(Some(hover)),
       ..self
     }
   }
 
-  pub fn on_hover(self, clicked: impl FnOnce() + 'static) -> Self {
+  pub fn on_click(self, clicked: C) -> Self {
     Self {
-      clicked: RefCell::new(Some(Box::new(clicked))),
+      clicked: RefCell::new(Some(clicked)),
       ..self
     }
   }
@@ -59,9 +64,9 @@ impl UiElement for Interactable {
     //XXX: should we do this AFTER normal process call of wrapped element?
     //TODO other events...
     if ctx.input.check_click(rect) {
-      //TODO better error message
-      let clicked = self.clicked.borrow_mut().take().expect("you fucked up");
-      clicked();
+      if let Some(sig) = self.clicked.take() {
+        //ctx.signal.push(sig);
+      }
     }
 
     self.element.process(ctx)

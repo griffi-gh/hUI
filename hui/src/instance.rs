@@ -1,8 +1,16 @@
 use glam::Vec2;
 use crate::{
   draw::{
-    atlas::{TextureAtlasManager, TextureAtlasMeta}, TextureFormat, ImageHandle, UiDrawCall, UiDrawCommandList
-  }, element::{MeasureContext, ProcessContext, UiElement}, event::{EventQueue, UiEvent}, input::UiInputState, layout::{LayoutInfo, Direction}, state::StateRepo, text::{FontHandle, TextRenderer}
+    ImageHandle, TextureFormat, UiDrawCall, UiDrawCommandList,
+    atlas::{TextureAtlasManager, TextureAtlasMeta},
+  },
+  element::{MeasureContext, ProcessContext, UiElement},
+  event::{EventQueue, UiEvent},
+  input::UiInputState,
+  layout::{Direction, LayoutInfo},
+  signal::{SigIntStore, UiSignal},
+  state::StateRepo,
+  text::{FontHandle, TextRenderer}
 };
 
 /// The main instance of the UI system.
@@ -21,6 +29,7 @@ pub struct UiInstance {
   atlas: TextureAtlasManager,
   events: EventQueue,
   input: UiInputState,
+  signal: SigIntStore,
   //True if in the middle of a laying out a frame
   state: bool,
 }
@@ -48,6 +57,7 @@ impl UiInstance {
       },
       events: EventQueue::new(),
       input: UiInputState::new(),
+      signal: SigIntStore::new(),
       state: false,
     }
   }
@@ -227,6 +237,18 @@ impl UiInstance {
       log::warn!("UiInstance::push_event called while in the middle of a frame, this is probably a mistake");
     }
     self.events.push(event);
+  }
+
+  /// Push a "fake" signal to the UI signal queue
+  pub fn push_signal<T: UiSignal + 'static>(&mut self, signal: T) {
+    self.signal.add(signal);
+  }
+
+  /// Process all signals of a given type
+  ///
+  /// This clears the signal queue for the given type and iterates over all signals
+  pub fn process_signals<T: UiSignal + 'static>(&mut self, f: impl FnMut(T)) {
+    self.signal.drain::<T>().for_each(f);
   }
 }
 

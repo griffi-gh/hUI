@@ -8,7 +8,6 @@ use hui::{
     container::Container,
     fill_rect::FillRect,
     image::Image,
-    spacer::Spacer,
     text::Text,
     UiElementExt
   },

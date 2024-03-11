@@ -215,11 +215,15 @@ pub struct InputCtx<'a>(&'a UiInputState);
 
 impl<'a> InputCtx<'a> {
   /// Get the current position of the mouse pointer
+  ///
+  /// Do not use this function to check for hover, use [`InputCtx::check_hover`] instead
   pub fn mouse_position(&self) -> Vec2 {
     self.0.mouse_pointer.current_position
   }
 
   /// Get the current position of the mouse pointer within a rectangle
+  ///
+  /// Do not use this function to check for hover, use [`InputCtx::check_hover`] instead
   pub fn mouse_position_in_rect(&self, rect: Rect) -> Option<Vec2> {
     let pos = self.0.mouse_pointer.current_position;
     rect.contains_point(pos).then_some(pos - rect.position)
@@ -247,7 +251,7 @@ impl<'a> InputCtx<'a> {
   }
 
   /// Check if a rect can be considered "hovered"
-  pub fn is_hovered(&self, rect: Rect) -> bool {
+  pub fn check_hover(&self, rect: Rect) -> bool {
     rect.contains_point(self.0.mouse_pointer.current_position)
   }
 }

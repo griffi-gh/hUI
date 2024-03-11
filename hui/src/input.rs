@@ -203,7 +203,9 @@ impl UiInputState {
               button.start_position = self.mouse_pointer.current_position;
             },
             ButtonState::Released => {
+              //log::trace!("Button {:?} was released", button);
               if let Some(button_meta) = self.mouse_pointer.buttons.remove(button) {
+                //log::trace!("start pos was: {:?} current pos is: {:?}", button_meta.start_position, self.mouse_pointer.current_position);
                 self.mouse_pointer.released_buttons.insert(*button, button_meta);
               } else {
                 //huh

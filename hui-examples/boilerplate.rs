@@ -42,7 +42,7 @@ pub fn ui<T>(
   let mut hui = UiInstance::new();
   let mut backend = GliumUiRenderer::new(&display);
 
-  let result = init(&mut hui);
+  let mut result = init(&mut hui);
 
   event_loop.run(|event, window_target| {
     window.request_redraw();
@@ -60,7 +60,7 @@ pub fn ui<T>(
           hui.begin();
 
           let size = UVec2::from(display.get_framebuffer_dimensions()).as_vec2();
-          draw(&mut hui, size, &result);
+          draw(&mut hui, size, &mut result);
 
           hui.end();
 

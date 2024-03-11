@@ -1,3 +1,5 @@
+// "The essentials":
+
 #[cfg(feature = "builtin_container")]
 pub mod container;
 
@@ -7,17 +9,24 @@ pub mod fill_rect;
 #[cfg(feature = "builtin_elements")]
 pub mod spacer;
 
-#[cfg(feature = "builtin_elements")]
-pub mod progress_bar;
+// "The basics":
 
 #[cfg(feature = "builtin_elements")]
 pub mod text;
 
 #[cfg(feature = "builtin_elements")]
+pub mod image;
+
+#[cfg(feature = "builtin_elements")]
+pub mod progress_bar;
+
+// Wrappers:
+
+#[cfg(feature = "builtin_elements")]
 pub mod transformer;
 
 #[cfg(feature = "builtin_elements")]
-pub mod image;
+pub mod interactable;
 
 //TODO add: Image
 //TODO add: OverlayContainer (for simply laying multiple elements on top of each other)

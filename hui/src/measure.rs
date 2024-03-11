@@ -1,6 +1,7 @@
 //! element measurement, hints and responses
 
 use glam::Vec2;
+use crate::rectangle::Rect;
 
 // #[non_exhaustive]
 #[derive(Default)]
@@ -26,4 +27,13 @@ pub struct Response {
   ///
   /// You should almost never set this, and the exact behavior may change in the future
   pub should_wrap: bool,
+}
+
+impl Response {
+  pub fn rect(&self, position: Vec2) -> Rect {
+    Rect {
+      position,
+      size: self.size,
+    }
+  }
 }

@@ -29,7 +29,7 @@ macro_rules! ui_main {
 /// Initializes glium renderer, `UiInstance`, and runs the event loop.
 pub fn ui<T>(
   mut init: impl FnMut(&mut UiInstance) -> T,
-  mut draw: impl FnMut(&mut UiInstance, Vec2, &T),
+  mut draw: impl FnMut(&mut UiInstance, Vec2, &mut T),
   name: &'static str
 ) {
   kubi_logging::init();

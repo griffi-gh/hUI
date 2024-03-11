@@ -16,8 +16,10 @@ mod boilerplate;
 
 ui_main!(
   "hUI: Internal input test",
-  init: |_| {},
-  run: |ui, size, _| {
+  init: |_| {
+    0
+  },
+  run: |ui, size, n| {
     Container::default()
       .with_size(size!(100%))
       .with_align(Alignment::Center)
@@ -30,6 +32,7 @@ ui_main!(
           .into_interactable()
           .on_click(|| {
             println!("clicked");
+            *n += 1;
           })
           .add_child(ui);
       })

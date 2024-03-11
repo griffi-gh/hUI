@@ -452,6 +452,7 @@ impl UiElement for Container {
           text_measure: ctx.text_measure,
           current_font: ctx.current_font,
           images: ctx.images,
+          input: ctx.input,
         });
 
         //layout

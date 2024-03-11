@@ -12,7 +12,41 @@ impl Rect {
   pub fn contains_point(&self, point: Vec2) -> bool {
     point.cmpge(self.position).all() && point.cmple(self.position + self.size).all()
   }
+
+  //TODO: return intersect rect
+  pub fn intersects_rect(&self, other: Rect) -> bool {
+    self.position.x < other.position.x + other.size.x
+      && self.position.x + self.size.x > other.position.x
+      && self.position.y < other.position.y + other.size.y
+      && self.position.y + self.size.y > other.position.y
+  }
+
+  pub fn width(&self) -> f32 {
+    self.size.x
+  }
+
+  pub fn height(&self) -> f32 {
+    self.size.y
+  }
+
+  pub fn x(&self) -> f32 {
+    self.position.x
+  }
+
+  pub fn y(&self) -> f32 {
+    self.position.y
+  }
+
+  pub fn corners(&self) -> Corners<Vec2> {
+    Corners {
+      top_left: self.position,
+      top_right: self.position + Vec2::new(self.size.x, 0.0),
+      bottom_left: self.position + Vec2::new(0.0, self.size.y),
+      bottom_right: self.position + self.size,
+    }
+  }
 }
+
 /// Represents 4 sides of a rectangular shape.
 #[derive(Default, Clone, Copy, PartialEq, Eq, Debug)]
 pub struct Sides<T> {

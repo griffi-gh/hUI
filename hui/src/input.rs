@@ -47,10 +47,25 @@ pub enum ButtonState {
   Pressed = 1,
 }
 
+impl From<bool> for ButtonState {
+  fn from(b: bool) -> Self {
+    if b { ButtonState::Pressed } else { ButtonState::Released }
+  }
+}
+
+impl From<ButtonState> for bool {
+  fn from(s: ButtonState) -> Self {
+    s.is_pressed()
+  }
+}
+
 impl ButtonState {
+  /// Returns `true` if the button is pressed
   pub fn is_pressed(self) -> bool {
     self == ButtonState::Pressed
   }
+
+  /// Returns `true` if the button is released
   pub fn is_released(self) -> bool {
     self == ButtonState::Released
   }
@@ -117,140 +132,106 @@ impl_fits64_for_keyboard_key!(
   Mute = 104, VolumeUp = 105, VolumeDown = 106, MediaPlay = 107, MediaStop = 108, MediaNext = 109, MediaPrevious = 110
 );
 
-/// Information about the state of a mouse button
+/// Information about the current state of a pressed mouse button
 #[derive(Default, Clone, Copy, Debug)]
-pub struct MouseButtonState {
-  /// Whether the input is currently active (i.e. the button is currently held down)
-  pub state: ButtonState,
+pub struct MouseButtonMeta {
   /// Position at which the input was initiated (last time it was pressed **down**)
   pub start_position: Option<Vec2>,
 }
 
 #[derive(Default)]
 pub struct MousePointer {
+  /// Current position of the mouse pointer
   pub current_position: Vec2,
-  pub buttons: HashMap<MouseButton, MouseButtonState, BuildNoHashHasher<u16>>,
+  /// Current state of each mouse button (if down)
+  pub buttons: HashMap<MouseButton, MouseButtonMeta, BuildNoHashHasher<u16>>,
 }
 
+/// Unique identifier of a touch pointer (finger)
+pub type TouchId = u32;
+
 pub struct TouchFinger {
-  /// Unique identifier of the pointer (finger)
-  pub id: u32,
+  /// Unique identifier of the pointer/finger
+  pub id: TouchId,
+  /// Current position of the pointer/finger
   pub current_position: Vec2,
   pub start_position: Vec2,
 }
 
-pub type PointerId = u32;
-
-/// Represents a pointer (mouse or touch)
-pub enum Pointer {
-  MousePointer(MousePointer),
-  TouchFinger(TouchFinger),
-}
-
-impl Pointer {
-  pub fn current_position(&self) -> Vec2 {
-    match self {
-      Pointer::MousePointer(mouse) => mouse.current_position,
-      Pointer::TouchFinger(touch) => touch.current_position,
-    }
-  }
-}
-
-impl MouseButtonState {
-  /// Check if the pointer (mouse or touch) was just pressed\
-  /// (i.e. it was not pressed in the previous frame, but is pressed now)
-  ///
-  /// You should avoid using this, as it's not very intuitive for touch input (use `just_pressed` instead, if possible)
-  pub fn just_pressed(&self) -> bool {
-    todo!()
-  }
-
-  /// Check if the pointer (mouse or touch) was just released\
-  /// (i.e. it was pressed in the previous frame, but is not pressed now)
-  ///
-  /// This is the preferred "on click" event for elements like buttons
-  pub fn just_released(&self) -> bool {
-    todo!()
-  }
-}
-
-pub struct PointerQuery<'a> {
-  pointers: &'a HashMap<PointerId, Pointer, BuildNoHashHasher<PointerId>>,
-  /// Set of filtered pointer IDs
-  filtered: SetU32
-}
-
-impl<'a> PointerQuery<'a> {
-  fn new(pointers: &'a HashMap<PointerId, Pointer, BuildNoHashHasher<PointerId>>) -> Self {
-    Self {
-      pointers,
-      filtered: pointers.keys().copied().collect(),
-    }
-  }
-
-  /// Filter pointers that are *currently* located within the specified rectangle
-  pub fn within_rect(&mut self, rect: Rect) -> &mut Self {
-    for (&idx, pointer) in self.pointers {
-      if rect.contains_point(pointer.current_position()) {
-        self.filtered.insert(idx);
-      }
-    }
-    self
-  }
-
-  /// Check if any pointers matched the filter
-  pub fn any_matched(&self) -> bool {
-    !self.filtered.is_empty()
-  }
-
-  pub fn finish(&self) -> Vec<&'a Pointer> {
-    self.filtered.iter()
-      .map(|id| self.pointers.get(&id).unwrap())
-      .collect()
-  }
-}
-
-const MOUSE_POINTER_ID: u32 = u32::MAX;
-
 pub(crate) struct UiInputState {
-  pointers: HashMap<u32, Pointer, BuildNoHashHasher<u32>>,
+  // pointers: HashMap<u32, Pointer, BuildNoHashHasher<u32>>,
+  mouse_pointer: MousePointer,
   keyboard_state: Set64<KeyboardKey>,
 }
 
 impl UiInputState {
   pub fn new() -> Self {
     Self {
-      pointers: HashMap::default(),
+      // pointers: HashMap::default(),
+      mouse_pointer: MousePointer::default(),
       keyboard_state: Set64::new(),
     }
-  }
-
-  pub fn query_pointer(&self) -> PointerQuery {
-    PointerQuery::new(&self.pointers)
   }
 
   /// Drain the event queue and update the internal input state
   pub fn update_state(&mut self, event_queue: &mut EventQueue) {
     for event in event_queue.drain() {
+      #[allow(clippy::single_match)]
       match event {
         UiEvent::MouseMove(pos) => {
-          let Pointer::MousePointer(mouse) = self.pointers.entry(MOUSE_POINTER_ID)
-            .or_insert(Pointer::MousePointer(MousePointer::default())) else { unreachable!() };
-          mouse.current_position = pos;
+          self.mouse_pointer.current_position = pos;
         },
         UiEvent::MouseButton { button, state } => {
-          let Pointer::MousePointer(mouse) = self.pointers.entry(MOUSE_POINTER_ID)
-            .or_insert(Pointer::MousePointer(MousePointer::default())) else { unreachable!() };
-          let button_state = mouse.buttons.entry(button)
-            .or_insert(MouseButtonState::default());
-          button_state.state = state;
-          button_state.start_position = state.is_pressed().then_some(mouse.current_position);
+          match state {
+            ButtonState::Pressed => {
+              let button = self.mouse_pointer.buttons.entry(button)
+                .or_insert(MouseButtonMeta::default());
+              button.start_position = state.is_pressed().then_some(self.mouse_pointer.current_position);
+            },
+            ButtonState::Released => {
+              self.mouse_pointer.buttons.remove(&button);
+            },
+          }
         },
         UiEvent::KeyboardButton { key, state } => {
-          todo!()
+          match state {
+            ButtonState::Pressed => self.keyboard_state.insert(key),
+            ButtonState::Released => self.keyboard_state.remove(&key),
+          };
         },
-        _ => (), //TODO: Handle other events
+        //TODO touch, text input
+        _ => (),
       }
     }
+  }
+
+  pub fn ctx(&self) -> InputCtx {
+    InputCtx(self)
+  }
+}
+
+#[derive(Clone, Copy)]
+pub struct InputCtx<'a>(&'a UiInputState);
+
+impl<'a> InputCtx<'a> {
+  /// Get the current position of the mouse pointer
+  pub fn mouse_position(&self) -> Vec2 {
+    self.0.mouse_pointer.current_position
+  }
+
+  /// Get the current position of the mouse pointer within a rectangle
+  pub fn mouse_position_in_rect(&self, rect: Rect) -> Option<Vec2> {
+    let pos = self.0.mouse_pointer.current_position;
+    rect.contains_point(pos).then_some(pos - rect.position)
+  }
+
+  /// Get the state of a mouse button
+  pub fn mouse_button_down(&self, button: MouseButton) -> ButtonState {
+    self.0.mouse_pointer.buttons.contains_key(&button).into()
+  }
+
+  /// Check if a rect can be considered "hovered"
+  pub fn is_hovered(&self, rect: Rect) -> bool {
+    rect.contains_point(self.0.mouse_pointer.current_position)
   }
 }

@@ -3,11 +3,12 @@
 use std::any::Any;
 use crate::{
   draw::{atlas::ImageCtx, UiDrawCommandList},
+  input::InputCtx,
   layout::LayoutInfo,
   measure::Response,
   state::StateRepo,
   text::{FontHandle, TextMeasure},
-  UiInstance
+  UiInstance,
 };
 
 mod builtin;
@@ -20,6 +21,8 @@ pub struct MeasureContext<'a> {
   pub text_measure: TextMeasure<'a>,
   pub current_font: FontHandle,
   pub images: ImageCtx<'a>,
+  //XXX: should measure have a reference to input?
+  //pub input: InputCtx<'a>,
 }
 
 /// Context for the `Element::process` function
@@ -31,6 +34,7 @@ pub struct ProcessContext<'a> {
   pub text_measure: TextMeasure<'a>,
   pub current_font: FontHandle,
   pub images: ImageCtx<'a>,
+  pub input: InputCtx<'a>,
 }
 
 pub trait UiElement {

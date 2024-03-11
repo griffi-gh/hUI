@@ -136,7 +136,7 @@ impl_fits64_for_keyboard_key!(
 #[derive(Default, Clone, Copy, Debug)]
 pub struct MouseButtonMeta {
   /// Position at which the input was initiated (last time it was pressed **down**)
-  pub start_position: Option<Vec2>,
+  pub start_position: Vec2,
 }
 
 #[derive(Default)]
@@ -186,7 +186,7 @@ impl UiInputState {
             ButtonState::Pressed => {
               let button = self.mouse_pointer.buttons.entry(button)
                 .or_insert(MouseButtonMeta::default());
-              button.start_position = state.is_pressed().then_some(self.mouse_pointer.current_position);
+              button.start_position = self.mouse_pointer.current_position;
             },
             ButtonState::Released => {
               self.mouse_pointer.buttons.remove(&button);
@@ -228,6 +228,22 @@ impl<'a> InputCtx<'a> {
   /// Get the state of a mouse button
   pub fn mouse_button_down(&self, button: MouseButton) -> ButtonState {
     self.0.mouse_pointer.buttons.contains_key(&button).into()
+  }
+
+  /// Get the start position of a mouse button\
+  /// (Position at the last time it was pressed **down**)
+  ///
+  /// Returns `None` if the button is not currently down
+  pub fn mouse_button_start_position(&self, button: MouseButton) -> Option<Vec2> {
+    self.0.mouse_pointer.buttons.get(&button).map(|meta| meta.start_position)
+  }
+
+  /// Get the relative movement of the mouse pointer since the button was pressed down
+  ///
+  /// This function is similar to [`InputCtx::mouse_button_start_position`], but returns the relative movement instead of the absolute position
+  pub fn mouse_button_relative_movement(&self, button: MouseButton) -> Option<Vec2> {
+    let start = self.mouse_button_start_position(button)?;
+    Some(self.mouse_position() - start)
   }
 
   /// Check if a rect can be considered "hovered"

@@ -140,11 +140,15 @@ pub struct MouseButtonMeta {
 }
 
 #[derive(Default)]
-pub struct MousePointer {
+pub struct MouseState {
   /// Current position of the mouse pointer
   pub current_position: Vec2,
+
   /// Current state of each mouse button (if down)
   pub buttons: HashMap<MouseButton, MouseButtonMeta, BuildNoHashHasher<u16>>,
+
+  /// mouse buttons that were released *in the current frame*
+  pub released_buttons: HashMap<MouseButton, MouseButtonMeta, BuildNoHashHasher<u16>>,
 }
 
 /// Unique identifier of a touch pointer (finger)
@@ -160,43 +164,61 @@ pub struct TouchFinger {
 
 pub(crate) struct UiInputState {
   // pointers: HashMap<u32, Pointer, BuildNoHashHasher<u32>>,
-  mouse_pointer: MousePointer,
+  mouse_pointer: MouseState,
   keyboard_state: Set64<KeyboardKey>,
+  /// events that happened in the current frame
+  just_happened: Vec<UiEvent>,
 }
 
 impl UiInputState {
   pub fn new() -> Self {
     Self {
       // pointers: HashMap::default(),
-      mouse_pointer: MousePointer::default(),
+      mouse_pointer: MouseState::default(),
       keyboard_state: Set64::new(),
+      just_happened: Vec::new(),
     }
   }
 
   /// Drain the event queue and update the internal input state
+  ///
+  /// This function should be called exactly once per frame
   pub fn update_state(&mut self, event_queue: &mut EventQueue) {
-    for event in event_queue.drain() {
+    self.mouse_pointer.released_buttons.clear();
+    self.just_happened.clear();
+    self.just_happened.extend(event_queue.drain());
+    for event in &self.just_happened {
       #[allow(clippy::single_match)]
       match event {
         UiEvent::MouseMove(pos) => {
-          self.mouse_pointer.current_position = pos;
+          self.mouse_pointer.current_position = *pos;
         },
         UiEvent::MouseButton { button, state } => {
           match state {
+            //wtf should we do with buttons that are pressed and released in the same frame?
+            //i have no fvcking idea
             ButtonState::Pressed => {
-              let button = self.mouse_pointer.buttons.entry(button)
+              let button = self.mouse_pointer.buttons.entry(*button)
                 .or_insert(MouseButtonMeta::default());
               button.start_position = self.mouse_pointer.current_position;
             },
             ButtonState::Released => {
-              self.mouse_pointer.buttons.remove(&button);
+              if let Some(button_meta) = self.mouse_pointer.buttons.remove(button) {
+                self.mouse_pointer.released_buttons.insert(*button, button_meta);
+              } else {
+                //huh
+                //this can happen i guess ¯\_(=^･ω･^)_/¯
+                self.mouse_pointer.released_buttons.insert(*button, MouseButtonMeta {
+                  start_position: self.mouse_pointer.current_position,
+                });
+              }
             },
           }
         },
         UiEvent::KeyboardButton { key, state } => {
           match state {
-            ButtonState::Pressed => self.keyboard_state.insert(key),
-            ButtonState::Released => self.keyboard_state.remove(&key),
+            ButtonState::Pressed => self.keyboard_state.insert(*key),
+            ButtonState::Released => self.keyboard_state.remove(key),
           };
         },
         //TODO touch, text input
@@ -251,7 +273,35 @@ impl<'a> InputCtx<'a> {
   }
 
   /// Check if a rect can be considered "hovered"
+  ///
+  /// This can be triggered by multiple input sources, such as mouse, touch, etc.
   pub fn check_hover(&self, rect: Rect) -> bool {
     rect.contains_point(self.0.mouse_pointer.current_position)
+  }
+
+  /// Check if a rect can be considered "active" (i.e. held down)
+  ///
+  /// WIP: Not implemented yet, always returns `false`
+  pub fn check_active(&self, rect: Rect) -> bool {
+    //TODO `check_active`
+    false
+  }
+
+  /// Check if a rect can be considered "clicked"
+  ///
+  /// This can be triggered by multiple input sources, such as mouse, touch, etc.\
+  /// In case of a mouse, these conditions must be met:
+  /// - The mouse button got released in the current frame
+  /// - The mouse pointer is currently inside the rectangle
+  /// - The mouse pointer was inside the rectangle at the time the button was pressed down
+  ///
+  /// By default, this function only checks for the primary mouse button\
+  /// This is a limitation of the current API and may change in the future\
+  /// (as the current implementation of this function checks for both mouse and touch input, and the touch input quite obviously only supports one "button")
+  pub fn check_click(&self, rect: Rect) -> bool {
+    let pos = self.0.mouse_pointer.current_position;
+    self.0.mouse_pointer.released_buttons.get(&MouseButton::Primary).map_or(false, |meta| {
+      rect.contains_point(meta.start_position) && rect.contains_point(pos)
+    })
   }
 }

@@ -32,7 +32,6 @@ ui_main!(
           .into_interactable()
           .on_click(|| {
             println!("clicked");
-            *n += 1;
           })
           .add_child(ui);
       })

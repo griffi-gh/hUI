@@ -282,7 +282,7 @@ impl<'a> InputCtx<'a> {
   /// Check if a rect can be considered "active" (i.e. held down)
   ///
   /// WIP: Not implemented yet, always returns `false`
-  pub fn check_active(&self, rect: Rect) -> bool {
+  pub fn check_active(&self, _rect: Rect) -> bool {
     //TODO `check_active`
     false
   }

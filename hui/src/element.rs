@@ -36,7 +36,7 @@ pub struct ProcessContext<'a> {
   pub current_font: FontHandle,
   pub images: ImageCtx<'a>,
   pub input: InputCtx<'a>,
-  //pub signal: SignalCtx<'a>,
+  pub signal: SignalCtx<'a>,
 }
 
 pub trait UiElement {

@@ -52,7 +52,7 @@ impl SigIntStore {
   }
 }
 
-pub struct SignalCtx<'a>(&'a mut SigIntStore);
+pub struct SignalCtx<'a>(pub(crate) &'a mut SigIntStore);
 
 impl<'a> SignalCtx<'a> {
   /// Add a signal to the store

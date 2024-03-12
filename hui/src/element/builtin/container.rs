@@ -4,11 +4,12 @@ use derive_setters::Setters;
 use glam::{Vec2, vec2};
 use crate::{
   background::BackgroundColor,
-  draw::{RoundedCorners, ImageHandle, UiDrawCommand},
+  draw::{ImageHandle, RoundedCorners, UiDrawCommand},
   element::{ElementList, MeasureContext, ProcessContext, UiElement},
-  layout::{Alignment, Alignment2d, LayoutInfo, Size, Size2d, Direction},
+  layout::{Alignment, Alignment2d, Direction, LayoutInfo, Size, Size2d},
   measure::{Hints, Response},
-  rectangle::{Corners, Sides}
+  rectangle::{Corners, Sides},
+  signal::SignalCtx,
 };
 
 // pub struct Border {
@@ -453,6 +454,9 @@ impl UiElement for Container {
           current_font: ctx.current_font,
           images: ctx.images,
           input: ctx.input,
+          //HACK: i have no idea what to do with this
+          //this sucks
+          signal: SignalCtx(ctx.signal.0),
         });
 
         //layout

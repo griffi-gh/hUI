@@ -41,11 +41,17 @@ ui_main!(
             Text::new("-")
               .add_child(ui);
           })
-          .on_click(CounterSignal::Increment)
+          .on_click(CounterSignal::Decrement)
           .add_child(ui);
-        Text::new(counter.to_string())
-          .with_color(color::BLACK)
-          .with_text_size(32)
+        Container::default()
+          .with_size(size!(20, auto))
+          .with_align(Alignment::Center)
+          .with_children(|ui| {
+            Text::new(counter.to_string())
+              .with_color(color::BLACK)
+              .with_text_size(32)
+              .add_child(ui);
+          })
           .add_child(ui);
         Container::default()
           .with_padding(10.)
@@ -55,7 +61,7 @@ ui_main!(
             Text::new("+")
               .add_child(ui);
           })
-          .on_click(CounterSignal::Decrement)
+          .on_click(CounterSignal::Increment)
           .add_child(ui);
       })
       .add_root(ui, size);

@@ -135,6 +135,7 @@ impl UiInstance {
       current_font: self.text_renderer.current_font(),
       images: self.atlas.context(),
       input: self.input.ctx(),
+      signal: self.signal.ctx(),
     });
   }
 

@@ -34,12 +34,17 @@ ui_main!(
   run: |ui, size, (ref mut counter, image)| {
     Container::default()
       .with_size(size!(100%))
-      .with_align(Alignment::Center)
+      .with_padding(10.)
+      .with_align((Alignment::Center, Alignment::Begin))
       .with_direction(Direction::Horizontal)
       .with_gap(5.)
       .with_background((0.1, 0.1, 0.1))
       .with_wrap(true)
       .with_children(|ui| {
+        Text::new("Number of images:")
+          .with_text_size(24)
+          .add_child(ui);
+        Br.add_child(ui);
         Container::default()
           .with_padding(10.)
           .with_background(color::ORANGE)
@@ -78,11 +83,9 @@ ui_main!(
       })
       .add_root(ui, size);
 
-    ui.process_signals(|sig| {
-      match sig {
-        CounterSignal::Increment => *counter += 1,
-        CounterSignal::Decrement => *counter -= 1,
-      }
+    ui.process_signals(|sig| match sig {
+      CounterSignal::Increment => *counter += 1,
+      CounterSignal::Decrement => *counter -= 1,
     });
   }
 );

@@ -8,7 +8,7 @@ use crate::{
   event::{EventQueue, UiEvent},
   input::UiInputState,
   layout::{Direction, LayoutInfo},
-  signal::{SigIntStore, UiSignal},
+  signal::{SignalStore, UiSignal},
   state::StateRepo,
   text::{FontHandle, TextRenderer}
 };
@@ -29,7 +29,7 @@ pub struct UiInstance {
   atlas: TextureAtlasManager,
   events: EventQueue,
   input: UiInputState,
-  signal: SigIntStore,
+  signal: SignalStore,
   //True if in the middle of a laying out a frame
   state: bool,
 }
@@ -57,7 +57,7 @@ impl UiInstance {
       },
       events: EventQueue::new(),
       input: UiInputState::new(),
-      signal: SigIntStore::new(),
+      signal: SignalStore::new(),
       state: false,
     }
   }
@@ -135,7 +135,7 @@ impl UiInstance {
       current_font: self.text_renderer.current_font(),
       images: self.atlas.context(),
       input: self.input.ctx(),
-      signal: self.signal.ctx(),
+      signal: &mut self.signal,
     });
   }
 

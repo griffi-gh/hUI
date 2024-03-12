@@ -5,18 +5,18 @@ use nohash_hasher::BuildNoHashHasher;
 /// A marker trait for signals
 pub trait UiSignal: Any {}
 
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]
-pub(crate) struct DummySignal;
-impl UiSignal for DummySignal {}
+// #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]
+// pub(crate) struct DummySignal;
+// impl UiSignal for DummySignal {}
 
-pub(crate) struct SigIntStore {
+pub struct SignalStore {
   ///XXX: is this truly the most efficient structure?
   sig: HashMap<TypeId, Vec<Box<dyn Any>>, BuildNoHashHasher<u64>>
 }
 
-impl SigIntStore {
+impl SignalStore {
   /// Create a new [`SigIntStore`]
-  pub fn new() -> Self {
+  pub(crate) fn new() -> Self {
     Self {
       sig: Default::default(),
     }
@@ -41,22 +41,9 @@ impl SigIntStore {
   }
 
   /// Drain all signals of a given type
-  pub fn drain<T: UiSignal + 'static>(&mut self) -> impl Iterator<Item = T> + '_ {
+  pub(crate) fn drain<T: UiSignal + 'static>(&mut self) -> impl Iterator<Item = T> + '_ {
     self.internal_store::<T>()
       .drain(..)
       .map(|x| *x.downcast::<T>().unwrap()) //unchecked?
-  }
-
-  pub fn ctx(&mut self) -> SignalCtx {
-    SignalCtx(self)
-  }
-}
-
-pub struct SignalCtx<'a>(pub(crate) &'a mut SigIntStore);
-
-impl<'a> SignalCtx<'a> {
-  /// Add a signal to the store
-  pub fn push<T: UiSignal + 'static>(&mut self, sig: T) {
-    self.0.add(sig);
   }
 }

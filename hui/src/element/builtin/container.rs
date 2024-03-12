@@ -9,7 +9,6 @@ use crate::{
   layout::{Alignment, Alignment2d, Direction, LayoutInfo, Size, Size2d},
   measure::{Hints, Response},
   rectangle::{Corners, Sides},
-  signal::SignalCtx,
 };
 
 // pub struct Border {
@@ -456,7 +455,7 @@ impl UiElement for Container {
           input: ctx.input,
           //HACK: i have no idea what to do with this
           //this sucks
-          signal: SignalCtx(ctx.signal.0),
+          signal: ctx.signal,
         });
 
         //layout

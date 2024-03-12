@@ -56,8 +56,7 @@ impl<C: UiSignal + 'static> UiElement for Interactable<C> {
     //XXX: should we do this AFTER normal process call of wrapped element?
     if ctx.input.check_click(rect) {
       if let Some(sig) = self.signal.take() {
-        //HACK: Fucking whatever
-        ctx.signal.0.add(sig);
+        ctx.signal.add(sig);
       }
     }
 

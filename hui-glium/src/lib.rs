@@ -1,13 +1,12 @@
 use std::rc::Rc;
 use glam::Vec2;
 use glium::{
-  Surface, DrawParameters, Blend,
-  Program, VertexBuffer, IndexBuffer,
-  backend::{Facade, Context},
-  texture::{Texture2d, RawImage2d},
+  Blend, DrawParameters, IndexBuffer, Program, Surface, VertexBuffer,
+  implement_vertex, uniform,
+  backend::{Context, Facade},
   index::PrimitiveType,
-  implement_vertex,
-  uniform, uniforms::{Sampler, SamplerBehavior, SamplerWrapFunction},
+  texture::{RawImage2d, Texture2d},
+  uniforms::{MagnifySamplerFilter, MinifySamplerFilter, Sampler, SamplerBehavior, SamplerWrapFunction},
 };
 use hui::{
   draw::{TextureAtlasMeta, UiDrawCall, UiVertex}, UiInstance
@@ -182,6 +181,9 @@ impl GliumUiRenderer {
         &uniform! {
           resolution: resolution.to_array(),
           tex: Sampler(self.ui_texture.as_ref().unwrap(), SamplerBehavior {
+            max_anisotropy: 1,
+            magnify_filter: MagnifySamplerFilter::Nearest,
+            minify_filter: MinifySamplerFilter::NearestMipmapNearest,
             wrap_function: (SamplerWrapFunction::Clamp, SamplerWrapFunction::Clamp, SamplerWrapFunction::Clamp),
             ..Default::default()
           }),

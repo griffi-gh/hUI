@@ -5,51 +5,43 @@
 
 use crate::{
   element::{MeasureContext, ProcessContext, UiElement},
-  signal::{DummySignal, UiSignal},
+  signal::UiSignal,
 };
 use std::cell::RefCell;
 
+#[non_exhaustive]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
+pub enum InteractableEvent {
+  #[default]
+  Click,
+  Hover,
+}
+
 /// Wrapper that allows adding click and hover events to any element
-pub struct Interactable<H: UiSignal + 'static = DummySignal, C: UiSignal + 'static = DummySignal> {
+pub struct Interactable<C: UiSignal + 'static> {
   /// The wrapped element that will be interactable
   pub element: Box<dyn UiElement>,
 
-  /// Signal that will be called if the element is hovered in the current frame
-  ///
-  /// Will be consumed after the first time it's called
-  pub hovered: RefCell<Option<H>>,
+  /// Event to listen for
+  pub event: InteractableEvent,
 
   /// Signal that will be called if the element was clicked in the current frame
   ///
   /// Will be consumed after the first time it's called
-  pub clicked: RefCell<Option<C>>,
+  pub signal: RefCell<Option<C>>,
 }
 
-impl<H: UiSignal, C: UiSignal> Interactable<H, C> {
-  pub fn new(element: Box<dyn UiElement>) -> Self {
+impl<C: UiSignal + 'static> Interactable<C> {
+  pub fn new(element: Box<dyn UiElement>, event: InteractableEvent, signal: C) -> Self {
     Self {
       element,
-      hovered: RefCell::new(None),
-      clicked: RefCell::new(None),
-    }
-  }
-
-  pub fn on_hover(self, hover: H) -> Self {
-    Self {
-      hovered: RefCell::new(Some(hover)),
-      ..self
-    }
-  }
-
-  pub fn on_click(self, clicked: C) -> Self {
-    Self {
-      clicked: RefCell::new(Some(clicked)),
-      ..self
+      event: InteractableEvent::Click,
+      signal: RefCell::new(Some(signal)),
     }
   }
 }
 
-impl UiElement for Interactable {
+impl<C: UiSignal + 'static> UiElement for Interactable<C> {
   fn name(&self) -> &'static str {
     "Interactable"
   }
@@ -62,9 +54,8 @@ impl UiElement for Interactable {
     let rect = ctx.measure.rect(ctx.layout.position);
 
     //XXX: should we do this AFTER normal process call of wrapped element?
-    //TODO other events...
     if ctx.input.check_click(rect) {
-      if let Some(sig) = self.clicked.take() {
+      if let Some(sig) = self.signal.take() {
         //ctx.signal.push(sig);
       }
     }
@@ -74,11 +65,21 @@ impl UiElement for Interactable {
 }
 
 pub trait ElementInteractableExt: UiElement {
-  fn into_interactable(self) -> Interactable;
+  fn into_interactable<C: UiSignal + 'static>(self, event: InteractableEvent, signal: C) -> Interactable<C>;
+  fn on_click<C: UiSignal + 'static>(self, signal: C) -> Interactable<C>;
+  fn on_hover<C: UiSignal + 'static>(self, signal: C) -> Interactable<C>;
 }
 
 impl<T: UiElement + 'static> ElementInteractableExt for T {
-  fn into_interactable(self) -> Interactable {
-    Interactable::new(Box::new(self))
+  fn into_interactable<C: UiSignal + 'static>(self, event: InteractableEvent, signal: C) -> Interactable<C> {
+    Interactable::new(Box::new(self), event, signal)
+  }
+
+  fn on_click<C: UiSignal + 'static>(self, signal: C) -> Interactable<C> {
+    self.into_interactable(InteractableEvent::Click, signal)
+  }
+
+  fn on_hover<C: UiSignal + 'static>(self, signal: C) -> Interactable<C> {
+    self.into_interactable(InteractableEvent::Hover, signal)
   }
 }

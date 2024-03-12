@@ -41,10 +41,7 @@ ui_main!(
             Text::new("-")
               .add_child(ui);
           })
-          .into_interactable()
-          .on_click(|| {
-            println!("clicked");
-          })
+          .on_click(CounterSignal::Increment)
           .add_child(ui);
         Text::new(counter.to_string())
           .with_color(color::BLACK)
@@ -58,10 +55,7 @@ ui_main!(
             Text::new("+")
               .add_child(ui);
           })
-          .into_interactable()
-          .on_click(|| {
-            println!("clicked");
-          })
+          .on_click(CounterSignal::Decrement)
           .add_child(ui);
       })
       .add_root(ui, size);

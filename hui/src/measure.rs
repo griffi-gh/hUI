@@ -26,6 +26,8 @@ pub struct Response {
   /// (the element itself gets wrapped to the next line too)
   ///
   /// You should almost never set this, and the exact behavior may change in the future
+  ///
+  /// Currently, this forces wrapping even if Container::wrap is set to false
   pub should_wrap: bool,
 }
 

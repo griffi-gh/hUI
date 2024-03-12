@@ -9,6 +9,9 @@ pub mod fill_rect;
 #[cfg(feature = "builtin_elements")]
 pub mod spacer;
 
+#[cfg(feature = "builtin_elements")]
+pub mod br;
+
 // "The basics":
 
 #[cfg(feature = "builtin_elements")]

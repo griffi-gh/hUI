@@ -76,7 +76,11 @@ pub struct Container {
   #[setters(into)]
   pub corner_radius: Corners<f32>,
 
-  /// Set this to `true` to allow the elements wrap automatically\
+  /// Set this to `true` to allow the elements wrap automatically
+  ///
+  /// Disabling/enabling this does not affect explicit wrapping\
+  /// (for example, `Br`, or any other element with `should_wrap` set to `true`)
+  ///
   /// This is an experimental feature and may not work as expected
   pub wrap: bool,
 
@@ -206,7 +210,7 @@ impl UiElement for Container {
       };
 
       //Wrap the element if it exceeds container's size and is not the first element in the line
-      if self.wrap && (end_pos_pri > max_line_pri) && (line_element_count > 0) {
+      if ((self.wrap && (end_pos_pri > max_line_pri)) || measure.should_wrap) && (line_element_count > 0) {
         // >>>>>>> WRAP THAT B*TCH!
 
         //Negate the leftover gap from the previous element

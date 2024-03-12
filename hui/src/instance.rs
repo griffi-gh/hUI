@@ -153,6 +153,9 @@ impl UiInstance {
     //first, drain and process the event queue
     self.input.update_state(&mut self.events);
 
+    //then, reset the (remaining) signals
+    self.signal.clear();
+
     //then, reset the draw commands
     std::mem::swap(&mut self.prev_draw_commands, &mut self.draw_commands);
     self.draw_commands.commands.clear();

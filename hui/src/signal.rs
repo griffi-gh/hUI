@@ -46,4 +46,10 @@ impl SignalStore {
       .drain(..)
       .map(|x| *x.downcast::<T>().unwrap()) //unchecked?
   }
+
+  /// Clear all signals
+  pub(crate) fn clear(&mut self) {
+    //XXX: should we clear the vecs instead?
+    self.sig.clear();
+  }
 }

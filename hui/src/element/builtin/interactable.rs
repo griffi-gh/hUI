@@ -64,9 +64,15 @@ impl<C: UiSignal + 'static> UiElement for Interactable<C> {
   }
 }
 
+/// Extension trait for [`UiElement`] that adds methods to wrap the element in an [`Interactable`]
 pub trait ElementInteractableExt: UiElement {
+  /// Wrap the element in an [`Interactable`] that will call the given signal when the specified event occurs
   fn into_interactable<C: UiSignal + 'static>(self, event: InteractableEvent, signal: C) -> Interactable<C>;
+
+  /// Wrap the element in an [`Interactable`] that will call the given signal when clicked
   fn on_click<C: UiSignal + 'static>(self, signal: C) -> Interactable<C>;
+
+  /// Wrap the element in an [`Interactable`] that will call the given signal while hovered
   fn on_hover<C: UiSignal + 'static>(self, signal: C) -> Interactable<C>;
 }
 

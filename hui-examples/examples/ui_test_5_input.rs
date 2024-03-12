@@ -1,13 +1,16 @@
 use hui::{
   color, size,
+  draw::TextureFormat,
+  signal::UiSignal,
   layout::{Alignment, Direction},
   element::{
     container::Container,
     text::Text,
+    image::Image,
+    br::Br,
     interactable::ElementInteractableExt,
-    UiElementExt
+    UiElementExt,
   },
-  signal::UiSignal,
 };
 
 enum CounterSignal {
@@ -20,49 +23,58 @@ impl UiSignal for CounterSignal {}
 #[macro_use]
 mod boilerplate;
 
+const IMAGE_DATA: &[u8] = include_bytes!("../assets/icons/visual-studio-code-icon_32x32.rgba");
+
 ui_main!(
   "hUI: Internal input test",
-  init: |_| {
-    0
+  init: |ui| {
+    let image = ui.add_image(TextureFormat::Rgba, IMAGE_DATA, 32);
+    (0, image)
   },
-  run: |ui, size, counter| {
+  run: |ui, size, (ref mut counter, image)| {
     Container::default()
       .with_size(size!(100%))
       .with_align(Alignment::Center)
       .with_direction(Direction::Horizontal)
       .with_gap(5.)
-      .with_background(color::WHITE)
+      .with_background((0.1, 0.1, 0.1))
+      .with_wrap(true)
       .with_children(|ui| {
         Container::default()
           .with_padding(10.)
-          .with_corner_radius(8.)
-          .with_background(color::DARK_RED)
+          .with_background(color::ORANGE)
           .with_children(|ui| {
             Text::new("-")
+              .with_text_size(32)
               .add_child(ui);
           })
           .on_click(CounterSignal::Decrement)
           .add_child(ui);
         Container::default()
-          .with_size(size!(20, auto))
+          .with_size(size!(60, auto))
           .with_align(Alignment::Center)
           .with_children(|ui| {
             Text::new(counter.to_string())
-              .with_color(color::BLACK)
-              .with_text_size(32)
+              .with_text_size(64)
               .add_child(ui);
           })
           .add_child(ui);
         Container::default()
           .with_padding(10.)
-          .with_corner_radius(8.)
-          .with_background(color::DARK_RED)
+          .with_background(color::ORANGE)
           .with_children(|ui| {
             Text::new("+")
+              .with_text_size(32)
               .add_child(ui);
           })
           .on_click(CounterSignal::Increment)
           .add_child(ui);
+        Br.add_child(ui);
+        for _ in 0..*counter {
+          Image::new(*image)
+            .with_size(size!(48, 48))
+            .add_child(ui);
+        }
       })
       .add_root(ui, size);
 

@@ -35,7 +35,7 @@ impl<C: UiSignal + 'static> Interactable<C> {
   pub fn new(element: Box<dyn UiElement>, event: InteractableEvent, signal: C) -> Self {
     Self {
       element,
-      event: InteractableEvent::Click,
+      event,
       signal: RefCell::new(Some(signal)),
     }
   }
@@ -54,7 +54,12 @@ impl<C: UiSignal + 'static> UiElement for Interactable<C> {
     let rect = ctx.measure.rect(ctx.layout.position);
 
     //XXX: should we do this AFTER normal process call of wrapped element?
-    if ctx.input.check_click(rect) {
+    let event_happened = match self.event {
+      InteractableEvent::Click => ctx.input.check_click(rect),
+      InteractableEvent::Hover => ctx.input.check_hover(rect),
+    };
+
+    if event_happened {
       if let Some(sig) = self.signal.take() {
         ctx.signal.add(sig);
       }

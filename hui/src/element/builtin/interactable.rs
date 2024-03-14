@@ -26,8 +26,6 @@ pub struct Interactable<C: UiSignal + 'static> {
   pub event: InteractableEvent,
 
   /// Signal that will be called if the element was clicked in the current frame
-  ///
-  /// Will be consumed after the first time it's called
   pub signal: RefCell<Option<C>>,
 }
 
@@ -55,7 +53,8 @@ impl<C: UiSignal + 'static> UiElement for Interactable<C> {
 
     //XXX: should we do this AFTER normal process call of wrapped element?
     let event_happened = match self.event {
-      InteractableEvent::Click => ctx.input.check_click(rect),
+      //TODO: actually pass the response
+      InteractableEvent::Click => ctx.input.check_click(rect).is_some(),
       InteractableEvent::Hover => ctx.input.check_hover(rect),
     };
 

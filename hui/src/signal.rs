@@ -56,16 +56,20 @@ impl SignalStore {
 
 //TODO this, simplifies handling signals
 
-pub struct SignalTrigger<R: UiSignal + 'static, A = ()>(pub(crate) Box<dyn Fn(A) -> R>);
+// pub struct SignalTrigger<R: UiSignal + 'static, A = ()>(pub(crate) Box<dyn Fn(A) -> R + 'static>);
 
-impl<R: UiSignal + 'static, A> SignalTrigger<R, A> {
-  pub fn new<F: Fn(A) -> R + 'static>(f: F) -> Self {
-    Self(Box::new(f))
-  }
-}
+// impl<R: UiSignal + 'static, A> SignalTrigger<R, A> {
+//   pub fn new<F: Fn(A) -> R + 'static>(f: F) -> Self {
+//     Self(Box::new(f))
+//   }
 
-impl<R: UiSignal + 'static, A, T: Fn(A) -> R + 'static> From<T> for SignalTrigger<R, A> {
-  fn from(f: T) -> Self {
-    Self(Box::new(f))
-  }
-}
+//   pub fn call(&self, a: A) -> R {
+//     (self.0)(a)
+//   }
+// }
+
+// impl<R: UiSignal + 'static, A, T: Fn(A) -> R + 'static> From<T> for SignalTrigger<R, A> {
+//   fn from(f: T) -> Self {
+//     Self(Box::new(f))
+//   }
+// }

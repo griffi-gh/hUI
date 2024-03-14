@@ -234,6 +234,11 @@ impl UiInputState {
   }
 }
 
+#[derive(Clone, Copy, Debug)]
+pub struct ClickCheckResponse {
+  pub position_in_rect: Vec2,
+}
+
 #[derive(Clone, Copy)]
 pub struct InputCtx<'a>(&'a UiInputState);
 
@@ -300,10 +305,12 @@ impl<'a> InputCtx<'a> {
   /// By default, this function only checks for the primary mouse button\
   /// This is a limitation of the current API and may change in the future\
   /// (as the current implementation of this function checks for both mouse and touch input, and the touch input quite obviously only supports one "button")
-  pub fn check_click(&self, rect: Rect) -> bool {
+  pub fn check_click(&self, rect: Rect) -> Option<ClickCheckResponse> {
     let pos = self.0.mouse_pointer.current_position;
     self.0.mouse_pointer.released_buttons.get(&MouseButton::Primary).map_or(false, |meta| {
       rect.contains_point(meta.start_position) && rect.contains_point(pos)
+    }).then_some(ClickCheckResponse {
+      position_in_rect: pos - rect.position,
     })
   }
 }

@@ -3,12 +3,11 @@
 use derive_setters::Setters;
 use glam::{vec2, Vec4};
 use crate::{
-  background::BackgroundColor,
-  draw::{UiDrawCommand, RoundedCorners},
-  element::{UiElement, MeasureContext, ProcessContext},
+  draw::{RoundedCorners, UiDrawCommand},
+  element::{MeasureContext, ProcessContext, UiElement},
   layout::{Size, Size2d},
   measure::Response,
-  rect::Corners,
+  rect::{Corners, FillColor},
   size,
 };
 
@@ -22,7 +21,7 @@ pub struct FillRect {
 
   /// Background color of the rectangle
   #[setters(into)]
-  pub background: BackgroundColor,
+  pub background: FillColor,
 
   /// Corner radius of the rectangle
   #[setters(into)]

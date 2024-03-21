@@ -1,12 +1,11 @@
 use derive_setters::Setters;
 use glam::vec2;
 use crate::{
-  background::BackgroundColor,
   draw::{ImageHandle, RoundedCorners, UiDrawCommand},
   element::{MeasureContext, ProcessContext, UiElement},
   layout::{compute_size, Size, Size2d},
   measure::Response,
-  rect::Corners,
+  rect::{Corners, FillColor},
 };
 
 #[derive(Setters)]
@@ -29,7 +28,7 @@ pub struct Image {
   ///
   /// Image will get multiplied/tinted by this color or gradient
   #[setters(into)]
-  pub color: BackgroundColor,
+  pub color: FillColor,
 
   /// Corner radius of the image
   #[setters(into)]
@@ -44,7 +43,7 @@ impl Image {
         width: Size::Auto,
         height: Size::Auto,
       },
-      color: BackgroundColor::from((1., 1., 1., 1.)),
+      color: (1., 1., 1.).into(),
       corner_radius: Corners::all(0.),
     }
   }

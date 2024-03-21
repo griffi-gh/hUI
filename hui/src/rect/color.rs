@@ -50,9 +50,14 @@ impl FillColor {
     })
   }
 
-  /// Construct a simple gradient fill from four colors representing the corners of the rectangle
-  pub const fn corners(top_left: Vec4, top_right: Vec4, bottom_left: Vec4, bottom_right: Vec4) -> Self {
-    Self(Corners { top_left, top_right, bottom_left, bottom_right })
+  /// Construct a solid color fill from colors for each corner
+  pub const fn from_corners(corners: Corners<Vec4>) -> Self {
+    Self(corners)
+  }
+
+  /// Get a list of the colors for each corner
+  pub const fn corners(&self) -> Corners<Vec4> {
+    self.0
   }
 }
 

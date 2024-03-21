@@ -3,12 +3,11 @@
 use derive_setters::Setters;
 use glam::{Vec2, vec2};
 use crate::{
-  background::BackgroundColor,
   draw::{ImageHandle, RoundedCorners, UiDrawCommand},
   element::{ElementList, MeasureContext, ProcessContext, UiElement},
   layout::{Alignment, Alignment2d, Direction, LayoutInfo, Size, Size2d},
   measure::{Hints, Response},
-  rect::{Corners, Sides},
+  rect::{Corners, FillColor, Sides},
 };
 
 // pub struct Border {
@@ -59,7 +58,7 @@ pub struct Container {
   ///
   /// If the container has a background texture, it will be multiplied by this color
   #[setters(into)]
-  pub background: BackgroundColor,
+  pub background: FillColor,
 
   /// Background texture of the container
   ///

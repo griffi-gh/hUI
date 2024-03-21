@@ -13,7 +13,6 @@ mod instance;
 mod macros;
 pub mod layout;
 pub mod rect;
-pub mod background;
 pub mod element;
 pub mod event;
 pub mod input;

@@ -1,12 +1,11 @@
 use derive_setters::Setters;
 use glam::{vec2, vec4};
 use crate::{
-  background::BackgroundColor,
   draw::{RoundedCorners, UiDrawCommand},
   element::{MeasureContext, ProcessContext, UiElement},
   layout::{compute_size, Size, Size2d},
   measure::Response,
-  rect::Corners
+  rect::{Corners, FillColor}
 };
 
 #[derive(Debug, Clone, Copy, Setters)]
@@ -21,11 +20,11 @@ pub struct ProgressBar {
 
   /// Foreground (bar) color
   #[setters(into)]
-  pub foreground: BackgroundColor,
+  pub foreground: FillColor,
 
   /// Background color
   #[setters(into)]
-  pub background: BackgroundColor,
+  pub background: FillColor,
 
   /// Corner radius of the progress bar
   #[setters(into)]

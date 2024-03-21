@@ -8,7 +8,7 @@ use crate::{
   element::{MeasureContext, ProcessContext, UiElement},
   layout::{Size2d, compute_size},
   measure::Response,
-  rectangle::CornersColors,
+  rectangle::FillColor,
   signal::{trigger::SignalTriggerArg, Signal},
 };
 
@@ -42,11 +42,11 @@ pub struct Slider {
 
   /// Color of the slider handle
   #[setters(into)]
-  pub handle_color: CornersColors,
+  pub handle_color: FillColor,
 
   /// Color of the slider track
   #[setters(into)]
-  pub track_color: CornersColors,
+  pub track_color: FillColor,
 
   /// Follow mode
   pub follow_mode: SliderFollowMode,

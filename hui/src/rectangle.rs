@@ -7,4 +7,7 @@ mod sides;
 pub use sides::Sides;
 
 mod corners;
-pub use corners::{Corners, CornersColors};
+pub use corners::Corners;
+
+mod color;
+pub use color::FillColor;

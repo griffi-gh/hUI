@@ -30,6 +30,16 @@ impl FillColor {
     self.0.bottom_right.w == 0.
   }
 
+  /// Check if the fill color is completely opaque
+  ///
+  /// (i.e. all corners have an alpha value of 1.0)
+  pub fn is_opaque(&self) -> bool {
+    self.0.top_left.w == 1. &&
+    self.0.top_right.w == 1. &&
+    self.0.bottom_left.w == 1. &&
+    self.0.bottom_right.w == 1.
+  }
+
   /// Construct a solid color fill from values representing the red, green, blue and alpha channels
   pub const fn rgba(r: f32, g: f32, b: f32, a: f32) -> Self {
     Self(Corners {

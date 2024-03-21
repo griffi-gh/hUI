@@ -1,5 +1,5 @@
 use glam::{UVec2, Vec2};
-use glium::{backend::glutin::SimpleWindowBuilder, Surface};
+use glium::{Surface, backend::glutin::SimpleWindowBuilder};
 use winit::{
   event::{Event, WindowEvent},
   event_loop::{EventLoopBuilder, ControlFlow}
@@ -35,9 +35,9 @@ pub fn ui<T>(
   kubi_logging::init();
 
   let event_loop = EventLoopBuilder::new().build().unwrap();
-  let (window, display) = SimpleWindowBuilder::new().build(&event_loop);
-
-  window.set_title(name);
+  let (window, display) = SimpleWindowBuilder::new()
+    .with_title(name)
+    .build(&event_loop);
 
   let mut hui = UiInstance::new();
   let mut backend = GliumUiRenderer::new(&display);

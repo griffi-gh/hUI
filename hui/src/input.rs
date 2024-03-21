@@ -286,15 +286,7 @@ impl<'a> InputCtx<'a> {
     rect.contains_point(self.0.mouse_pointer.current_position)
   }
 
-  /// Check if a rect can be considered "active" (i.e. held down)
-  ///
-  /// WIP: Not implemented yet, always returns `false`
-  pub fn check_active(&self, _rect: Rect) -> bool {
-    //TODO `check_active`
-    false
-  }
-
-  /// Check if a rect can be considered "clicked"
+  /// Check if a rect can be considered "clicked" in the current frame
   ///
   /// This can be triggered by multiple input sources, such as mouse, touch, etc.\
   /// In case of a mouse, these conditions must be met:
@@ -311,6 +303,17 @@ impl<'a> InputCtx<'a> {
       rect.contains_point(meta.start_position) && rect.contains_point(pos)
     }).then_some(ClickCheckResponse {
       position_in_rect: pos - rect.position,
+    })
+  }
+
+  // TODO: write better docs
+
+  /// Check if a rect is being actively being interacted with (e.g. dragged)
+  pub fn check_active(&self, rect: Rect) -> Option<ClickCheckResponse> {
+    self.0.mouse_pointer.buttons.get(&MouseButton::Primary).filter(|mi| {
+      rect.contains_point(mi.start_position)
+    }).map(|_| ClickCheckResponse {
+      position_in_rect: self.0.mouse_pointer.current_position - rect.position,
     })
   }
 }

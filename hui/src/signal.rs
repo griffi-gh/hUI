@@ -56,6 +56,28 @@ impl SignalStore {
 
 //TODO this, simplifies handling signals
 
+// pub trait Signal {
+//   type Arg;
+//   type Output;
+//   fn call(&self, arg: Self::Arg) -> Self::Output;
+// }
+
+// impl<F: Fn() -> T, T> Signal for F {
+//   type Arg = ();
+//   type Output = T;
+//   fn call(&self, _: Self::Arg) -> Self::Output {
+//     self()
+//   }
+// }
+
+// // impl<F: Fn(A) -> T, A, T> Signal for F {
+// //   type Arg = A;
+// //   type Output = T;
+// //   fn call(&self, a: Self::Arg) -> Self::Output {
+// //     self(a)
+// //   }
+// // }
+
 // pub struct SignalTrigger<R: UiSignal + 'static, A = ()>(pub(crate) Box<dyn Fn(A) -> R + 'static>);
 
 // impl<R: UiSignal + 'static, A> SignalTrigger<R, A> {

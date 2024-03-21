@@ -248,6 +248,8 @@ impl UiInstance {
     self.signal.add(signal);
   }
 
+  //TODO: offer a non-consuming version of this function for T: Clone
+
   /// Process all signals of a given type
   ///
   /// This clears the signal queue for the given type and iterates over all signals

@@ -3,8 +3,8 @@
 use std::hash::{Hash, Hasher};
 use glam::Vec2;
 use hashbrown::HashMap;
-use nohash_hasher::{BuildNoHashHasher, NoHashHasher};
-use tinyset::{Fits64, Set64, SetU32};
+use nohash_hasher::BuildNoHashHasher;
+use tinyset::{Fits64, Set64};
 use crate::{event::{EventQueue, UiEvent}, rectangle::Rect};
 
 /// Represents a mouse button.

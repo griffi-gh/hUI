@@ -1,5 +1,4 @@
 use hui::{
-  color, size,
   draw::TextureFormat,
   signal::Signal,
   layout::{Alignment, Direction},
@@ -8,10 +7,10 @@ use hui::{
     text::Text,
     image::Image,
     br::Br,
-    interactable::ElementInteractableExt,
     slider::Slider,
     UiElementExt,
   },
+  size,
 };
 
 enum CounterSignal {

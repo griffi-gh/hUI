@@ -3,7 +3,7 @@ use hui::{
   color, size,
   element::{container::Container, progress_bar::ProgressBar, text::Text, UiElementExt},
   layout::Alignment,
-  rectangle::Corners,
+  rect::Corners,
   text::FontHandle,
 };
 

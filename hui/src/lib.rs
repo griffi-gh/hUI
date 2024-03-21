@@ -12,7 +12,7 @@
 mod instance;
 mod macros;
 pub mod layout;
-pub mod rectangle;
+pub mod rect;
 pub mod background;
 pub mod element;
 pub mod event;

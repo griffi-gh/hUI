@@ -5,7 +5,7 @@ use glam::Vec2;
 use hashbrown::HashMap;
 use nohash_hasher::BuildNoHashHasher;
 use tinyset::{Fits64, Set64};
-use crate::{event::{EventQueue, UiEvent}, rectangle::Rect};
+use crate::{event::{EventQueue, UiEvent}, rect::Rect};
 
 /// Represents a mouse button.
 ///

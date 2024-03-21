@@ -8,7 +8,7 @@ use crate::{
   element::{ElementList, MeasureContext, ProcessContext, UiElement},
   layout::{Alignment, Alignment2d, Direction, LayoutInfo, Size, Size2d},
   measure::{Hints, Response},
-  rectangle::{Corners, Sides},
+  rect::{Corners, Sides},
 };
 
 // pub struct Border {

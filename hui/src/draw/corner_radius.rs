@@ -1,5 +1,5 @@
 use std::num::NonZeroU16;
-use crate::rectangle::Corners;
+use crate::rect::Corners;
 
 //TODO uneven corners (separate width/height for each corner)
 

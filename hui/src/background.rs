@@ -2,7 +2,7 @@
 #![allow(deprecated)]
 
 use glam::{vec4, Vec3, Vec4};
-use crate::rectangle::Corners;
+use crate::rect::Corners;
 
 //TODO: use this
 // pub struct Background {

@@ -9,7 +9,7 @@ use hui::{
     UiElementExt
   },
   layout::Alignment,
-  rectangle::Corners,
+  rect::Corners,
   text::FontHandle,
   size,
 };

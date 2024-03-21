@@ -3,7 +3,7 @@
 //TODO: 9-slice draw command
 
 use crate::{
-  rectangle::Corners,
+  rect::Corners,
   text::{FontHandle, TextRenderer}
 };
 

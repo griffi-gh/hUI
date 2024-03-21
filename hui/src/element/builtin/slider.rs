@@ -8,7 +8,7 @@ use crate::{
   element::{MeasureContext, ProcessContext, UiElement},
   layout::{Size2d, compute_size},
   measure::Response,
-  rectangle::FillColor,
+  rect::FillColor,
   signal::{trigger::SignalTriggerArg, Signal},
 };
 

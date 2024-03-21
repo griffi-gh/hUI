@@ -12,7 +12,7 @@ use hui::{
     text::Text, ElementList
   },
   layout::{Alignment, Direction, Size},
-  rectangle::{Corners, Sides},
+  rect::{Corners, Sides},
   UiInstance
 };
 use hui_glium::GliumUiRenderer;

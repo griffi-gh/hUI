@@ -10,7 +10,7 @@ use winit::{
 use hui::{
   element::{
     container::Container, progress_bar::ProgressBar, fill_rect::FillRect, ElementList, UiElement
-  }, layout::{Alignment, Direction, Size}, rectangle::{Corners, Sides}, UiInstance
+  }, layout::{Alignment, Direction, Size}, rect::{Corners, Sides}, UiInstance
 };
 use hui_glium::GliumUiRenderer;
 

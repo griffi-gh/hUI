@@ -1,7 +1,7 @@
 //! element measurement, hints and responses
 
 use glam::Vec2;
-use crate::rectangle::Rect;
+use crate::rect::Rect;
 
 // #[non_exhaustive]
 #[derive(Default)]

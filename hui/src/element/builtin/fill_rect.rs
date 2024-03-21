@@ -8,7 +8,7 @@ use crate::{
   element::{UiElement, MeasureContext, ProcessContext},
   layout::{Size, Size2d},
   measure::Response,
-  rectangle::Corners,
+  rect::Corners,
   size,
 };
 

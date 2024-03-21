@@ -6,7 +6,7 @@ use crate::{
   element::{MeasureContext, ProcessContext, UiElement},
   layout::{compute_size, Size, Size2d},
   measure::Response,
-  rectangle::Corners,
+  rect::Corners,
 };
 
 #[derive(Setters)]

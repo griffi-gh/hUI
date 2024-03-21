@@ -2,7 +2,7 @@ use glam::{uvec2, vec2, UVec2, Vec2};
 use hashbrown::HashMap;
 use nohash_hasher::BuildNoHashHasher;
 use rect_packer::DensePacker;
-use crate::rectangle::Corners;
+use crate::rect::Corners;
 
 const RGBA_CHANNEL_COUNT: u32 = 4;
 //TODO make this work

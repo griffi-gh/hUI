@@ -103,7 +103,7 @@ impl Default for Container {
       gap: 0.,
       padding: Sides::all(0.),
       align: Alignment2d::default(),
-      background: Default::default(),
+      background: FillColor::transparent(),
       background_image: None,
       children: ElementList(Vec::new()),
       wrap: false,

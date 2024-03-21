@@ -1,4 +1,4 @@
-//! work in progress
+//! a slider element that allows selecting a value in a range
 
 use derive_setters::Setters;
 use glam::{Vec2, vec2};

@@ -144,6 +144,9 @@ pub struct MouseState {
   /// Current position of the mouse pointer
   pub current_position: Vec2,
 
+  /// Position of the mouse pointer on the previous frame
+  pub prev_position: Vec2,
+
   /// Current state of each mouse button (if down)
   pub buttons: HashMap<MouseButton, MouseButtonMeta, BuildNoHashHasher<u16>>,
 
@@ -184,6 +187,7 @@ impl UiInputState {
   ///
   /// This function should be called exactly once per frame
   pub fn update_state(&mut self, event_queue: &mut EventQueue) {
+    self.mouse_pointer.prev_position = self.mouse_pointer.current_position;
     self.mouse_pointer.released_buttons.clear();
     self.just_happened.clear();
     self.just_happened.extend(event_queue.drain());
@@ -234,9 +238,17 @@ impl UiInputState {
   }
 }
 
+/// Response for checks that involve an active pointer
 #[derive(Clone, Copy, Debug)]
-pub struct ClickCheckResponse {
+pub struct ActiveCheckResponse {
+  /// Current position of the pointer inside the target rectangle's coordinate space
   pub position_in_rect: Vec2,
+
+  /// Position of the pointer at the time the start of the input inside the target rectangle's coordinate space
+  pub start_position_in_rect: Vec2,
+
+  /// Position of the pointer on the previous frame inside the target rectangle's coordinate space
+  pub last_position_in_rect: Vec2,
 }
 
 #[derive(Clone, Copy)]
@@ -297,23 +309,27 @@ impl<'a> InputCtx<'a> {
   /// By default, this function only checks for the primary mouse button\
   /// This is a limitation of the current API and may change in the future\
   /// (as the current implementation of this function checks for both mouse and touch input, and the touch input quite obviously only supports one "button")
-  pub fn check_click(&self, rect: Rect) -> Option<ClickCheckResponse> {
+  pub fn check_click(&self, rect: Rect) -> Option<ActiveCheckResponse> {
     let pos = self.0.mouse_pointer.current_position;
-    self.0.mouse_pointer.released_buttons.get(&MouseButton::Primary).map_or(false, |meta| {
+    self.0.mouse_pointer.released_buttons.get(&MouseButton::Primary).filter(|meta| {
       rect.contains_point(meta.start_position) && rect.contains_point(pos)
-    }).then_some(ClickCheckResponse {
+    }).map(|mi| ActiveCheckResponse {
       position_in_rect: pos - rect.position,
+      start_position_in_rect: mi.start_position - rect.position,
+      last_position_in_rect: self.0.mouse_pointer.prev_position - rect.position,
     })
   }
 
   // TODO: write better docs
 
   /// Check if a rect is being actively being interacted with (e.g. dragged)
-  pub fn check_active(&self, rect: Rect) -> Option<ClickCheckResponse> {
+  pub fn check_active(&self, rect: Rect) -> Option<ActiveCheckResponse> {
     self.0.mouse_pointer.buttons.get(&MouseButton::Primary).filter(|mi| {
       rect.contains_point(mi.start_position)
-    }).map(|_| ClickCheckResponse {
+    }).map(|mi| ActiveCheckResponse {
       position_in_rect: self.0.mouse_pointer.current_position - rect.position,
+      start_position_in_rect: mi.start_position - rect.position,
+      last_position_in_rect: self.0.mouse_pointer.prev_position - rect.position,
     })
   }
 }

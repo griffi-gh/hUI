@@ -24,6 +24,7 @@ rect_packer = "0.2"
 log = "0.4"
 document-features = "0.2"
 derive_setters = "0.1"
+derive_more = "0.99"
 tinyset = "0.4"
 
 [features]

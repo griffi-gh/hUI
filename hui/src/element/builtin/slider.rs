@@ -1,30 +1,75 @@
 //! work in progress
 
 use derive_setters::Setters;
-use glam::{vec2, Vec2};
+use glam::{Vec2, vec2};
 
 use crate::{
-  draw::{RoundedCorners, UiDrawCommand},
+  draw::UiDrawCommand,
   element::{MeasureContext, ProcessContext, UiElement},
-  layout::{compute_size, Size2d},
+  layout::{Size2d, compute_size},
   measure::Response,
-  rectangle::Corners,
-  signal::{SignalStore, UiSignal},
+  rectangle::CornersColors,
+  signal::{trigger::SignalTriggerArg, Signal},
 };
 
-/// work in progress
-#[derive(Default, Setters)]
+/// Follow mode for the slider
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
+pub enum SliderFollowMode {
+  /// Slider will change based on the absolute mouse position in the slider
+  ///
+  /// This is the default mode and is recommended for most use cases
+  #[default]
+  Absolute,
+
+  /// Slider will change based on the difference between the current and starting mouse position
+  ///
+  /// This is an experimental option and does not currently work well for sliders with large step sizes
+  Relative,
+}
+
+/// A slider element that allows selecting a value in a range
+#[derive(Setters)]
 #[setters(prefix = "with_")]
 pub struct Slider {
+  /// Value of the slider, should be in range 0..1
+  ///
+  /// Out of range values will be clamped
   pub value: f32,
+
+  /// Size of the element
+  #[setters(into)]
   pub size: Size2d,
 
+  /// Color of the slider handle
+  #[setters(into)]
+  pub handle_color: CornersColors,
+
+  /// Color of the slider track
+  #[setters(into)]
+  pub track_color: CornersColors,
+
+  /// Follow mode
+  pub follow_mode: SliderFollowMode,
+
   #[setters(skip)]
-  fire_on_shit: Option<Box<dyn Fn(&mut SignalStore, f32)>>,
+  pub on_change: Option<SignalTriggerArg<f32>>,
+}
+
+impl Default for Slider {
+  fn default() -> Self {
+    Self {
+      value: 0.0,
+      size: Size2d::default(),
+      handle_color: (0.0, 0.0, 1.0).into(),
+      track_color: (0.5, 0.5, 0.5).into(),
+      follow_mode: SliderFollowMode::default(),
+      on_change: None
+    }
+  }
 }
 
 impl Slider {
-  pub const DEFAULT_HEIGHT: f32 = 20.0;
+  pub const DEFAULT_HEIGHT: f32 = 21.0;
 
   pub fn new(value: f32) -> Self {
     Self {
@@ -33,11 +78,9 @@ impl Slider {
     }
   }
 
-  pub fn on_change<S: UiSignal + 'static, T: Fn(f32) -> S + 'static>(self, f: T) -> Self {
+  pub fn on_change<S: Signal, T: Fn(f32) -> S + 'static>(self, f: T) -> Self {
     Self {
-      fire_on_shit: Some(Box::new(move |s: &mut SignalStore, x| {
-        s.add::<S>(f(x));
-      })),
+      on_change: Some(SignalTriggerArg::new(f)),
       ..self
     }
   }
@@ -56,32 +99,39 @@ impl UiElement for Slider {
   }
 
   fn process(&self, ctx: ProcessContext) {
-    let bgrect_height_ratio = 0.25;
+    //TODO: unhardcode this
+    let bgrect_height_ratio = 0.33;
+
     ctx.draw.add(UiDrawCommand::Rectangle {
       position: ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - bgrect_height_ratio / 2.),
       size: ctx.measure.size * vec2(1., bgrect_height_ratio),
-      color: Corners::all((1., 1., 1., 0.7).into()),
+      color: self.track_color.into(),
       texture: None,
       rounded_corners: None,
-      //Some(RoundedCorners::from_radius(Corners::all(bgrect_height_ratio * ctx.measure.size.y * 0.4))),
     });
 
     let value = self.value.clamp(0., 1.);
     let handle_size = vec2(15., ctx.measure.size.y);
     ctx.draw.add(UiDrawCommand::Rectangle {
-      position: ctx.layout.position + (ctx.measure.size.x * value - handle_size.x / 2.) * Vec2::X,
+      position: ctx.layout.position + ((ctx.measure.size.x - handle_size.x) * value) * Vec2::X,
       size: handle_size,
-      color: Corners::all((1., 1., 1., 1.).into()),
+      color: self.handle_color.into(),
       texture: None,
       rounded_corners: None,
-      //Some(RoundedCorners::from_radius(Corners::all(handle_size.x / 3.))),
     });
 
-    //handle click etc
+    //handle events
     if let Some(res) = ctx.input.check_active(ctx.measure.rect(ctx.layout.position)) {
-      let new_value = (res.position_in_rect.x / ctx.measure.size.x).clamp(0., 1.);
-      if let Some(fire) = &self.fire_on_shit {
-        fire(ctx.signal, new_value);
+      let new_value = match self.follow_mode {
+        SliderFollowMode::Absolute => ((res.position_in_rect.x - handle_size.x / 2.) / (ctx.measure.size.x - handle_size.x)).clamp(0., 1.),
+        SliderFollowMode::Relative => {
+          let delta = res.position_in_rect.x - res.last_position_in_rect.x;
+          let delta_ratio = delta / (ctx.measure.size.x - handle_size.x);
+          (self.value + delta_ratio).clamp(0., 1.)
+        }
+      };
+      if let Some(signal) = &self.on_change {
+        signal.fire(ctx.signal, new_value);
       }
       //TODO call signal with new value
     }

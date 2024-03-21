@@ -1,0 +1,88 @@
+mod corners_colors;
+pub use corners_colors::CornersColors;
+
+/// Represents 4 corners of a rectangular shape.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+pub struct Corners<T> {
+  pub top_left: T,
+  pub top_right: T,
+  pub bottom_left: T,
+  pub bottom_right: T,
+}
+
+impl<T: Clone> Corners<T> {
+  #[inline]
+  pub fn all(value: T) -> Self {
+    Self {
+      top_left: value.clone(),
+      top_right: value.clone(),
+      bottom_left: value.clone(),
+      bottom_right: value,
+    }
+  }
+
+  #[inline]
+  pub fn top_bottom(top: T, bottom: T) -> Self {
+    Self {
+      top_left: top.clone(),
+      top_right: top,
+      bottom_left: bottom.clone(),
+      bottom_right: bottom,
+    }
+  }
+
+  #[inline]
+  pub fn left_right(left: T, right: T) -> Self {
+    Self {
+      top_left: left.clone(),
+      top_right: right.clone(),
+      bottom_left: left,
+      bottom_right: right,
+    }
+  }
+}
+
+impl <T: Ord + Clone> Corners<T> {
+  pub fn max(&self) -> T {
+    self.top_left.clone()
+      .max(self.top_right.clone())
+      .max(self.bottom_left.clone())
+      .max(self.bottom_right.clone())
+      .clone()
+  }
+}
+
+impl Corners<f32> {
+  pub fn max_f32(&self) -> f32 {
+    self.top_left
+      .max(self.top_right)
+      .max(self.bottom_left)
+      .max(self.bottom_right)
+  }
+}
+
+impl Corners<f64> {
+  pub fn max_f64(&self) -> f64 {
+    self.top_left
+      .max(self.top_right)
+      .max(self.bottom_left)
+      .max(self.bottom_right)
+  }
+}
+
+impl<T: Clone> From<T> for Corners<T> {
+  fn from(value: T) -> Self {
+    Self::all(value)
+  }
+}
+
+impl<T> From<(T, T, T, T)> for Corners<T> {
+  fn from((top_left, top_right, bottom_left, bottom_right): (T, T, T, T)) -> Self {
+    Self {
+      top_left,
+      top_right,
+      bottom_left,
+      bottom_right,
+    }
+  }
+}

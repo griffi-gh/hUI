@@ -8,7 +8,7 @@ use crate::{
   event::{EventQueue, UiEvent},
   input::UiInputState,
   layout::{Direction, LayoutInfo},
-  signal::{SignalStore, UiSignal},
+  signal::{SignalStore, Signal},
   state::StateRepo,
   text::{FontHandle, TextRenderer}
 };
@@ -244,7 +244,7 @@ impl UiInstance {
   }
 
   /// Push a "fake" signal to the UI signal queue
-  pub fn push_signal<T: UiSignal + 'static>(&mut self, signal: T) {
+  pub fn push_signal<T: Signal + 'static>(&mut self, signal: T) {
     self.signal.add(signal);
   }
 
@@ -253,7 +253,7 @@ impl UiInstance {
   /// Process all signals of a given type
   ///
   /// This clears the signal queue for the given type and iterates over all signals
-  pub fn process_signals<T: UiSignal + 'static>(&mut self, f: impl FnMut(T)) {
+  pub fn process_signals<T: Signal + 'static>(&mut self, f: impl FnMut(T)) {
     self.signal.drain::<T>().for_each(f);
   }
 }

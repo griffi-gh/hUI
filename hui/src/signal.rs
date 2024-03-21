@@ -2,8 +2,10 @@ use std::any::{Any, TypeId};
 use hashbrown::HashMap;
 use nohash_hasher::BuildNoHashHasher;
 
+pub mod trigger;
+
 /// A marker trait for signals
-pub trait UiSignal: Any {}
+pub trait Signal: Any {}
 
 // #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]
 // pub(crate) struct DummySignal;
@@ -23,7 +25,7 @@ impl SignalStore {
   }
 
   /// Ensure that store for given signal type exists and return a mutable reference to it
-  fn internal_store<T: UiSignal + 'static>(&mut self) -> &mut Vec<Box<dyn Any>> {
+  fn internal_store<T: Signal + 'static>(&mut self) -> &mut Vec<Box<dyn Any>> {
     let type_id = TypeId::of::<T>();
     self.sig.entry(type_id).or_default()
   }
@@ -31,7 +33,7 @@ impl SignalStore {
   /// Add a signal to the store
   ///
   /// Signals are stored in the order they are added
-  pub fn add<T: UiSignal + 'static>(&mut self, sig: T) {
+  pub fn add<T: Signal + 'static>(&mut self, sig: T) {
     let type_id = TypeId::of::<T>();
     if let Some(v) = self.sig.get_mut(&type_id) {
       v.push(Box::new(sig));
@@ -41,7 +43,7 @@ impl SignalStore {
   }
 
   /// Drain all signals of a given type
-  pub(crate) fn drain<T: UiSignal + 'static>(&mut self) -> impl Iterator<Item = T> + '_ {
+  pub(crate) fn drain<T: Signal + 'static>(&mut self) -> impl Iterator<Item = T> + '_ {
     self.internal_store::<T>()
       .drain(..)
       .map(|x| *x.downcast::<T>().unwrap()) //unchecked?
@@ -54,7 +56,6 @@ impl SignalStore {
   }
 }
 
-//TODO this, simplifies handling signals
 
 // pub trait Signal {
 //   type Arg;

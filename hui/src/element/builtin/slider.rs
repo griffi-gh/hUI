@@ -48,6 +48,10 @@ pub struct Slider {
   #[setters(into)]
   pub track_color: FillColor,
 
+  /// Color of the "active" part of the slider
+  #[setters(into)]
+  pub track_active_color: FillColor,
+
   /// Follow mode
   pub follow_mode: SliderFollowMode,
 
@@ -62,6 +66,7 @@ impl Default for Slider {
       size: Size2d::default(),
       handle_color: (0.0, 0.0, 1.0).into(),
       track_color: (0.5, 0.5, 0.5).into(),
+      track_active_color: (0.0, 0.0, 0.75).into(),
       follow_mode: SliderFollowMode::default(),
       on_change: None
     }
@@ -102,23 +107,51 @@ impl UiElement for Slider {
     //TODO: unhardcode this
     let bgrect_height_ratio = 0.33;
 
-    ctx.draw.add(UiDrawCommand::Rectangle {
-      position: ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - bgrect_height_ratio / 2.),
-      size: ctx.measure.size * vec2(1., bgrect_height_ratio),
-      color: self.track_color.into(),
-      texture: None,
-      rounded_corners: None,
-    });
+    //XXX: some of these assumptions are wrong if the  corners are rounded
 
-    let value = self.value.clamp(0., 1.);
-    let handle_size = vec2(15., ctx.measure.size.y);
-    ctx.draw.add(UiDrawCommand::Rectangle {
-      position: ctx.layout.position + ((ctx.measure.size.x - handle_size.x) * value) * Vec2::X,
-      size: handle_size,
-      color: self.handle_color.into(),
-      texture: None,
-      rounded_corners: None,
-    });
+    //Draw the track
+    //If the active part is opaque and value >= 1., we don't need to draw the background as the active part will cover it
+    //Of corse, if it's fully transparent, we don't need to draw it either
+    if !(self.track_color.is_transparent() || (self.track_active_color.is_opaque() && self.value >= 1.)) {
+      ctx.draw.add(UiDrawCommand::Rectangle {
+        position: ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - bgrect_height_ratio / 2.),
+        size: ctx.measure.size * vec2(1., bgrect_height_ratio),
+        color: self.track_color.into(),
+        texture: None,
+        rounded_corners: None,
+      });
+    }
+
+    //"Active" part of the track
+    //We can skip drawing it if it's fully transparent or value <= 0.
+    if !(self.track_active_color.is_transparent() || self.value <= 0.) {
+      ctx.draw.add(UiDrawCommand::Rectangle {
+        position: ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - bgrect_height_ratio / 2.),
+        size: ctx.measure.size * vec2(self.value, bgrect_height_ratio),
+        color: self.track_active_color.into(),
+        texture: None,
+        rounded_corners: None,
+      });
+    }
+
+    // The handle
+    // This is kinda counter-intuitive, but if the handle is transparent, we treat it as completely disabled
+    // To prevent confusing offset from the edge of the slider, we set the handle size to 0
+    let handle_size = if self.handle_color.is_transparent() {
+      Vec2::ZERO
+    } else {
+      vec2(15., ctx.measure.size.y)
+    };
+    if handle_size.x != 0. {
+      let value = self.value.clamp(0., 1.);
+      ctx.draw.add(UiDrawCommand::Rectangle {
+        position: ctx.layout.position + ((ctx.measure.size.x - handle_size.x) * value) * Vec2::X,
+        size: handle_size,
+        color: self.handle_color.into(),
+        texture: None,
+        rounded_corners: None,
+      });
+    }
 
     //handle events
     if let Some(res) = ctx.input.check_active(ctx.measure.rect(ctx.layout.position)) {
@@ -137,5 +170,3 @@ impl UiElement for Slider {
     }
   }
 }
-
-//TODO

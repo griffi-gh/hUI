@@ -15,7 +15,7 @@ use hui::{
 };
 
 enum CounterSignal {
-  ChangeValue(f32)
+  ChangeValue(u32)
 }
 impl UiSignal for CounterSignal {}
 
@@ -47,7 +47,9 @@ ui_main!(
         Br.add_child(ui);
         Slider::new(*counter as f32 / 100.)
           .with_size(size!(66%, 20))
-          .on_change(CounterSignal::ChangeValue)
+          .on_change(|x| {
+            CounterSignal::ChangeValue((x * 100.).round() as u32)
+          })
           .add_child(ui);
         Br.add_child(ui);
         for _ in 0..*counter {
@@ -59,9 +61,7 @@ ui_main!(
       .add_root(ui, size);
 
     ui.process_signals(|sig| match sig {
-      CounterSignal::ChangeValue(v) => {
-        *counter = (v * 100.).round() as usize;
-      }
+      CounterSignal::ChangeValue(v) => *counter = v,
     });
   }
 );

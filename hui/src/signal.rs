@@ -1,17 +1,21 @@
+//! signal handling for UI events
+
 use std::any::{Any, TypeId};
 use hashbrown::HashMap;
 use nohash_hasher::BuildNoHashHasher;
 
 pub mod trigger;
 
-/// A marker trait for signals
+/// A marker trait for UI Signals
 pub trait Signal: Any {}
 
 // #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, PartialOrd, Ord, Default)]
 // pub(crate) struct DummySignal;
 // impl UiSignal for DummySignal {}
 
+/// Internal storage for signals
 pub struct SignalStore {
+  //TODO use a multithreaded queue instead, to allow easily offloading ui processing to a different thread
   ///XXX: is this truly the most efficient structure?
   sig: HashMap<TypeId, Vec<Box<dyn Any>>, BuildNoHashHasher<u64>>
 }

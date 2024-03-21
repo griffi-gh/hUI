@@ -1,4 +1,4 @@
-//! Contains types which represent the sides and corners of a rectangular shape.
+//! contains types which represent the sides and corners of a rectangular shape.
 
 mod rect;
 pub use rect::Rect;

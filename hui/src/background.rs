@@ -1,4 +1,5 @@
-//! background color, gradient and texturing
+//! (deprecated) background color, gradient and texturing
+#![allow(deprecated)]
 
 use glam::{vec4, Vec3, Vec4};
 use crate::rectangle::Corners;
@@ -10,11 +11,20 @@ use crate::rectangle::Corners;
 // }
 
 //TODO: move this into the color module?
+/// Represents the background color of an element
+///
+/// Can be either a solid color, a gradient or transparent
+#[deprecated(note = "Use `CornersColors` instead")]
 #[derive(Clone, Copy, Default, Debug, PartialEq)]
 pub enum BackgroundColor {
+  /// Transparent background (alpha = 0)
   #[default]
   Transparent,
+
+  /// Solid, RGBA color
   Solid(Vec4),
+
+  /// Simple gradient color, with different colors for each corner
   Gradient(Corners<Vec4>),
 }
 

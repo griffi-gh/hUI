@@ -40,7 +40,7 @@ ui_main!(
       .with_background((0.1, 0.1, 0.1))
       .with_wrap(true)
       .with_children(|ui| {
-        Text::new("Number of images:")
+        Text::new(format!("Number of images: {counter}"))
           .with_text_size(24)
           .add_child(ui);
         Br.add_child(ui);

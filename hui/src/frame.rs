@@ -2,7 +2,11 @@
 
 use glam::{Vec2, vec2};
 use derive_more::{Add, AddAssign, Sub, SubAssign};
-use crate::{element::fill_rect::FillRect, layout::{Size, Size2d}};
+use crate::{
+  draw::ImageHandle,
+  element::fill_rect::FillRect,
+  layout::{Size, Size2d}
+};
 
 /// Point inside a frame
 ///
@@ -133,7 +137,8 @@ impl FramePoint2d {
 
 enum FrameLayer {
   Rect {
-    fill: FillRect,
+    color: FillRect,
+    image: Option<ImageHandle>,
     top_left: FramePoint2d,
     bottom_right: FramePoint2d,
   }

@@ -22,5 +22,6 @@ pub mod state;
 pub mod text;
 pub mod color;
 pub mod signal;
+pub mod frame;
 
 pub use instance::UiInstance;

@@ -91,18 +91,18 @@ pub enum Size {
   ///
   /// Out of range values are allowed, but are not guaranteed to work as expected\
   /// (especially with negative values)
-  Fraction(f32),
+  Relative(f32),
 
   //TODO FractionRemaining(f32),
 
   /// Static size in pixels
-  Static(f32),
+  Absolute(f32),
 }
 
 impl From<f32> for Size {
   #[inline]
   fn from(value: f32) -> Self {
-    Self::Static(value)
+    Self::Absolute(value)
   }
 }
 
@@ -166,13 +166,13 @@ pub struct LayoutInfo {
 pub fn compute_size(layout: &LayoutInfo, size: Size2d, comfy_size: Vec2) -> Vec2 {
   let width = match size.width {
     Size::Auto => comfy_size.x,
-    Size::Fraction(fraction) => layout.max_size.x * fraction,
-    Size::Static(size) => size,
+    Size::Relative(fraction) => layout.max_size.x * fraction,
+    Size::Absolute(size) => size,
   };
   let height = match size.height {
     Size::Auto => comfy_size.y,
-    Size::Fraction(fraction) => layout.max_size.y * fraction,
-    Size::Static(size) => size,
+    Size::Relative(fraction) => layout.max_size.y * fraction,
+    Size::Absolute(size) => size,
   };
   vec2(width, height)
 }

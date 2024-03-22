@@ -44,7 +44,7 @@ fn main() {
           gap: 5.,
           padding: Sides::all(5.),
           align: (Alignment::Center, Alignment::Begin).into(),
-          size: (Size::Fraction(1.), Size::Fraction(1.)).into(),
+          size: (Size::Relative(1.), Size::Relative(1.)).into(),
           children: ElementList(vec![
             Box::new(ProgressBar {
               value: 0.5,
@@ -58,7 +58,7 @@ fn main() {
           gap: 5.,
           padding: Sides::all(5.),
           align: (Alignment::Center, Alignment::End).into(),
-          size: (Size::Fraction(1.), Size::Fraction(1.)).into(),
+          size: (Size::Relative(1.), Size::Relative(1.)).into(),
           children: ElementList(vec![
             Box::new(ProgressBar {
               value: z,
@@ -66,18 +66,18 @@ fn main() {
               ..Default::default()
             }),
             Box::new(Container {
-              size: (Size::Fraction(1.), Size::Auto).into(),
+              size: (Size::Relative(1.), Size::Auto).into(),
               align: (Alignment::End, Alignment::Center).into(),
               padding: Sides::all(5.),
               gap: 10.,
               children: ElementList(vec![
                 Box::new(FillRect {
-                  size: (Size::Fraction(0.5), Size::Static(30.)).into(),
+                  size: (Size::Relative(0.5), Size::Absolute(30.)).into(),
                   background: vec4(0.75, 0., 0., 1.).into(),
                   ..Default::default()
                 }),
                 Box::new(FillRect {
-                  size: (Size::Fraction(z / 2. + 0.5), Size::Static(30.)).into(),
+                  size: (Size::Relative(z / 2. + 0.5), Size::Absolute(30.)).into(),
                   background: Corners::left_right(
                     vec4(1., 0., 0., 1.),
                     vec4(0., 1., 0., 1.)
@@ -88,7 +88,7 @@ fn main() {
               ..Default::default()
             }),
             Box::new(FillRect {
-              size: (Size::Fraction(z / 2. + 0.5), Size::Static(30.)).into(),
+              size: (Size::Relative(z / 2. + 0.5), Size::Absolute(30.)).into(),
               background: vec4(0., 0.75, 0., 1.).into(),
               ..Default::default()
             }),
@@ -101,7 +101,7 @@ fn main() {
                 let mut x: Vec<Box<dyn UiElement>> = vec![];
                 for i in 0..10 {
                   x.push(Box::new(FillRect {
-                    size: (Size::Static(50.), Size::Static(50.)).into(),
+                    size: (Size::Absolute(50.), Size::Absolute(50.)).into(),
                     background: if i == 1 {
                       vec4(0.75, 0.75, 0.75, 0.75).into()
                     } else {
@@ -130,7 +130,7 @@ fn main() {
               },
               children: ElementList(vec![
                 Box::new(FillRect {
-                  size: (Size::Static(50.), Size::Static(50.)).into(),
+                  size: (Size::Absolute(50.), Size::Absolute(50.)).into(),
                   background: vec4(1., 1., 1., 0.75).into(),
                   ..Default::default()
                 }),

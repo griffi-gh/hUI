@@ -42,11 +42,11 @@ fn main() {
         hui.add(Container {
           gap: 10.,
           align: Alignment::Center.into(),
-          size: (Size::Fraction(1.), Size::Fraction(1.)).into(),
+          size: (Size::Relative(1.), Size::Relative(1.)).into(),
           children: ElementList(vec![
             Box::new(Container {
               align: Alignment::Center.into(),
-              size: (Size::Fraction(0.5), Size::Fraction(0.5)).into(),
+              size: (Size::Relative(0.5), Size::Relative(0.5)).into(),
               background: vec4(1., 0., 0., 1.).into(),
               corner_radius: Corners {
                 top_left: 10.,
@@ -86,7 +86,7 @@ fn main() {
               direction: Direction::Horizontal,
               children: ElementList(vec![
                 Box::new(Container {
-                  size: (Size::Static(100.), Size::Static(100.)).into(),
+                  size: (Size::Absolute(100.), Size::Absolute(100.)).into(),
                   background: Corners::left_right(
                     vec4(1., 0., 0., 1.),
                     vec4(0., 1., 0., 1.)
@@ -95,7 +95,7 @@ fn main() {
                   ..Default::default()
                 }),
                 Box::new(Container {
-                  size: (Size::Static(100.), Size::Static(100.)).into(),
+                  size: (Size::Absolute(100.), Size::Absolute(100.)).into(),
                   background: Corners::left_right(
                     vec4(1., 0., 0., 1.),
                     vec4(0., 1., 0., 1.)
@@ -104,7 +104,7 @@ fn main() {
                   ..Default::default()
                 }),
                 Box::new(Container {
-                  size: (Size::Static(100.), Size::Static(100.)).into(),
+                  size: (Size::Absolute(100.), Size::Absolute(100.)).into(),
                   background: Corners::left_right(
                     vec4(1., 0., 0., 1.),
                     vec4(0., 1., 0., 1.)
@@ -113,7 +113,7 @@ fn main() {
                   ..Default::default()
                 }),
                 Box::new(Container {
-                  size: (Size::Static(100.), Size::Static(100.)).into(),
+                  size: (Size::Absolute(100.), Size::Absolute(100.)).into(),
                   background: Corners::left_right(
                     vec4(1., 0., 0., 1.),
                     vec4(0., 1., 0., 1.)

@@ -48,7 +48,7 @@ fn main() {
         hui.begin();
 
         hui.add(Container {
-          size: (Size::Fraction(1.), Size::Fraction(1.)).into(),
+          size: (Size::Relative(1.), Size::Relative(1.)).into(),
           background: vec4(0.1, 0.1, 0.1, 1.).into(),
           children: elements(|elem| {
             elem.push(Box::new(Text {
@@ -72,12 +72,12 @@ fn main() {
               }));
             }
             elem.push(Box::new(FillRect {
-              size: (Size::Fraction(1.), Size::Static(10.)).into(),
+              size: (Size::Relative(1.), Size::Absolute(10.)).into(),
               background: vec4(0., 0., 1., 1.).into(),
               ..Default::default()
             }));
             elem.push(Box::new(FillRect {
-              size: (Size::Fraction(1.), Size::Static(10.)).into(),
+              size: (Size::Relative(1.), Size::Absolute(10.)).into(),
               background: vec4(1., 1., 0., 1.).into(),
               ..Default::default()
             }));
@@ -89,12 +89,12 @@ fn main() {
             }));
             if instant.elapsed().as_secs() & 1 != 0 {
               elem.push(Box::new(FillRect {
-                size: (Size::Fraction(1.), Size::Static(10.)).into(),
+                size: (Size::Relative(1.), Size::Absolute(10.)).into(),
                 background: vec4(1., 0., 0., 1.).into(),
                 ..Default::default()
               }));
               elem.push(Box::new(FillRect {
-                size: (Size::Fraction(1.), Size::Static(10.)).into(),
+                size: (Size::Relative(1.), Size::Absolute(10.)).into(),
                 background: vec4(0., 0., 0., 1.).into(),
                 ..Default::default()
               }));

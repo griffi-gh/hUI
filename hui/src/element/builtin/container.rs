@@ -116,13 +116,13 @@ impl Container {
   pub fn measure_max_inner_size(&self, layout: &LayoutInfo) -> Vec2 {
     let outer_size_x = match self.size.width {
       Size::Auto => layout.max_size.x,
-      Size::Fraction(p) => layout.max_size.x * p,
-      Size::Static(p) => p,
+      Size::Relative(p) => layout.max_size.x * p,
+      Size::Absolute(p) => p,
     };
     let outer_size_y = match self.size.height {
       Size::Auto => layout.max_size.y,
-      Size::Fraction(p) => layout.max_size.y * p,
-      Size::Static(p) => p,
+      Size::Relative(p) => layout.max_size.y * p,
+      Size::Absolute(p) => p,
     };
     vec2(
       outer_size_x - (self.padding.left + self.padding.right),
@@ -148,13 +148,13 @@ impl UiElement for Container {
     let max_line_pri = match self.direction {
       Direction::Horizontal => match self.size.width {
         Size::Auto => ctx.layout.max_size.x,
-        Size::Fraction(p) => ctx.layout.max_size.x * p,
-        Size::Static(p) => p,
+        Size::Relative(p) => ctx.layout.max_size.x * p,
+        Size::Absolute(p) => p,
       },
       Direction::Vertical => match self.size.height {
         Size::Auto => ctx.layout.max_size.y,
-        Size::Fraction(p) => ctx.layout.max_size.y * p,
-        Size::Static(p) => p,
+        Size::Relative(p) => ctx.layout.max_size.y * p,
+        Size::Absolute(p) => p,
       }
     };
 
@@ -300,13 +300,13 @@ impl UiElement for Container {
 
     match self.size.width {
       Size::Auto => (),
-      Size::Fraction(percentage) => total_size.x = ctx.layout.max_size.x * percentage,
-      Size::Static(pixels) => total_size.x = pixels,
+      Size::Relative(percentage) => total_size.x = ctx.layout.max_size.x * percentage,
+      Size::Absolute(pixels) => total_size.x = pixels,
     }
     match self.size.height {
       Size::Auto => (),
-      Size::Fraction(percentage) => total_size.y = ctx.layout.max_size.y * percentage,
-      Size::Static(pixels) => total_size.y = pixels,
+      Size::Relative(percentage) => total_size.y = ctx.layout.max_size.y * percentage,
+      Size::Absolute(pixels) => total_size.y = pixels,
     }
 
     Response {

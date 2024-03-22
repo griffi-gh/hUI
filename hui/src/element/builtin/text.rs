@@ -86,13 +86,13 @@ impl UiElement for Text {
       size: vec2(
         match self.size.width {
           Size::Auto => size.0,
-          Size::Fraction(percentage) => ctx.layout.max_size.x * percentage,
-          Size::Static(pixels) => pixels,
+          Size::Relative(percentage) => ctx.layout.max_size.x * percentage,
+          Size::Absolute(pixels) => pixels,
         },
         match self.size.height {
           Size::Auto => size.1,
-          Size::Fraction(percentage) => ctx.layout.max_size.y * percentage,
-          Size::Static(pixels) => pixels,
+          Size::Relative(percentage) => ctx.layout.max_size.y * percentage,
+          Size::Absolute(pixels) => pixels,
         },
       ),
       ..Default::default()

@@ -3,16 +3,16 @@
 ///
 /// # Syntax:
 /// - `auto` - `Size::Auto`
-/// - `x` - `Size::Static(x)`
-/// - `x%` - `Size::Fraction(x / 100.)` *(literal only)*
-/// - `x/` - `Size::Fraction(x)`
+/// - `x` - `Size::Absolute(x)`
+/// - `x%` - `Size::Relative(x / 100.)` *(literal only)*
+/// - `x/` - `Size::Relative(x)`
 ///
 /// ...where `x` is a literal, identifier or an expression wrapped in parentheses
 ///
 /// # Note:
 /// - If a single argument is provided, it creates a `Size` using the rules specified above\
 /// - If two arguments are provided, it creates a `Size2d` with the first value as width and the second as height\
-///   Example: `size!(100, 50%)` creates a `Size2d` with width `100` (`Size::Static(100.)`) and height `50%` (`Size::Fraction(0.5)`)
+///   Example: `size!(100, 50%)` creates a `Size2d` with width `100` (`Size::Absolute(100.)`) and height `50%` (`Size::Relative(0.5)`)
 /// - `%` syntax is only valid for literals (`50%`), not expressions or identidiers.\
 ///   Use `/` instead (`(0.5 * x)/`, `x/`), but be aware of the different range (0.0-1.0) \
 /// - Expressions must be wrapped in parentheses (for example: `(x + 5)`).\
@@ -24,27 +24,27 @@ macro_rules! size {
   };
 
   ($x:literal) => {
-    $crate::layout::Size::Static($x as f32)
+    $crate::layout::Size::Absolute($x as f32)
   };
   ($x:literal %) => {
-    $crate::layout::Size::Fraction($x as f32 / 100.)
+    $crate::layout::Size::Relative($x as f32 / 100.)
   };
   ($x:literal /) => {
-    $crate::layout::Size::Fraction($x as f32)
+    $crate::layout::Size::Relative($x as f32)
   };
 
   ($x:ident) => {
-    $crate::layout::Size::Static($x as f32)
+    $crate::layout::Size::Absolute($x as f32)
   };
   ($x:ident /) => {
-    $crate::layout::Size::Fraction($x as f32)
+    $crate::layout::Size::Relative($x as f32)
   };
 
   (($x:expr)) => {
-    $crate::layout::Size::Static(($x) as f32)
+    $crate::layout::Size::Absolute(($x) as f32)
   };
   (($x:expr) /) => {
-    $crate::layout::Size::Fraction(($x) as f32)
+    $crate::layout::Size::Relative(($x) as f32)
   };
 
   ($x:tt , $y:tt $($ys:tt)?) => {

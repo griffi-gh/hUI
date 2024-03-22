@@ -28,8 +28,8 @@ impl From<Size> for FramePoint {
   fn from(size: Size) -> Self {
     match size {
       Size::Auto => Self::BEGIN,
-      Size::Fraction(value) => Self::relative(value),
-      Size::Static(value) => Self::absolute(value),
+      Size::Relative(value) => Self::relative(value),
+      Size::Absolute(value) => Self::absolute(value),
     }
   }
 }

@@ -41,11 +41,27 @@ ui_main!(
       .with_wrap(true)
       .with_children(|ui| {
         Text::new(format!("Number of images: {counter}"))
-          .with_text_size(24)
+          .with_text_size(32)
+          .add_child(ui);
+        Br.add_child(ui);
+        Text::new("Absolute tracking slider:")
+          .with_text_size(16)
           .add_child(ui);
         Br.add_child(ui);
         Slider::new(*counter as f32 / 100.)
           .with_size(size!(66%, 20))
+          .on_change(|x| {
+            CounterSignal::ChangeValue((x * 100.).round() as u32)
+          })
+          .add_child(ui);
+        Br.add_child(ui);
+        Text::new("Relative tracking slider (Experimental):")
+          .with_text_size(16)
+          .add_child(ui);
+        Br.add_child(ui);
+        Slider::new(*counter as f32 / 100.)
+          .with_size(size!(66%, 20))
+          .with_follow_mode(hui::element::slider::SliderFollowMode::Relative)
           .on_change(|x| {
             CounterSignal::ChangeValue((x * 100.).round() as u32)
           })

@@ -12,6 +12,10 @@ use crate::{
   signal::{trigger::SignalTriggerArg, Signal},
 };
 
+
+//TODO: use state for slider?
+// ^ useful if the user only hanldes the drag end event or has large step sizes with relative mode
+
 /// Follow mode for the slider
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
 pub enum SliderFollowMode {
@@ -52,6 +56,11 @@ pub struct Slider {
   #[setters(into)]
   pub track_active_color: FillColor,
 
+  /// Track height relative to the slider height\
+  ///
+  /// Range: 0.0..=1.0
+  pub track_height_ratio: f32,
+
   /// Follow mode
   pub follow_mode: SliderFollowMode,
 
@@ -64,9 +73,10 @@ impl Default for Slider {
     Self {
       value: 0.0,
       size: Size2d::default(),
-      handle_color: (0.0, 0.0, 1.0).into(),
+      handle_color: (0.0, 0.0, 1.).into(),
       track_color: (0.5, 0.5, 0.5).into(),
       track_active_color: (0.0, 0.0, 0.75).into(),
+      track_height_ratio: 0.25,
       follow_mode: SliderFollowMode::default(),
       on_change: None
     }
@@ -74,7 +84,7 @@ impl Default for Slider {
 }
 
 impl Slider {
-  pub const DEFAULT_HEIGHT: f32 = 21.0;
+  pub const DEFAULT_HEIGHT: f32 = 20.0;
 
   pub fn new(value: f32) -> Self {
     Self {
@@ -104,18 +114,25 @@ impl UiElement for Slider {
   }
 
   fn process(&self, ctx: ProcessContext) {
-    //TODO: unhardcode this
-    let bgrect_height_ratio = 0.33;
-
     //XXX: some of these assumptions are wrong if the  corners are rounded
+
+    //Compute handle size:
+    // This is kinda counter-intuitive, but if the handle is transparent, we treat it as completely disabled
+    // To prevent confusing offset from the edge of the slider, we set the handle size to 0
+    let handle_size = if self.handle_color.is_transparent() {
+      Vec2::ZERO
+    } else {
+      vec2(15., ctx.measure.size.y)
+    };
 
     //Draw the track
     //If the active part is opaque and value >= 1., we don't need to draw the background as the active part will cover it
+    //However, if the handle is not opaque, we need to draw the background as the active part won't quite reach the end
     //Of corse, if it's fully transparent, we don't need to draw it either
-    if !(self.track_color.is_transparent() || (self.track_active_color.is_opaque() && self.value >= 1.)) {
+    if !(self.track_color.is_transparent() || (self.track_active_color.is_opaque() && self.handle_color.is_opaque() && self.value >= 1.)) {
       ctx.draw.add(UiDrawCommand::Rectangle {
-        position: ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - bgrect_height_ratio / 2.),
-        size: ctx.measure.size * vec2(1., bgrect_height_ratio),
+        position: ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height_ratio / 2.),
+        size: ctx.measure.size * vec2(1., self.track_height_ratio),
         color: self.track_color.into(),
         texture: None,
         rounded_corners: None,
@@ -124,10 +141,11 @@ impl UiElement for Slider {
 
     //"Active" part of the track
     //We can skip drawing it if it's fully transparent or value <= 0.
-    if !(self.track_active_color.is_transparent() || self.value <= 0.) {
+    //But if the handle is not opaque, it should be visible even if value is zero
+    if !(self.track_active_color.is_transparent() || (self.value <= 0. && self.handle_color.is_opaque())) {
       ctx.draw.add(UiDrawCommand::Rectangle {
-        position: ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - bgrect_height_ratio / 2.),
-        size: ctx.measure.size * vec2(self.value, bgrect_height_ratio),
+        position: ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height_ratio / 2.),
+        size: (ctx.measure.size - handle_size * Vec2::X) * vec2(self.value, self.track_height_ratio) + handle_size * Vec2::X / 2.,
         color: self.track_active_color.into(),
         texture: None,
         rounded_corners: None,
@@ -135,14 +153,7 @@ impl UiElement for Slider {
     }
 
     // The handle
-    // This is kinda counter-intuitive, but if the handle is transparent, we treat it as completely disabled
-    // To prevent confusing offset from the edge of the slider, we set the handle size to 0
-    let handle_size = if self.handle_color.is_transparent() {
-      Vec2::ZERO
-    } else {
-      vec2(15., ctx.measure.size.y)
-    };
-    if handle_size.x != 0. {
+    if handle_size.x != 0. && !self.handle_color.is_transparent() {
       let value = self.value.clamp(0., 1.);
       ctx.draw.add(UiDrawCommand::Rectangle {
         position: ctx.layout.position + ((ctx.measure.size.x - handle_size.x) * value) * Vec2::X,

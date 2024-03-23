@@ -40,7 +40,9 @@ pub struct ProcessContext<'a> {
 }
 
 pub trait UiElement {
-  /// Get the name of the element, for example "Button" or "ProgressBar"
+  /// Get the name of the element (in lower case)
+  ///
+  /// For example, "button" or "progress_bar"
   fn name(&self) -> &'static str;
 
   /// Get the unique id used for internal state management\

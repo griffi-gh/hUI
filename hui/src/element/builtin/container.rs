@@ -133,7 +133,7 @@ impl Container {
 
 impl UiElement for Container {
   fn name(&self) -> &'static str {
-    "Container"
+    "container"
   }
 
   fn measure(&self, ctx: MeasureContext) -> Response {

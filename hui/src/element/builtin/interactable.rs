@@ -45,7 +45,7 @@ impl Interactable {
 
 impl UiElement for Interactable {
   fn name(&self) -> &'static str {
-    "Interactable"
+    "interactable"
   }
 
   fn measure(&self, ctx: MeasureContext) -> crate::measure::Response {

@@ -51,7 +51,7 @@ impl Image {
 
 impl UiElement for Image {
   fn name(&self) -> &'static str {
-    "Image"
+    "image"
   }
 
   fn measure(&self, ctx: MeasureContext) -> Response {

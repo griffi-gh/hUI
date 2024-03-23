@@ -71,7 +71,7 @@ impl Text {
 
 impl UiElement for Text {
   fn name(&self) -> &'static str {
-    "Text"
+    "text"
   }
 
   fn measure(&self, ctx: MeasureContext) -> Response {

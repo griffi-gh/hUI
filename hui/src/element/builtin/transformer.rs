@@ -38,7 +38,7 @@ impl Transformer {
 
 impl UiElement for Transformer {
   fn name(&self) -> &'static str {
-    "Transformer"
+    "transformer"
   }
 
   fn measure(&self, ctx: MeasureContext) -> Response {

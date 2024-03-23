@@ -8,7 +8,7 @@ pub struct Break;
 
 impl UiElement for Break {
   fn name(&self) -> &'static str {
-    "Break"
+    "break"
   }
 
   fn measure(&self, _: MeasureContext) -> Response {

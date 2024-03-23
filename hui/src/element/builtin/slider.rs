@@ -103,7 +103,7 @@ impl Slider {
 
 impl UiElement for Slider {
   fn name(&self) -> &'static str {
-    "Slider"
+    "slider"
   }
 
   fn measure(&self, ctx: MeasureContext) -> Response {

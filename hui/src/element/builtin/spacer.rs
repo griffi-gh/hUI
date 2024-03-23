@@ -19,7 +19,7 @@ impl Default for Spacer {
 
 impl UiElement for Spacer {
   fn name(&self) -> &'static str {
-    "Spacer"
+    "spacer"
   }
 
   fn measure(&self, ctx: MeasureContext) -> Response {

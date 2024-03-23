@@ -40,7 +40,7 @@ impl Default for FillRect {
 
 impl UiElement for FillRect {
   fn name(&self) -> &'static str {
-    "FillRect"
+    "fill_rect"
   }
 
   fn measure(&self, ctx: MeasureContext) -> Response {

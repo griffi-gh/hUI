@@ -20,11 +20,17 @@ pub enum FrameLayer {
 
 #[derive(Clone, Copy)]
 pub struct RectLayer {
-  color: FillColor,
-  image: Option<ImageHandle>,
-  top_left: FramePoint2d,
-  bottom_right: FramePoint2d,
-  corner_radius: Corners<f32>,
+  pub color: FillColor,
+  pub image: Option<ImageHandle>,
+  pub top_left: FramePoint2d,
+  pub bottom_right: FramePoint2d,
+  pub corner_radius: Corners<f32>,
+}
+
+impl<T: Into<FillColor>> From<T> for RectLayer {
+  fn from(color: T) -> Self {
+    Self::from_color(color)
+  }
 }
 
 impl RectLayer {
@@ -65,9 +71,9 @@ impl Default for RectLayer {
     Self {
       color: FillColor::default(),
       image: None,
-      top_left: FramePoint2d::default(),
-      bottom_right: FramePoint2d::default(),
-      corner_radius: Corners::default(),
+      top_left: FramePoint2d::TOP_LEFT,
+      bottom_right: FramePoint2d::BOTTOM_RIGHT,
+      corner_radius: Corners::all(0.),
     }
   }
 }

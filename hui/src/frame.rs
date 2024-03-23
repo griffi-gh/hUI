@@ -1,4 +1,4 @@
-use crate::rect::FillColor;
+use crate::rect::{Corners, FillColor};
 
 pub mod point;
 pub mod layer;
@@ -20,10 +20,10 @@ pub struct Frame {
   layers: Vec<FrameLayer>
 }
 
-impl<T: Into<FillColor>> From<T> for Frame {
-  fn from(color: T) -> Self {
+impl<T: Into<RectLayer>> From<T> for Frame {
+  fn from(layer: T) -> Self {
     let mut frame = Self::default();
-    frame.add(RectLayer::from_color(color));
+    frame.add(layer.into());
     frame
   }
 }

@@ -1,25 +1,13 @@
 use glam::Vec2;
-use enum_dispatch::enum_dispatch;
 use crate::{
   color,
   draw::{ImageHandle, RoundedCorners, UiDrawCommand, UiDrawCommandList},
   rect::{Corners, FillColor},
 };
-use super::point::FramePoint2d;
-
-#[enum_dispatch]
-pub(crate) trait FrameLayerImpl {
-  fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2);
-}
+use super::{Frame, point::FramePoint2d};
 
 #[derive(Clone, Copy)]
-#[enum_dispatch(FrameLayerImpl)]
-pub enum FrameLayer {
-  Rect(RectFrame),
-}
-
-#[derive(Clone, Copy)]
-pub struct RectFrame {
+pub struct FrameRect {
   /// Background color of the frame\
   ///
   /// If the container has a background texture, it will be multiplied by this color
@@ -44,24 +32,28 @@ pub struct RectFrame {
   pub corner_radius: Corners<f32>,
 }
 
-impl<T: Into<FillColor>> From<T> for RectFrame {
-  fn from(color: T) -> Self {
+// impl<T: Into<FillColor>> From<T> for FrameRect {
+//   fn from(color: T) -> Self {
+//     Self::from_color(color)
+//   }
+// }
+
+impl From<FillColor> for FrameRect {
+  fn from(color: FillColor) -> Self {
     Self::from_color(color)
   }
 }
 
-impl RectFrame {
+impl From<ImageHandle> for FrameRect {
+  fn from(image: ImageHandle) -> Self {
+    Self::from_image(image)
+  }
+}
+
+impl FrameRect {
   pub fn from_color(color: impl Into<FillColor>) -> Self {
     Self {
       color: color.into(),
-      ..Self::default()
-    }
-  }
-
-  pub fn from_color_rounded(color: impl Into<FillColor>, corner_radius: impl Into<Corners<f32>>) -> Self {
-    Self {
-      color: color.into(),
-      corner_radius: corner_radius.into(),
       ..Self::default()
     }
   }
@@ -82,17 +74,17 @@ impl RectFrame {
     }
   }
 
-  pub fn from_color_image_rounded(color: impl Into<FillColor>, image: ImageHandle, corner_radius: impl Into<Corners<f32>>) -> Self {
+  pub fn with_corner_radius(radius: impl Into<Corners<f32>>) -> Self {
     Self {
-      color: color.into(),
-      image: Some(image),
-      corner_radius: corner_radius.into(),
+      corner_radius: radius.into(),
       ..Self::default()
     }
   }
 
-  /// Inset the rectangle by the given amount
-  pub fn inset(self, inset: f32) -> Self {
+  //TODO: deprecate and replace
+
+  /// Inset the rectangle by the given amount in pixels
+  pub fn with_inset(self, inset: f32) -> Self {
     Self {
       top_left: self.top_left + Vec2::splat(inset).into(),
       bottom_right: self.bottom_right - Vec2::splat(inset).into(),
@@ -101,7 +93,7 @@ impl RectFrame {
   }
 }
 
-impl Default for RectFrame {
+impl Default for FrameRect {
   fn default() -> Self {
     Self {
       color: FillColor::default(),
@@ -113,7 +105,7 @@ impl Default for RectFrame {
   }
 }
 
-impl FrameLayerImpl for RectFrame {
+impl Frame for FrameRect {
   fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2) {
     //TODO: handle bottom_right < top_left
     let top_left = self.top_left.resolve(parent_size);

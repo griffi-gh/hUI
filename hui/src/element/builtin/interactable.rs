@@ -14,6 +14,7 @@ pub enum InteractableEvent {
   #[default]
   Click,
   Hover,
+  Active,
 }
 
 /// Wrapper that allows adding click and hover events to any element
@@ -59,6 +60,7 @@ impl UiElement for Interactable {
       //TODO: actually pass the response
       InteractableEvent::Click => ctx.input.check_click(rect).is_some(),
       InteractableEvent::Hover => ctx.input.check_hover(rect),
+      InteractableEvent::Active => ctx.input.check_active(rect).is_some(),
     };
 
     if event_happened {
@@ -77,8 +79,11 @@ pub trait ElementInteractableExt: UiElement {
   /// Wrap the element in an [`Interactable`] that will call the given signal when clicked
   fn on_click<S: Signal, F: Fn() -> S + 'static>(self, signal: F) -> Interactable;
 
-  /// Wrap the element in an [`Interactable`] that will call the given signal while hovered
+  /// Wrap the element in an [`Interactable`] that will call the given signal continuously while hovered
   fn on_hover<S: Signal, F: Fn() -> S + 'static>(self, signal: F) -> Interactable;
+
+  /// Wrap the element in an [`Interactable`] that will call the given signal continuously while active
+  fn on_active<S: Signal, F: Fn() -> S + 'static>(self, signal: F) -> Interactable;
 }
 
 impl<T: UiElement + 'static> ElementInteractableExt for T {
@@ -92,5 +97,9 @@ impl<T: UiElement + 'static> ElementInteractableExt for T {
 
   fn on_hover<S: Signal, F: Fn() -> S + 'static>(self, signal: F) -> Interactable {
     self.into_interactable(InteractableEvent::Hover, signal)
+  }
+
+  fn on_active<S: Signal, F: Fn() -> S + 'static>(self, signal: F) -> Interactable {
+    self.into_interactable(InteractableEvent::Active, signal)
   }
 }

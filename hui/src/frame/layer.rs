@@ -15,11 +15,11 @@ pub(crate) trait FrameLayerImpl {
 #[derive(Clone, Copy)]
 #[enum_dispatch(FrameLayerImpl)]
 pub enum FrameLayer {
-  Rect(RectLayer),
+  Rect(RectFrame),
 }
 
 #[derive(Clone, Copy)]
-pub struct RectLayer {
+pub struct RectFrame {
   pub color: FillColor,
   pub image: Option<ImageHandle>,
   pub top_left: FramePoint2d,
@@ -27,13 +27,13 @@ pub struct RectLayer {
   pub corner_radius: Corners<f32>,
 }
 
-impl<T: Into<FillColor>> From<T> for RectLayer {
+impl<T: Into<FillColor>> From<T> for RectFrame {
   fn from(color: T) -> Self {
     Self::from_color(color)
   }
 }
 
-impl RectLayer {
+impl RectFrame {
   pub fn from_color(color: impl Into<FillColor>) -> Self {
     Self {
       color: color.into(),
@@ -64,9 +64,27 @@ impl RectLayer {
       ..Self::default()
     }
   }
+
+  pub fn from_color_image_rounded(color: impl Into<FillColor>, image: ImageHandle, corner_radius: impl Into<Corners<f32>>) -> Self {
+    Self {
+      color: color.into(),
+      image: Some(image),
+      corner_radius: corner_radius.into(),
+      ..Self::default()
+    }
+  }
+
+  /// Inset the rectangle by the given amount
+  pub fn inset(self, inset: f32) -> Self {
+    Self {
+      top_left: self.top_left + Vec2::splat(inset).into(),
+      bottom_right: self.bottom_right - Vec2::splat(inset).into(),
+      ..self
+    }
+  }
 }
 
-impl Default for RectLayer {
+impl Default for RectFrame {
   fn default() -> Self {
     Self {
       color: FillColor::default(),
@@ -78,7 +96,7 @@ impl Default for RectLayer {
   }
 }
 
-impl FrameLayerImpl for RectLayer {
+impl FrameLayerImpl for RectFrame {
   fn draw(&self, draw: &mut UiDrawCommandList, parent_size: Vec2) {
     //TODO: handle bottom_right < top_left
     let top_left = self.top_left.resolve(parent_size);

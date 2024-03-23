@@ -1,9 +1,7 @@
-use crate::rect::{Corners, FillColor};
-
 pub mod point;
 pub mod layer;
 
-use layer::{FrameLayer, RectLayer};
+use layer::{FrameLayer, RectFrame};
 
 ///XXX: this is not used yet, and also kinda a mess, simplify?
 ///Maybe limit to a single layer? (aka `Frame` will be just one of the options)
@@ -29,9 +27,29 @@ impl<T: Into<FrameLayer>> From<T> for Frame {
 }
 
 impl Frame {
+  /// Get the layer with the given index
+  #[inline]
+  pub fn layer(&self, index: usize) -> Option<&FrameLayer> {
+    self.layers.get(index)
+  }
+
+  /// Get a mutable reference to the layer with the given index
+  #[inline]
+  pub fn layer_mut(&mut self, index: usize) -> Option<&mut FrameLayer> {
+    self.layers.get_mut(index)
+  }
+
+  /// Add a layer to the frame
   #[inline]
   pub fn add(&mut self, layer: impl Into<FrameLayer>) -> &mut Self {
     self.layers.push(layer.into());
+    self
+  }
+
+  /// Add a layer to the back of the frame
+  #[inline]
+  pub fn add_back(&mut self, layer: impl Into<FrameLayer>) -> &mut Self {
+    self.layers.insert(0, layer.into());
     self
   }
 

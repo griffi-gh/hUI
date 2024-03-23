@@ -55,6 +55,7 @@ pub enum UiDrawCommand {
   PushTransform(Affine2),
   /// Pop a transformation matrix from the stack
   PopTransform,
+  //TODO PushClip PopClip
 }
 
 /// List of draw commands

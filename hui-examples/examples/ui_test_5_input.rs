@@ -53,7 +53,7 @@ ui_main!(
               .with_text_size(32)
               .add_child(ui);
           })
-          .on_click(CounterSignal::Decrement)
+          .on_click(|| CounterSignal::Decrement)
           .add_child(ui);
         Container::default()
           .with_size(size!(60, auto))
@@ -72,7 +72,7 @@ ui_main!(
               .with_text_size(32)
               .add_child(ui);
           })
-          .on_click(CounterSignal::Increment)
+          .on_click(|| CounterSignal::Increment)
           .add_child(ui);
         Br.add_child(ui);
         for _ in 0..*counter {

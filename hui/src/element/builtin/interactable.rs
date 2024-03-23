@@ -5,9 +5,8 @@
 
 use crate::{
   element::{MeasureContext, ProcessContext, UiElement},
-  signal::Signal,
+  signal::{trigger::SignalTrigger, Signal},
 };
-use std::cell::RefCell;
 
 #[non_exhaustive]
 #[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Hash)]
@@ -18,7 +17,7 @@ pub enum InteractableEvent {
 }
 
 /// Wrapper that allows adding click and hover events to any element
-pub struct Interactable<C: Signal + 'static> {
+pub struct Interactable {
   /// The wrapped element that will be interactable
   pub element: Box<dyn UiElement>,
 
@@ -26,20 +25,24 @@ pub struct Interactable<C: Signal + 'static> {
   pub event: InteractableEvent,
 
   /// Signal that will be called if the element was clicked in the current frame
-  pub signal: RefCell<Option<C>>,
+  pub signal: SignalTrigger,
 }
 
-impl<C: Signal + 'static> Interactable<C> {
-  pub fn new(element: Box<dyn UiElement>, event: InteractableEvent, signal: C) -> Self {
+impl Interactable {
+  pub fn new<S: Signal, F: Fn() -> S + 'static>(
+    element: Box<dyn UiElement>,
+    event: InteractableEvent,
+    signal: F
+  ) -> Self {
     Self {
       element,
       event,
-      signal: RefCell::new(Some(signal)),
+      signal: SignalTrigger::new(signal),
     }
   }
 }
 
-impl<C: Signal + 'static> UiElement for Interactable<C> {
+impl UiElement for Interactable {
   fn name(&self) -> &'static str {
     "Interactable"
   }
@@ -59,9 +62,7 @@ impl<C: Signal + 'static> UiElement for Interactable<C> {
     };
 
     if event_happened {
-      if let Some(sig) = self.signal.take() {
-        ctx.signal.add(sig);
-      }
+      self.signal.fire(ctx.signal);
     }
 
     self.element.process(ctx)
@@ -71,25 +72,25 @@ impl<C: Signal + 'static> UiElement for Interactable<C> {
 /// Extension trait for [`UiElement`] that adds methods to wrap the element in an [`Interactable`]
 pub trait ElementInteractableExt: UiElement {
   /// Wrap the element in an [`Interactable`] that will call the given signal when the specified event occurs
-  fn into_interactable<C: Signal + 'static>(self, event: InteractableEvent, signal: C) -> Interactable<C>;
+  fn into_interactable<S: Signal, F: Fn() -> S + 'static>(self, event: InteractableEvent, signal: F) -> Interactable;
 
   /// Wrap the element in an [`Interactable`] that will call the given signal when clicked
-  fn on_click<C: Signal + 'static>(self, signal: C) -> Interactable<C>;
+  fn on_click<S: Signal, F: Fn() -> S + 'static>(self, signal: F) -> Interactable;
 
   /// Wrap the element in an [`Interactable`] that will call the given signal while hovered
-  fn on_hover<C: Signal + 'static>(self, signal: C) -> Interactable<C>;
+  fn on_hover<S: Signal, F: Fn() -> S + 'static>(self, signal: F) -> Interactable;
 }
 
 impl<T: UiElement + 'static> ElementInteractableExt for T {
-  fn into_interactable<C: Signal + 'static>(self, event: InteractableEvent, signal: C) -> Interactable<C> {
+  fn into_interactable<S: Signal, F: Fn() -> S + 'static>(self, event: InteractableEvent, signal: F) -> Interactable {
     Interactable::new(Box::new(self), event, signal)
   }
 
-  fn on_click<C: Signal + 'static>(self, signal: C) -> Interactable<C> {
+  fn on_click<S: Signal, F: Fn() -> S + 'static>(self, signal: F) -> Interactable {
     self.into_interactable(InteractableEvent::Click, signal)
   }
 
-  fn on_hover<C: Signal + 'static>(self, signal: C) -> Interactable<C> {
+  fn on_hover<S: Signal, F: Fn() -> S + 'static>(self, signal: F) -> Interactable {
     self.into_interactable(InteractableEvent::Hover, signal)
   }
 }

@@ -17,6 +17,12 @@ pub struct RoundedCorners {
   pub point_count: NonZeroU16,
 }
 
+impl From<Corners<f32>> for RoundedCorners {
+  fn from(radius: Corners<f32>) -> Self {
+    Self::from_radius(radius)
+  }
+}
+
 impl RoundedCorners {
   pub fn from_radius(radius: Corners<f32>) -> Self {
     Self {

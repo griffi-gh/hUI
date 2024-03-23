@@ -20,7 +20,7 @@ pub struct Frame {
   layers: Vec<FrameLayer>
 }
 
-impl<T: Into<RectLayer>> From<T> for Frame {
+impl<T: Into<FrameLayer>> From<T> for Frame {
   fn from(layer: T) -> Self {
     let mut frame = Self::default();
     frame.add(layer.into());

@@ -40,25 +40,27 @@ pub struct FrameRect {
 
 impl From<FillColor> for FrameRect {
   fn from(color: FillColor) -> Self {
-    Self::from_color(color)
+    Self::color(color)
   }
 }
 
 impl From<ImageHandle> for FrameRect {
   fn from(image: ImageHandle) -> Self {
-    Self::from_image(image)
+    Self::image(image)
   }
 }
 
 impl FrameRect {
-  pub fn from_color(color: impl Into<FillColor>) -> Self {
+  /// Create a new [`FrameRect`] with the given color
+  pub fn color(color: impl Into<FillColor>) -> Self {
     Self {
       color: color.into(),
       ..Self::default()
     }
   }
 
-  pub fn from_image(image: ImageHandle) -> Self {
+  /// Create a new [`FrameRect`] with the given image
+  pub fn image(image: ImageHandle) -> Self {
     Self {
       color: color::WHITE.into(),
       image: Some(image),
@@ -66,7 +68,8 @@ impl FrameRect {
     }
   }
 
-  pub fn from_color_image(color: impl Into<FillColor>, image: ImageHandle) -> Self {
+  /// Create a new [`FrameRect`] with the given color and image
+  pub fn color_image(color: impl Into<FillColor>, image: ImageHandle) -> Self {
     Self {
       color: color.into(),
       image: Some(image),
@@ -74,10 +77,11 @@ impl FrameRect {
     }
   }
 
-  pub fn with_corner_radius(radius: impl Into<Corners<f32>>) -> Self {
+  /// Set the corner radius of the [`FrameRect`]
+  pub fn with_corner_radius(self, radius: impl Into<Corners<f32>>) -> Self {
     Self {
       corner_radius: radius.into(),
-      ..Self::default()
+      ..self
     }
   }
 
@@ -96,7 +100,7 @@ impl FrameRect {
 impl Default for FrameRect {
   fn default() -> Self {
     Self {
-      color: FillColor::default(),
+      color: FillColor::transparent(),
       image: None,
       top_left: FramePoint2d::TOP_LEFT,
       bottom_right: FramePoint2d::BOTTOM_RIGHT,

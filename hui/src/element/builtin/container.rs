@@ -3,17 +3,12 @@
 use derive_setters::Setters;
 use glam::{Vec2, vec2};
 use crate::{
-  draw::{ImageHandle, RoundedCorners, UiDrawCommand},
   element::{ElementList, MeasureContext, ProcessContext, UiElement},
   layout::{Alignment, Alignment2d, Direction, LayoutInfo, Size, Size2d},
+  frame::{Frame, FrameRect},
   measure::{Hints, Response},
-  rect::{Corners, FillColor, Sides},
+  rect::{Sides, FillColor},
 };
-
-// pub struct Border {
-//   pub color: Vec4,
-//   pub width: f32,
-// }
 
 //XXX: add Order/Direction::Forward/Reverse or sth?
 //TODO: clip children flag
@@ -54,26 +49,8 @@ pub struct Container {
   #[setters(into)]
   pub align: Alignment2d,
 
-  /// Background color of the container\
-  ///
-  /// If the container has a background texture, it will be multiplied by this color
-  #[setters(into)]
-  pub background: FillColor,
-
-  /// Background texture of the container
-  ///
-  /// Can be used in conjunction with the background color\
-  /// In this case, the texture will be shaded by the color
-  ///
-  /// Please note that if the background color is NOT set (or set to transparent), the texture will NOT be visible\
-  /// This is because the texture is multiplied by the color, and if the color is transparent, the texture will be too\
-  //TODO: fix this flaw, if background_image is called for the first time, bg wasnt explicitly set and background is transparent, set it to white
-  #[setters(into)]
-  pub background_image: Option<ImageHandle>,
-
-  /// Corner radius of the background rectangle
-  #[setters(into)]
-  pub corner_radius: Corners<f32>,
+  #[setters(skip)]
+  pub background_frame: Box<dyn Frame>,
 
   /// Set this to `true` to allow the elements wrap automatically
   ///
@@ -93,6 +70,17 @@ impl Container {
     self.children.0.extend(ElementList::from_callback(ui).0);
     self
   }
+
+  pub fn with_background_frame(mut self, frame: impl Frame + 'static) -> Self {
+    self.background_frame = Box::new(frame);
+    self
+  }
+
+  #[deprecated(note = "use with_background_frame instead")]
+  pub fn with_background(mut self, color: impl Into<FillColor>) -> Self {
+    self.background_frame = Box::new(FrameRect::color(color.into()));
+    self
+  }
 }
 
 impl Default for Container {
@@ -103,11 +91,9 @@ impl Default for Container {
       gap: 0.,
       padding: Sides::all(0.),
       align: Alignment2d::default(),
-      background: FillColor::transparent(),
-      background_image: None,
-      children: ElementList(Vec::new()),
+      background_frame: Box::<FrameRect>::default(),
       wrap: false,
-      corner_radius: Corners::all(0.),
+      children: ElementList(Vec::new()),
     }
   }
 }
@@ -328,18 +314,20 @@ impl UiElement for Container {
     let mut position = ctx.layout.position;
 
     //background
-    if !self.background.is_transparent() {
-      let corner_colors = self.background.corners();
-      ctx.draw.add(UiDrawCommand::Rectangle {
-        position,
-        size: ctx.measure.size,
-        color: corner_colors,
-        texture: self.background_image,
-        rounded_corners: (self.corner_radius.max_f32() > 0.).then_some({
-          RoundedCorners::from_radius(self.corner_radius)
-        }),
-      });
-    }
+    // if !self.background.is_transparent() {
+    //   let corner_colors = self.background.corners();
+    //   ctx.draw.add(UiDrawCommand::Rectangle {
+    //     position,
+    //     size: ctx.measure.size,
+    //     color: corner_colors,
+    //     texture: self.background_image,
+    //     rounded_corners: (self.corner_radius.max_f32() > 0.).then_some({
+    //       RoundedCorners::from_radius(self.corner_radius)
+    //     }),
+    //   });
+    // }
+
+    self.background_frame.draw(ctx.draw, ctx.layout.position, ctx.measure.size);
 
     //padding
     position += vec2(self.padding.left, self.padding.top);

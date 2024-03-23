@@ -43,14 +43,14 @@ impl FramePoint {
 
   /// Center of the frame axis
   pub const CENTER: Self = Self {
-    absolute: 0.5,
-    relative: 0.0,
+    absolute: 0.0,
+    relative: 0.5,
   };
 
   /// End of the frame axis
   pub const END: Self = Self {
-    absolute: 1.0,
-    relative: 0.0,
+    absolute: 0.0,
+    relative: 1.0,
   };
 
   /// Create a new absolutely positioned `FramePoint`

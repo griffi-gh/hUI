@@ -22,8 +22,6 @@ pub mod state;
 pub mod text;
 pub mod color;
 pub mod signal;
-//TODO change this to pub once the api is ready
-//pub mod frame;
-mod frame;
+pub mod frame;
 
 pub use instance::UiInstance;

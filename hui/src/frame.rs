@@ -1,7 +1,8 @@
 pub mod point;
 pub mod layer;
-
-use layer::{FrameLayer, RectFrame};
+use glam::Vec2;
+use layer::{FrameLayer, FrameLayerImpl};
+use crate::draw::UiDrawCommandList;
 
 ///XXX: this is not used yet, and also kinda a mess, simplify?
 ///Maybe limit to a single layer? (aka `Frame` will be just one of the options)
@@ -56,5 +57,11 @@ impl Frame {
   #[inline]
   pub fn finish(&mut self) -> Self {
     self.clone()
+  }
+
+  pub(crate) fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2) {
+    for layer in &self.layers {
+      layer.draw(draw, position, parent_size);
+    }
   }
 }

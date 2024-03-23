@@ -9,7 +9,7 @@ use super::point::FramePoint2d;
 
 #[enum_dispatch]
 pub(crate) trait FrameLayerImpl {
-  fn draw(&self, draw: &mut UiDrawCommandList, parent_size: Vec2);
+  fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2);
 }
 
 #[derive(Clone, Copy)]
@@ -20,10 +20,28 @@ pub enum FrameLayer {
 
 #[derive(Clone, Copy)]
 pub struct RectFrame {
+  /// Background color of the frame\
+  ///
+  /// If the container has a background texture, it will be multiplied by this color
+
   pub color: FillColor,
+
+  /// Background texture of the frame
+  ///
+  /// Can be used in conjunction with the background color\
+  /// In this case, the texture will be shaded by the color
+  ///
+  /// Please note that if the background color is NOT set (or set to transparent), the texture will NOT be visible\
+  /// This is because the texture is multiplied by the color, and if the color is transparent, the texture will be too\
   pub image: Option<ImageHandle>,
+
+  /// Top left corner of the rectangle
   pub top_left: FramePoint2d,
+
+  /// Bottom right corner of the rectangle
   pub bottom_right: FramePoint2d,
+
+  /// Corner radius of the frame
   pub corner_radius: Corners<f32>,
 }
 
@@ -97,12 +115,12 @@ impl Default for RectFrame {
 }
 
 impl FrameLayerImpl for RectFrame {
-  fn draw(&self, draw: &mut UiDrawCommandList, parent_size: Vec2) {
+  fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2) {
     //TODO: handle bottom_right < top_left
     let top_left = self.top_left.resolve(parent_size);
     let bottom_right = self.bottom_right.resolve(parent_size);
     draw.add(UiDrawCommand::Rectangle {
-      position: top_left,
+      position: position + top_left,
       size: bottom_right - top_left,
       color: self.color.corners(),
       texture: self.image,

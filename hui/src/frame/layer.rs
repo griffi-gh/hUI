@@ -23,7 +23,6 @@ pub struct RectFrame {
   /// Background color of the frame\
   ///
   /// If the container has a background texture, it will be multiplied by this color
-
   pub color: FillColor,
 
   /// Background texture of the frame

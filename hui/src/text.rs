@@ -8,6 +8,7 @@ mod font;
 mod ftm;
 mod stack;
 
+/// Built-in font handle
 #[cfg(feature="builtin_font")]
 pub use font::BUILTIN_FONT;
 pub use font::FontHandle;
@@ -17,7 +18,7 @@ use ftm::FontTextureManager;
 use ftm::GlyphCacheEntry;
 use stack::FontStack;
 
-pub struct TextRenderer {
+pub(crate) struct TextRenderer {
   manager: FontManager,
   ftm: FontTextureManager,
   stack: FontStack,
@@ -63,15 +64,18 @@ impl Default for TextRenderer {
   }
 }
 
+/// Size of measured text
 pub struct TextMeasureResponse {
   pub max_width: f32,
   pub height: f32,
 }
 
+/// Context for measuring text
 #[derive(Clone, Copy)]
 pub struct TextMeasure<'a>(&'a TextRenderer);
 
 impl<'a> TextMeasure<'a> {
+  /// Measure the given string of text with the given font and size
   pub fn measure(&self, font: FontHandle, size: u16, text: &str) -> TextMeasureResponse {
     use fontdue::layout::{Layout, CoordinateSystem, TextStyle};
     let mut layout = Layout::new(CoordinateSystem::PositiveYDown);

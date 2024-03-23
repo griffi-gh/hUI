@@ -6,7 +6,7 @@ use hui::{
     container::Container,
     text::Text,
     image::Image,
-    br::Br,
+    br::Break,
     slider::Slider,
     UiElementExt,
   },
@@ -43,22 +43,22 @@ ui_main!(
         Text::new(format!("Number of images: {counter}"))
           .with_text_size(32)
           .add_child(ui);
-        Br.add_child(ui);
+        Break.add_child(ui);
         Text::new("Absolute tracking slider:")
           .with_text_size(16)
           .add_child(ui);
-        Br.add_child(ui);
+        Break.add_child(ui);
         Slider::new(*counter as f32 / 100.)
           .with_size(size!(66%, 20))
           .on_change(|x| {
             CounterSignal::ChangeValue((x * 100.).round() as u32)
           })
           .add_child(ui);
-        Br.add_child(ui);
+        Break.add_child(ui);
         Text::new("Relative tracking slider (Experimental):")
           .with_text_size(16)
           .add_child(ui);
-        Br.add_child(ui);
+        Break.add_child(ui);
         Slider::new(*counter as f32 / 100.)
           .with_size(size!(66%, 20))
           .with_follow_mode(hui::element::slider::SliderFollowMode::Relative)
@@ -66,7 +66,7 @@ ui_main!(
             CounterSignal::ChangeValue((x * 100.).round() as u32)
           })
           .add_child(ui);
-        Br.add_child(ui);
+        Break.add_child(ui);
         for _ in 0..*counter {
           Image::new(*image)
             .with_size(size!(48, 48))

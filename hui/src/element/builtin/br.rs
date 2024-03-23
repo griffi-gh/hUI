@@ -4,11 +4,11 @@ use crate::{
 };
 
 #[derive(Clone, Copy, Debug, Default)]
-pub struct Br;
+pub struct Break;
 
-impl UiElement for Br {
+impl UiElement for Break {
   fn name(&self) -> &'static str {
-    "Br"
+    "Break"
   }
 
   fn measure(&self, _: MeasureContext) -> Response {

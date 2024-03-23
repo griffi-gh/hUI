@@ -7,7 +7,7 @@ use hui::{
     container::Container,
     text::Text,
     image::Image,
-    br::Br,
+    br::Break,
     interactable::ElementInteractableExt,
     UiElementExt,
   },
@@ -44,7 +44,7 @@ ui_main!(
         Text::new("Number of images:")
           .with_text_size(24)
           .add_child(ui);
-        Br.add_child(ui);
+        Break.add_child(ui);
         Container::default()
           .with_padding(10.)
           .with_background(color::ORANGE)
@@ -74,7 +74,7 @@ ui_main!(
           })
           .on_click(|| CounterSignal::Increment)
           .add_child(ui);
-        Br.add_child(ui);
+        Break.add_child(ui);
         for _ in 0..*counter {
           Image::new(*image)
             .with_size(size!(48, 48))

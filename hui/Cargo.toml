@@ -26,6 +26,7 @@ document-features = "0.2"
 derive_setters = "0.1"
 derive_more = "0.99"
 tinyset = "0.4"
+enum_dispatch = "0.3"
 
 [features]
 default = ["builtin_elements", "builtin_font", "pixel_perfect_text"]

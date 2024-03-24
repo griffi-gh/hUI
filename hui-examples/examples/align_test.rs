@@ -73,24 +73,21 @@ fn main() {
               children: ElementList(vec![
                 Box::new(FillRect {
                   size: (Size::Relative(0.5), Size::Absolute(30.)).into(),
-                  background: vec4(0.75, 0., 0., 1.).into(),
-                  ..Default::default()
+                  frame: Box::new(vec4(0.75, 0., 0., 1.)),
                 }),
                 Box::new(FillRect {
                   size: (Size::Relative(z / 2. + 0.5), Size::Absolute(30.)).into(),
-                  background: Corners::left_right(
+                  frame: Box::new(Corners::left_right(
                     vec4(1., 0., 0., 1.),
                     vec4(0., 1., 0., 1.)
-                  ).into(),
-                  ..Default::default()
+                  )),
                 }),
               ]),
               ..Default::default()
             }),
             Box::new(FillRect {
               size: (Size::Relative(z / 2. + 0.5), Size::Absolute(30.)).into(),
-              background: vec4(0., 0.75, 0., 1.).into(),
-              ..Default::default()
+              frame: Box::new(vec4(0., 0.75, 0., 1.)),
             }),
             Box::new(Container {
               gap: 5.,
@@ -102,12 +99,11 @@ fn main() {
                 for i in 0..10 {
                   x.push(Box::new(FillRect {
                     size: (Size::Absolute(50.), Size::Absolute(50.)).into(),
-                    background: if i == 1 {
-                      vec4(0.75, 0.75, 0.75, 0.75).into()
+                    frame: Box::new(if i == 1 {
+                      vec4(0.75, 0.75, 0.75, 0.75)
                     } else {
-                      vec4(0.5, 0.5, 0.5, 0.75).into()
-                    },
-                    ..Default::default()
+                      vec4(0.5, 0.5, 0.5, 0.75)
+                    }),
                   }));
                 }
                 ElementList(x)
@@ -130,8 +126,7 @@ fn main() {
               children: ElementList(vec![
                 Box::new(FillRect {
                   size: (Size::Absolute(50.), Size::Absolute(50.)).into(),
-                  background: vec4(1., 1., 1., 0.75).into(),
-                  ..Default::default()
+                  frame: Box::new(vec4(1., 1., 1., 0.75)),
                 }),
               ]),
               ..Default::default()

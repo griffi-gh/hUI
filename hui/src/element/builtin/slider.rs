@@ -42,12 +42,15 @@ pub struct Slider {
   pub size: Size2d,
 
   /// Track frame
+  #[setters(skip)]
   pub track: Box<dyn Frame>,
 
   /// Track active frame
+  #[setters(skip)]
   pub track_active: Box<dyn Frame>,
 
   /// Handle frame
+  #[setters(skip)]
   pub handle: Box<dyn Frame>,
 
   /// Track height relative to the slider height\
@@ -96,6 +99,21 @@ impl Slider {
       on_change: Some(SignalTriggerArg::new(f)),
       ..self
     }
+  }
+
+  pub fn with_track(mut self, track: impl Frame + 'static) -> Self {
+    self.track = Box::new(track);
+    self
+  }
+
+  pub fn with_track_active(mut self, track_active: impl Frame + 'static) -> Self {
+    self.track_active = Box::new(track_active);
+    self
+  }
+
+  pub fn with_handle(mut self, handle: impl Frame + 'static) -> Self {
+    self.handle = Box::new(handle);
+    self
   }
 }
 

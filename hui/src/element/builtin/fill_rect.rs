@@ -1,39 +1,41 @@
 //! Simple filled rectangle with the specified size, background and corner radius
 
 use derive_setters::Setters;
-use glam::{vec2, Vec4};
+use glam::vec2;
 use crate::{
   draw::{RoundedCorners, UiDrawCommand},
   element::{MeasureContext, ProcessContext, UiElement},
+  frame::{Frame, FrameRect},
   layout::{Size, Size2d},
   measure::Response,
-  rect::{Corners, FillColor},
-  size,
+  size
 };
 
 /// Simple filled rectangle with the specified size, background, and corner radius
-#[derive(Debug, Clone, Copy, Setters)]
+#[derive(Setters)]
 #[setters(prefix = "with_")]
 pub struct FillRect {
   /// Size of the rectangle
   #[setters(into)]
   pub size: Size2d,
 
-  /// Background color of the rectangle
-  #[setters(into)]
-  pub background: FillColor,
+  /// Frame
+  #[setters(skip)]
+  pub frame: Box<dyn Frame>,
+}
 
-  /// Corner radius of the rectangle
-  #[setters(into)]
-  pub corner_radius: Corners<f32>,
+impl FillRect {
+  pub fn with_frame(mut self, frame: impl Frame + 'static) -> Self {
+    self.frame = Box::new(frame);
+    self
+  }
 }
 
 impl Default for FillRect {
   fn default() -> Self {
     Self {
       size: size!(10, 10),
-      background: Vec4::new(0., 0., 0., 0.5).into(),
-      corner_radius: Corners::all(0.),
+      frame: Box::new(FrameRect::color((0., 0., 0., 0.5))),
     }
   }
 }
@@ -62,16 +64,17 @@ impl UiElement for FillRect {
   }
 
   fn process(&self, ctx: ProcessContext) {
-    if !self.background.is_transparent() {
-      ctx.draw.add(UiDrawCommand::Rectangle {
-        position: ctx.layout.position,
-        size: ctx.measure.size,
-        color: self.background.corners(),
-        texture: None,
-        rounded_corners: (self.corner_radius.max_f32() > 0.).then_some({
-          RoundedCorners::from_radius(self.corner_radius)
-        }),
-      });
-    }
+    // if !self.background.is_transparent() {
+    //   ctx.draw.add(UiDrawCommand::Rectangle {
+    //     position: ctx.layout.position,
+    //     size: ctx.measure.size,
+    //     color: self.background.corners(),
+    //     texture: None,
+    //     rounded_corners: (self.corner_radius.max_f32() > 0.).then_some({
+    //       RoundedCorners::from_radius(self.corner_radius)
+    //     }),
+    //   });
+    // }
+    self.frame.draw(ctx.draw, ctx.layout.position, ctx.measure.size);
   }
 }

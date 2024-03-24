@@ -12,7 +12,7 @@ use hui::{
 mod boilerplate;
 
 ui_main!(
-  "hUI: Wrapping demo",
+  "hUI: 9-Patch demo",
   init: |_| {
     Instant::now()
   },
@@ -27,15 +27,13 @@ ui_main!(
       .with_background(color::WHITE)
       .with_wrap(true)
       .with_children(|ui| {
-        for i in 0..10 {
-          FillRect::default()
-            .with_size(size!((40 + i * 10)))
-            .with_frame(frame_rect! {
-              color: color::DARK_RED,
-              corner_radius: 8.
-            })
-            .add_child(ui);
-        }
+        FillRect::default()
+          .with_size(size!(300, 100))
+          .with_frame(frame_rect! {
+            color: color::DARK_RED,
+            corner_radius: 8.
+          })
+          .add_child(ui);
       })
       .add_root(ui, size);
   }

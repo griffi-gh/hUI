@@ -73,13 +73,11 @@ fn main() {
             }
             elem.push(Box::new(FillRect {
               size: (Size::Relative(1.), Size::Absolute(10.)).into(),
-              background: vec4(0., 0., 1., 1.).into(),
-              ..Default::default()
+              frame: Box::new(vec4(0., 0., 1., 1.)),
             }));
             elem.push(Box::new(FillRect {
               size: (Size::Relative(1.), Size::Absolute(10.)).into(),
-              background: vec4(1., 1., 0., 1.).into(),
-              ..Default::default()
+              frame: Box::new(vec4(1., 1., 0., 1.)),
             }));
             elem.push(Box::new(Text {
               text: "Hello, world!\nżółty liść. życie nie ma sensu i wszyscy zginemy;\nтест кирилиці їїїїїїїїїїї\njapanese text: テスト".into(),
@@ -90,13 +88,11 @@ fn main() {
             if instant.elapsed().as_secs() & 1 != 0 {
               elem.push(Box::new(FillRect {
                 size: (Size::Relative(1.), Size::Absolute(10.)).into(),
-                background: vec4(1., 0., 0., 1.).into(),
-                ..Default::default()
+                frame: Box::new(vec4(1., 0., 0., 1.)),
               }));
               elem.push(Box::new(FillRect {
                 size: (Size::Relative(1.), Size::Absolute(10.)).into(),
-                background: vec4(0., 0., 0., 1.).into(),
-                ..Default::default()
+                frame: Box::new(vec4(0., 0., 0., 1.)),
               }));
               elem.push(Box::new(Spacer(100.)));
               elem.push(Box::new(Text {

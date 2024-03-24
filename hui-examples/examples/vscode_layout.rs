@@ -55,7 +55,7 @@ ui_main!(
           .add_child(ui);
         FillRect::default()
           .with_size(size!(100%, 1))
-          .with_background(color::rgb_hex(0x2d2d30))
+          .with_frame(color::rgb_hex(0x2d2d30))
           .add_child(ui);
         Container::default()
           .with_size(size!(100%, 100%))
@@ -67,7 +67,7 @@ ui_main!(
               .add_child(ui);
             FillRect::default()
               .with_size(size!(1, 100%))
-              .with_background(color::rgb_hex(0x2d2d30))
+              .with_frame(color::rgb_hex(0x2d2d30))
               .add_child(ui);
             Container::default()
               .with_size(size!(200, 100%))

@@ -139,6 +139,7 @@ impl Frame for FrameRect {
     self.bottom_right.x.relative >= 1. &&
     self.bottom_right.y.absolute >= 0. &&
     self.bottom_right.y.relative >= 1. &&
-    self.color.is_opaque()
+    self.color.is_opaque() &&
+    self.image.is_none()
   }
 }

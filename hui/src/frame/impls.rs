@@ -16,8 +16,9 @@ impl Frame for ImageHandle {
       rounded_corners: None,
     })
   }
+
   fn covers_opaque(&self) -> bool {
-    true
+    false
   }
 }
 
@@ -31,6 +32,7 @@ impl Frame for FillColor {
       rounded_corners: None,
     })
   }
+
   fn covers_opaque(&self) -> bool {
     self.is_opaque()
   }

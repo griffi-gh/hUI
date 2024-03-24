@@ -30,14 +30,20 @@ tinyset = "0.4"
 
 [features]
 default = ["el_all", "builtin_font", "pixel_perfect_text"]
-## Enable the built-in font (ProggyTiny, adds 35kb to the executable)
+
+#! #### Built-in font:
+
+## Enable the built-in font (ProggyTiny, adds *35kb* to the executable)
 builtin_font = []
+
+#! #### Pixel-perfect rendering:
+
 ## Round all vertex positions to nearest integer coordinates (not recommended)
 pixel_perfect = ["pixel_perfect_text"]
 ## Apply pixel-perfect rendering hack to text (fixes blurry text rendering)
 pixel_perfect_text = []
-#! Make sure to disable the `pixel_perfect` features if you are rendering UI in 3D space\
-#! or using DPI (or any other form of) scaling while passing the virtual resolution to the ui
+#! Make sure to disable both features if you are not rendering UI "as-is" at 1:1 scale\
+#! For exmaple, you should disable them if using DPI (or any other form of) scaling while passing the virtual resolution to the ui or rendering it in 3d space
 
 #! #### Built-in elements:
 

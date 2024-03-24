@@ -19,12 +19,8 @@ ui_main!(
   run: |ui, size, _| {
     Container::default()
       .with_size(size!(100%))
-      .with_direction(Direction::Horizontal)
       .with_align(Alignment::Center)
-      .with_padding(5.)
-      .with_gap(10.)
       .with_background(color::WHITE)
-      .with_wrap(true)
       .with_children(|ui| {
         FillRect::default()
           .with_size(size!(300, 100))

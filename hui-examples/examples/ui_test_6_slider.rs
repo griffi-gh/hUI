@@ -8,7 +8,6 @@ use hui::{
     text::Text,
     UiElementExt,
   },
-  frame::FrameRect,
   layout::{Alignment, Direction},
   signal::Signal,
   size,

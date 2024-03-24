@@ -53,13 +53,19 @@ pub struct Slider {
   #[setters(skip)]
   pub handle: Box<dyn Frame>,
 
-  /// Track height relative to the slider height\
+  /// Track height *relative to the slider height*\
   ///
   /// Range: 0.0..=1.0
-  pub track_height_ratio: f32,
+  pub track_height: f32,
 
-  /// Handle width in pixels
-  pub handle_width: f32,
+  /// Handle size
+  ///
+  /// Please be aware that:
+  ///
+  /// - Width is *static* and specified in *pixels* (e.g. `15.0`)
+  /// - Height is *relative* to the slider height,\
+  ///   ...and is specified as a *ratio* in range `0.0..=1.0`
+  pub handle_size: (f32, f32),
 
   /// Follow mode
   pub follow_mode: SliderFollowMode,
@@ -76,8 +82,8 @@ impl Default for Slider {
       handle: Box::new(FrameRect::color((0.0, 0.0, 1.))),
       track: Box::new(FrameRect::color((0.5, 0.5, 0.5))),
       track_active: Box::new(FrameRect::color((0.0, 0.0, 0.75))),
-      track_height_ratio: 0.25,
-      handle_width: 15.0,
+      track_height: 0.25,
+      handle_size: (15.0, 1.),
       follow_mode: SliderFollowMode::default(),
       on_change: None
     }
@@ -140,18 +146,18 @@ impl UiElement for Slider {
     // } else {
     //   vec2(15., ctx.measure.size.y)
     // };
-    let handle_size = vec2(self.handle_width, ctx.measure.size.y);
+    let handle_size = vec2(self.handle_size.0, self.handle_size.1 * ctx.measure.size.y);
 
     //Draw the track
     //If the active part is opaque and value >= 1., we don't need to draw the background as the active part will cover it
     //However, if the handle is not opaque, we need to draw the background as the active part won't quite reach the end
     //Of corse, if it's fully transparent, we don't need to draw it either
     // if !(self.track_color.is_transparent() || (self.track_active_color.is_opaque() && self.handle_color.is_opaque() && self.value >= 1.)) {
-    if !(self.track_active.covers_opaque() && self.handle.covers_opaque() && self.value >= 1.) {
+    if !(self.track_active.covers_opaque() && self.handle.covers_opaque() && (self.handle_size.1 >= self.track_height) && self.value >= 1.) {
       self.track.draw(
         ctx.draw,
-        ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height_ratio / 2.),
-        ctx.measure.size * vec2(1., self.track_height_ratio),
+        ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height / 2.),
+        ctx.measure.size * vec2(1., self.track_height),
       );
     }
 
@@ -159,11 +165,11 @@ impl UiElement for Slider {
     //We can skip drawing it if it's fully transparent or value <= 0.
     //But if the handle is not opaque, it should be visible even if value is zero
     // if !(self.track_active_color.is_transparent() || (self.value <= 0. && self.handle_color.is_opaque())) {
-    if !(self.handle.covers_opaque() && self.value <= 0.) {
+    if !(self.handle.covers_opaque() && (self.handle_size.1 >= self.track_height) && self.value <= 0.) {
       self.track_active.draw(
         ctx.draw,
-        ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height_ratio / 2.),
-        (ctx.measure.size - handle_size * Vec2::X) * vec2(self.value, self.track_height_ratio) + handle_size * Vec2::X / 2.,
+        ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height / 2.),
+        (ctx.measure.size - handle_size * Vec2::X) * vec2(self.value, self.track_height) + handle_size * Vec2::X / 2.,
       );
     }
 
@@ -178,11 +184,15 @@ impl UiElement for Slider {
     //     rounded_corners: None,
     //   });
     // }
-    self.handle.draw(
-      ctx.draw,
-      ctx.layout.position + ((ctx.measure.size.x - handle_size.x) * self.value) * Vec2::X,
-      handle_size,
-    );
+    if (self.handle_size.0 > 0. && self.handle_size.1 > 0.) {
+      self.handle.draw(
+        ctx.draw,
+        ctx.layout.position +
+          ((ctx.measure.size.x - handle_size.x) * self.value) * Vec2::X +
+          ctx.measure.size.y * ((1. - self.handle_size.1) * 0.5) * Vec2::Y,
+        handle_size,
+      );
+    }
 
     //handle events
     if let Some(res) = ctx.input.check_active(ctx.measure.rect(ctx.layout.position)) {

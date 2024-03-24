@@ -9,8 +9,8 @@ use winit::{
 };
 use hui::{
   element::{
-    container::Container, progress_bar::ProgressBar, fill_rect::FillRect, ElementList, UiElement
-  }, layout::{Alignment, Direction, Size}, rect::{Corners, Sides}, UiInstance
+    container::Container, fill_rect::FillRect, progress_bar::ProgressBar, ElementList, UiElement
+  }, frame::FrameRect, layout::{Alignment, Direction, Size}, rect::{Corners, Sides}, UiInstance
 };
 use hui_glium::GliumUiRenderer;
 
@@ -95,7 +95,7 @@ fn main() {
             Box::new(Container {
               gap: 5.,
               padding: Sides::all(5.),
-              background: vec4(0., 0., 0., 0.5).into(),
+              background_frame: Box::new(FrameRect::color(vec4(0., 0., 0., 0.5))),
               direction: Direction::Horizontal,
               children: {
                 let mut x: Vec<Box<dyn UiElement>> = vec![];
@@ -115,18 +115,17 @@ fn main() {
               ..Default::default()
             }),
             Box::new(Container {
-              background: vec4(1., 0., 0., 1.).into(),
+              background_frame: Box::new(FrameRect::color((1., 0., 0.)).with_corner_radius(Corners {
+                top_left: 0.,
+                top_right: 30.,
+                bottom_left: 0.,
+                bottom_right: 0.,
+              })),
               padding: Sides {
                 top: 10.,
                 bottom: 20.,
                 left: 30.,
                 right: 40.,
-              },
-              corner_radius: Corners {
-                top_left: 0.,
-                top_right: 30.,
-                bottom_left: 0.,
-                bottom_right: 0.,
               },
               children: ElementList(vec![
                 Box::new(FillRect {

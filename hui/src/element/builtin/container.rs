@@ -71,14 +71,8 @@ impl Container {
     self
   }
 
-  pub fn with_background_frame(mut self, frame: impl Frame + 'static) -> Self {
+  pub fn with_background(mut self, frame: impl Frame + 'static) -> Self {
     self.background_frame = Box::new(frame);
-    self
-  }
-
-  #[deprecated(note = "use with_background_frame instead")]
-  pub fn with_background(mut self, color: impl Into<FillColor>) -> Self {
-    self.background_frame = Box::new(FrameRect::color(color.into()));
     self
   }
 }

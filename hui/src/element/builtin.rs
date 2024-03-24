@@ -1,40 +1,40 @@
 // Layout stuff:
 
-#[cfg(feature = "builtin_container")]
+#[cfg(feature = "el_container")]
 pub mod container;
 
-#[cfg(feature = "builtin_elements")]
+#[cfg(feature = "el_fill_rect")]
 pub mod fill_rect;
 
-#[cfg(feature = "builtin_elements")]
+#[cfg(feature = "el_spacer")]
 pub mod spacer;
 
-#[cfg(feature = "builtin_elements")]
+#[cfg(feature = "el_br")]
 pub mod br;
 
 // Basic elements:
 
-#[cfg(feature = "builtin_elements")]
+#[cfg(feature = "el_text")]
 pub mod text;
 
-#[cfg(feature = "builtin_elements")]
+#[cfg(feature = "el_image")]
 pub mod image;
 
 // "Extras":
 // (meant to be replaced if needed)
 
-#[cfg(feature = "builtin_elements")]
+#[cfg(feature = "el_progress_bar")]
 pub mod progress_bar;
 
-#[cfg(feature = "builtin_elements")]
+#[cfg(feature = "el_slider")]
 pub mod slider;
 
 // Wrappers:
 
-#[cfg(feature = "builtin_elements")]
+#[cfg(feature = "el_transformer")]
 pub mod transformer;
 
-#[cfg(feature = "builtin_elements")]
+#[cfg(feature = "el_interactable")]
 pub mod interactable;
 
 //TODO add: Image

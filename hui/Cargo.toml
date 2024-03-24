@@ -26,21 +26,64 @@ document-features = "0.2"
 derive_setters = "0.1"
 derive_more = "0.99"
 tinyset = "0.4"
-#enum_dispatch = "0.3"
+
 
 [features]
-default = ["builtin_elements", "builtin_font", "pixel_perfect_text"]
+default = ["el_all", "builtin_font", "pixel_perfect_text"]
 ## Enable the built-in font (ProggyTiny, adds 35kb to the executable)
 builtin_font = []
-## Enable the built-in elements (`Container`, `ProgressBar`, etc.)\
-builtin_elements = ["builtin_container"]
-## Enable only the `Container` component (which is essential for laying out other components)
-builtin_container = []
 ## Round all vertex positions to nearest integer coordinates (not recommended)
 pixel_perfect = ["pixel_perfect_text"]
 ## Apply pixel-perfect rendering hack to text (fixes blurry text rendering)
 pixel_perfect_text = []
-#! Make sure to disable the `pixel_perfect` feature if you are rendering UI in 3D space\
+#! Make sure to disable the `pixel_perfect` features if you are rendering UI in 3D space\
 #! or using DPI (or any other form of) scaling while passing the virtual resolution to the ui
+
+#! #### Built-in elements:
+
+## Enable all built-in elements
+el_all = [
+  "el_container",
+  "el_fill_rect",
+  "el_spacer",
+  "el_br",
+  "el_text",
+  "el_image",
+  "el_progress_bar",
+  "el_slider",
+  "el_transformer",
+  "el_interactable",
+]
+
+## Enable the built-in `Container` element
+el_container = []
+
+## Enable the built-in `FillRect` element
+el_fill_rect = []
+
+## Enable the built-in `Spacer` element
+el_spacer = []
+
+## Enable the built-in `Break` element
+el_br = []
+
+## Enable the built-in `Text` element
+el_text = []
+
+## Enable the built-in `Image` element
+el_image = []
+
+## Enable the built-in `ProgressBar` element
+el_progress_bar = []
+
+## Enable the built-in `Slider` element
+el_slider = []
+
+## Enable the built-in `Transformer` element
+el_transformer = []
+
+## Enable the built-in `Interactable` element
+el_interactable = []
+
 # ## Enable multi-threading support (currently only affects some 3rd-party libraries)
 # parallel = ["fontdue/parallel"]

@@ -124,6 +124,7 @@ impl Frame for FrameRect {
       size: bottom_right - top_left,
       color: self.color.corners(),
       texture: self.image,
+      texture_uv: None,
       rounded_corners: (self.corner_radius.max_f32() > 0.).then_some(
         RoundedCorners::from_radius(self.corner_radius)
       ),
@@ -140,6 +141,7 @@ impl Frame for FrameRect {
     self.bottom_right.y.absolute >= 0. &&
     self.bottom_right.y.relative >= 1. &&
     self.color.is_opaque() &&
-    self.image.is_none()
+    self.image.is_none() &&
+    self.corner_radius.max_f32() == 0.
   }
 }

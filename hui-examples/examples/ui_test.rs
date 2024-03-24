@@ -1,7 +1,5 @@
 use hui::{
-  color, size,
-  layout::Alignment,
-  element::{UiElementExt, container::Container, text::Text},
+  color, element::{container::Container, text::Text, UiElementExt}, frame::FrameRect, layout::Alignment, size
 };
 
 #[path = "../boilerplate.rs"]
@@ -14,8 +12,10 @@ ui_main!(|ui, size, _| {
     .with_align(Alignment::Center)
     .with_padding(5.)
     .with_gap(10.)
-    .with_corner_radius(10.)
-    .with_background(color::WHITE)
+    .with_background(
+      FrameRect::color(color::WHITE)
+        .with_corner_radius(10.)
+    )
     .with_children(|ui| {
       Text::default()
         .with_text("Hello, world")
@@ -24,8 +24,10 @@ ui_main!(|ui, size, _| {
         .add_child(ui);
       Container::default()
         .with_padding((10., 20.))
-        .with_corner_radius((2.5, 30., 2.5, 2.5))
-        .with_background(color::DARK_RED)
+        .with_background(
+          FrameRect::color(color::DARK_RED)
+            .with_corner_radius((2.5, 30., 2.5, 2.5))
+        )
         .with_children(|ui| {
           Text::default()
             .with_text("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")

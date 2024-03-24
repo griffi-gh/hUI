@@ -7,11 +7,7 @@ use hui::{
     text::Text,
     transformer::ElementTransformExt,
     UiElementExt
-  },
-  layout::Alignment,
-  rect::Corners,
-  text::FontHandle,
-  size,
+  }, frame::FrameRect, layout::Alignment, rect::Corners, size, text::FontHandle
 };
 
 #[path = "../boilerplate.rs"]
@@ -41,8 +37,10 @@ ui_main!(
           .with_align((Alignment::Center, Alignment::Begin))
           .with_padding(15.)
           .with_gap(10.)
-          .with_corner_radius(8.)
-          .with_background((0., 0., 0., 0.5))
+          .with_background(
+            FrameRect::color((0., 0., 0., 0.5))
+              .with_corner_radius(8.)
+          )
           .with_children(|ui| {
             Text::default()
               .with_text("Did  you  know?")

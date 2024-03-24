@@ -1,10 +1,6 @@
 use glam::vec4;
 use hui::{
-  color, size,
-  element::{container::Container, progress_bar::ProgressBar, text::Text, UiElementExt},
-  layout::Alignment,
-  rect::Corners,
-  text::FontHandle,
+  color, element::{container::Container, progress_bar::ProgressBar, text::Text, UiElementExt}, frame::FrameRect, layout::Alignment, rect::Corners, size, text::FontHandle
 };
 
 #[path = "../boilerplate.rs"]
@@ -38,8 +34,10 @@ ui_main!(
       .with_children(|ui| {
         Container::default()
           .with_padding((10., 15.))
-          .with_corner_radius(8.)
-          .with_background((0., 0., 0., 0.5))
+          .with_background(
+            FrameRect::color((0., 0., 0., 0.5))
+              .with_corner_radius(8.)
+          )
           .with_children(|ui| {
             let flash = 1. - 0.5 * (4. * instant.elapsed().as_secs_f32()).sin().powi(2);
             Text::default()
@@ -61,8 +59,10 @@ ui_main!(
           .with_align((Alignment::Center, Alignment::Begin))
           .with_padding(15.)
           .with_gap(10.)
-          .with_corner_radius(8.)
-          .with_background((0., 0., 0., 0.5))
+          .with_background(
+            FrameRect::color((0., 0., 0., 0.5))
+              .with_corner_radius(8.)
+          )
           .with_children(|ui| {
             Text::default()
               .with_text("Did  you  know?")
@@ -100,8 +100,10 @@ ui_main!(
       .with_children(|ui| {
         Container::default()
           .with_padding(10.)
-          .with_corner_radius(8.)
-          .with_background((0., 0., 0., 0.5))
+          .with_background(
+            FrameRect::color((0., 0., 0., 0.5))
+              .with_corner_radius(8.)
+          )
           .with_children(|ui| {
             Text::default()
               .with_text("Level 5")

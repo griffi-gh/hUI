@@ -16,6 +16,8 @@ use crate::{
 //TODO: use state for slider?
 // ^ useful if the user only hanldes the drag end event or has large step sizes with relative mode
 
+//TODO: adopt frame api here
+
 /// Follow mode for the slider
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
 pub enum SliderFollowMode {

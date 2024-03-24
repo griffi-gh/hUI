@@ -60,3 +60,71 @@ macro_rules! size {
     }
   };
 }
+
+/// Helper macro for constructing a `FrameRect`
+#[macro_export]
+macro_rules! frame_rect {
+  () => {
+    $crate::frame::FrameRect::default()
+  };
+
+  ($expr:expr) => {
+    {
+      let _frame_rect: $crate::frame::FrameRect = $crate::frame::FrameRect::from($expr);
+      _frame_rect
+    }
+  };
+
+  ($image:expr, $color:expr) => {
+    $crate::frame::FrameRect::color_image($color, $image)
+  };
+
+  {$($ident:ident : $expr:expr),+$(,)?} => {
+    {
+      // ensure all identifiers are unique
+      #[allow(non_upper_case_globals)]
+      {$(const $ident: () = ();)+}
+
+      // construct the FrameRect
+      {
+        let mut frame_rect = $crate::frame::FrameRect::default();
+        $(
+          let $ident = ($expr).into();
+          frame_rect.$ident = $ident;
+        )+
+        frame_rect
+      }
+    }
+  };
+
+  // {$from:expr, $($ident:ident : $expr:expr),+$(,)?} => {
+  //   {
+  //     // ensure all identifiers are unique
+  //     #[allow(non_upper_case_globals)]
+  //     {
+  //       $(
+  //         const $ident: () = ();
+  //       )+
+  //     }
+  //     // construct the FrameRect
+  //     {
+  //       let mut _frame_rect: $crate::frame::FrameRect = ($from).into();
+  //       $(
+  //         let $ident = ($expr).into();
+  //         _frame_rect.$ident = $ident;
+  //       )+
+  //       _frame_rect
+  //     }
+  //   }
+  // };
+}
+
+// #[allow(unused)]
+// fn test() {
+//   // let _ = frame_rect!(5, 6);
+
+//   let _ = frame_rect! {
+//     color: (0.2, 0.2, 0.3, 1.),
+//     corner_radius: 5.,
+//   };
+// }

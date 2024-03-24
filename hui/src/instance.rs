@@ -83,6 +83,44 @@ impl UiInstance {
     self.atlas.add(width, data, format)
   }
 
+  //TODO better error handling
+
+  /// Add an image from a file to the texture atlas\
+  /// (experimental, may be removed in the future)
+  ///
+  /// Requires the `image` feature
+  ///
+  /// # Panics:
+  /// - If the file exists but contains invalid image data\
+  ///   (this will change to a soft error in the future)
+  #[cfg(feature = "image")]
+  pub fn add_image_file_path(&mut self, path: impl AsRef<std::path::Path>) -> Result<ImageHandle, std::io::Error> {
+    use std::io::Read;
+
+    // Open the file (and wrap it in a bufreader)
+    let mut file = std::io::BufReader::new(std::fs::File::open(path)?);
+
+    //Guess the image format from the magic bytes
+    //Read like 64 bytes, which should be enough for magic byte detection
+    //well this would fail if the image is somehow smaller than 64 bytes, but who the fvck cares...
+    let mut magic = [0; 64];
+    file.read_exact(&mut magic)?;
+    let format = image::guess_format(&magic).expect("Invalid image data (FORMAT)");
+
+    //Parse the image and read the raw uncompressed rgba data
+    let image = image::load(file, format).expect("Invalid image data");
+    let image_rgba = image.as_rgba8().unwrap();
+
+    //Add the image to the atlas
+    let handle = self.add_image(
+      TextureFormat::Rgba,
+      image_rgba,
+      image.width() as usize
+    );
+
+    Ok(handle)
+  }
+
   /// Push a font to the font stack\
   /// The font will be used for all text rendering until it is popped
   ///

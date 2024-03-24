@@ -59,7 +59,9 @@ impl FrameRect {
     }
   }
 
-  /// Create a new [`FrameRect`] with the given image
+  /// Create a new [`FrameRect`] with the given image\
+  ///
+  /// Color will be set to [`WHITE`](crate::color::WHITE) to ensure the image is visible
   pub fn image(image: ImageHandle) -> Self {
     Self {
       color: color::WHITE.into(),

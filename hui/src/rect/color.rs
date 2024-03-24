@@ -153,6 +153,17 @@ impl From<[[f32; 4]; 4]> for FillColor {
   }
 }
 
+impl From<Corners<Vec3>> for FillColor {
+  fn from(corners: Corners<Vec3>) -> Self {
+    Self(Corners {
+      top_left: corners.top_left.extend(1.),
+      top_right: corners.top_right.extend(1.),
+      bottom_left: corners.bottom_left.extend(1.),
+      bottom_right: corners.bottom_right.extend(1.),
+    })
+  }
+}
+
 impl From<(Vec3, Vec3, Vec3, Vec3)> for FillColor {
   fn from((top_left, top_right, bottom_left, bottom_right): (Vec3, Vec3, Vec3, Vec3)) -> Self {
     Self(Corners {

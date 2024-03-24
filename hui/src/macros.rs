@@ -62,6 +62,18 @@ macro_rules! size {
 }
 
 /// Helper macro for constructing a `FrameRect`
+///
+/// # Example:
+/// ```
+/// frame_rect! {
+///   color: (0.2, 0.2, 0.3, 1.),
+///   corner_radius: 5.,
+/// };
+/// ```
+///
+/// # Note:
+/// - If the `image` field is set, but not `color`, the `color` field will default to [`WHITE`](crate::color::WHITE) (to ensure visibility)
+/// - If both `color` and `image` are not set, the `color` field will default to [`TRANSPARENT`](crate::color::TRANSPARENT)
 #[macro_export]
 macro_rules! frame_rect {
   {} => {

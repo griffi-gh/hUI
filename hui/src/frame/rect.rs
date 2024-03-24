@@ -6,6 +6,9 @@ use crate::{
 };
 use super::{Frame, point::FramePoint2d};
 
+/// A rectangular frame
+///
+/// Can optionally be tinted, textured, and have rounded corners
 #[derive(Clone, Copy)]
 pub struct FrameRect {
   /// Background color of the frame\
@@ -125,5 +128,17 @@ impl Frame for FrameRect {
         RoundedCorners::from_radius(self.corner_radius)
       ),
     });
+  }
+
+  fn covers_opaque(&self) -> bool {
+    self.top_left.x.absolute <= 0. &&
+    self.top_left.x.relative <= 0. &&
+    self.top_left.y.absolute <= 0. &&
+    self.top_left.y.relative <= 0. &&
+    self.bottom_right.x.absolute >= 0. &&
+    self.bottom_right.x.relative >= 1. &&
+    self.bottom_right.y.absolute >= 0. &&
+    self.bottom_right.y.relative >= 1. &&
+    self.color.is_opaque()
   }
 }

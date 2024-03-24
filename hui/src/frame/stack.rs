@@ -9,6 +9,11 @@ impl Frame for FrameStack {
     self.0.draw(draw, position, parent_size);
     self.1.draw(draw, position, parent_size);
   }
+
+  fn covers_opaque(&self) -> bool {
+    self.0.covers_opaque() ||
+    self.1.covers_opaque()
+  }
 }
 
 pub trait FrameStackExt: Frame {

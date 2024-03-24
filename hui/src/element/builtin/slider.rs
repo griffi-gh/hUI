@@ -122,7 +122,6 @@ impl UiElement for Slider {
     // } else {
     //   vec2(15., ctx.measure.size.y)
     // };
-
     let handle_size = vec2(self.handle_width, ctx.measure.size.y);
 
     //Draw the track
@@ -130,37 +129,25 @@ impl UiElement for Slider {
     //However, if the handle is not opaque, we need to draw the background as the active part won't quite reach the end
     //Of corse, if it's fully transparent, we don't need to draw it either
     // if !(self.track_color.is_transparent() || (self.track_active_color.is_opaque() && self.handle_color.is_opaque() && self.value >= 1.)) {
-    //   ctx.draw.add(UiDrawCommand::Rectangle {
-    //     position: ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height_ratio / 2.),
-    //     size: ctx.measure.size * vec2(1., self.track_height_ratio),
-    //     color: self.track_color.into(),
-    //     texture: None,
-    //     rounded_corners: None,
-    //   });
-    // }
-    self.track.draw(
-      ctx.draw,
-      ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height_ratio / 2.),
-      ctx.measure.size * vec2(1., self.track_height_ratio),
-    );
+    if !(self.track_active.covers_opaque() && self.handle.covers_opaque() && self.value >= 1.) {
+      self.track.draw(
+        ctx.draw,
+        ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height_ratio / 2.),
+        ctx.measure.size * vec2(1., self.track_height_ratio),
+      );
+    }
 
     //"Active" part of the track
     //We can skip drawing it if it's fully transparent or value <= 0.
     //But if the handle is not opaque, it should be visible even if value is zero
     // if !(self.track_active_color.is_transparent() || (self.value <= 0. && self.handle_color.is_opaque())) {
-    //   ctx.draw.add(UiDrawCommand::Rectangle {
-    //     position: ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height_ratio / 2.),
-    //     size: (ctx.measure.size - handle_size * Vec2::X) * vec2(self.value, self.track_height_ratio) + handle_size * Vec2::X / 2.,
-    //     color: self.track_active_color.into(),
-    //     texture: None,
-    //     rounded_corners: None,
-    //   });
-    // }
-    self.track_active.draw(
-      ctx.draw,
-      ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height_ratio / 2.),
-      (ctx.measure.size - handle_size * Vec2::X) * vec2(self.value, self.track_height_ratio) + handle_size * Vec2::X / 2.,
-    );
+    if !(self.handle.covers_opaque() && self.value <= 0.) {
+      self.track_active.draw(
+        ctx.draw,
+        ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height_ratio / 2.),
+        (ctx.measure.size - handle_size * Vec2::X) * vec2(self.value, self.track_height_ratio) + handle_size * Vec2::X / 2.,
+      );
+    }
 
     // The handle
     // if handle_size.x != 0. && !self.handle_color.is_transparent() {
@@ -182,7 +169,9 @@ impl UiElement for Slider {
     //handle events
     if let Some(res) = ctx.input.check_active(ctx.measure.rect(ctx.layout.position)) {
       let new_value = match self.follow_mode {
-        SliderFollowMode::Absolute => ((res.position_in_rect.x - handle_size.x / 2.) / (ctx.measure.size.x - handle_size.x)).clamp(0., 1.),
+        SliderFollowMode::Absolute => {
+          ((res.position_in_rect.x - handle_size.x / 2.) / (ctx.measure.size.x - handle_size.x)).clamp(0., 1.)
+        },
         SliderFollowMode::Relative => {
           let delta = res.position_in_rect.x - res.last_position_in_rect.x;
           let delta_ratio = delta / (ctx.measure.size.x - handle_size.x);

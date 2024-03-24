@@ -16,6 +16,9 @@ impl Frame for ImageHandle {
       rounded_corners: None,
     })
   }
+  fn covers_opaque(&self) -> bool {
+    true
+  }
 }
 
 impl Frame for FillColor {
@@ -28,6 +31,9 @@ impl Frame for FillColor {
       rounded_corners: None,
     })
   }
+  fn covers_opaque(&self) -> bool {
+    self.is_opaque()
+  }
 }
 
 // impl for various types resembling colors
@@ -38,11 +44,17 @@ impl Frame for Corners<Vec4> {
   fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2) {
     FillColor::from(*self).draw(draw, position, parent_size)
   }
+  fn covers_opaque(&self) -> bool {
+    FillColor::from(*self).is_opaque()
+  }
 }
 
 impl Frame for (Vec4, Vec4, Vec4, Vec4) {
   fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2) {
     FillColor::from(*self).draw(draw, position, parent_size)
+  }
+  fn covers_opaque(&self) -> bool {
+    FillColor::from(*self).is_opaque()
   }
 }
 
@@ -50,11 +62,17 @@ impl Frame for ((f32, f32, f32, f32), (f32, f32, f32, f32), (f32, f32, f32, f32)
   fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2) {
     FillColor::from(*self).draw(draw, position, parent_size)
   }
+  fn covers_opaque(&self) -> bool {
+    FillColor::from(*self).is_opaque()
+  }
 }
 
 impl Frame for [[f32; 4]; 4] {
   fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2) {
     FillColor::from(*self).draw(draw, position, parent_size)
+  }
+  fn covers_opaque(&self) -> bool {
+    FillColor::from(*self).is_opaque()
   }
 }
 
@@ -64,11 +82,17 @@ impl Frame for Corners<Vec3> {
   fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2) {
     FillColor::from(*self).draw(draw, position, parent_size)
   }
+  fn covers_opaque(&self) -> bool {
+    FillColor::from(*self).is_opaque()
+  }
 }
 
 impl Frame for (Vec3, Vec3, Vec3, Vec3) {
   fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2) {
     FillColor::from(*self).draw(draw, position, parent_size)
+  }
+  fn covers_opaque(&self) -> bool {
+    FillColor::from(*self).is_opaque()
   }
 }
 
@@ -76,11 +100,17 @@ impl Frame for ((f32, f32, f32), (f32, f32, f32), (f32, f32, f32), (f32, f32, f3
   fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2) {
     FillColor::from(*self).draw(draw, position, parent_size)
   }
+  fn covers_opaque(&self) -> bool {
+    FillColor::from(*self).is_opaque()
+  }
 }
 
 impl Frame for [[f32; 3]; 4] {
   fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2) {
     FillColor::from(*self).draw(draw, position, parent_size)
+  }
+  fn covers_opaque(&self) -> bool {
+    FillColor::from(*self).is_opaque()
   }
 }
 
@@ -90,17 +120,26 @@ impl Frame for Vec4 {
   fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2) {
     FillColor::from(*self).draw(draw, position, parent_size)
   }
+  fn covers_opaque(&self) -> bool {
+    FillColor::from(*self).is_opaque()
+  }
 }
 
 impl Frame for (f32, f32, f32, f32) {
   fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2) {
     FillColor::from(*self).draw(draw, position, parent_size)
   }
+  fn covers_opaque(&self) -> bool {
+    FillColor::from(*self).is_opaque()
+  }
 }
 
 impl Frame for [f32; 4] {
   fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2) {
     FillColor::from(*self).draw(draw, position, parent_size)
+  }
+  fn covers_opaque(&self) -> bool {
+    FillColor::from(*self).is_opaque()
   }
 }
 
@@ -110,16 +149,25 @@ impl Frame for Vec3 {
   fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2) {
     FillColor::from(*self).draw(draw, position, parent_size)
   }
+  fn covers_opaque(&self) -> bool {
+    FillColor::from(*self).is_opaque()
+  }
 }
 
 impl Frame for (f32, f32, f32) {
   fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2) {
     FillColor::from(*self).draw(draw, position, parent_size)
   }
+  fn covers_opaque(&self) -> bool {
+    FillColor::from(*self).is_opaque()
+  }
 }
 
 impl Frame for [f32; 3] {
   fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2) {
     FillColor::from(*self).draw(draw, position, parent_size)
+  }
+  fn covers_opaque(&self) -> bool {
+    FillColor::from(*self).is_opaque()
   }
 }

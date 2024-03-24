@@ -38,7 +38,7 @@ ui_main!(
       .with_align((Alignment::Center, Alignment::Begin))
       .with_direction(Direction::Horizontal)
       .with_gap(5.)
-      .with_background_frame((0.1, 0.1, 0.1))
+      .with_background((0.1, 0.1, 0.1))
       .with_wrap(true)
       .with_children(|ui| {
         Text::new(format!("Number of images: {counter}"))

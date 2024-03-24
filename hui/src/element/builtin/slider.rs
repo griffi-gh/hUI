@@ -4,12 +4,7 @@ use derive_setters::Setters;
 use glam::{Vec2, vec2};
 
 use crate::{
-  draw::UiDrawCommand,
-  element::{MeasureContext, ProcessContext, UiElement},
-  layout::{Size2d, compute_size},
-  measure::Response,
-  rect::FillColor,
-  signal::{trigger::SignalTriggerArg, Signal},
+  draw::UiDrawCommand, element::{MeasureContext, ProcessContext, UiElement}, frame::{Frame, FrameRect}, layout::{compute_size, Size2d}, measure::Response, rect::FillColor, signal::{trigger::SignalTriggerArg, Signal}
 };
 
 
@@ -46,22 +41,22 @@ pub struct Slider {
   #[setters(into)]
   pub size: Size2d,
 
-  /// Color of the slider handle
-  #[setters(into)]
-  pub handle_color: FillColor,
+  /// Track frame
+  pub track: Box<dyn Frame>,
 
-  /// Color of the slider track
-  #[setters(into)]
-  pub track_color: FillColor,
+  /// Track active frame
+  pub track_active: Box<dyn Frame>,
 
-  /// Color of the "active" part of the slider
-  #[setters(into)]
-  pub track_active_color: FillColor,
+  /// Handle frame
+  pub handle: Box<dyn Frame>,
 
   /// Track height relative to the slider height\
   ///
   /// Range: 0.0..=1.0
   pub track_height_ratio: f32,
+
+  /// Handle width in pixels
+  pub handle_width: f32,
 
   /// Follow mode
   pub follow_mode: SliderFollowMode,
@@ -75,10 +70,11 @@ impl Default for Slider {
     Self {
       value: 0.0,
       size: Size2d::default(),
-      handle_color: (0.0, 0.0, 1.).into(),
-      track_color: (0.5, 0.5, 0.5).into(),
-      track_active_color: (0.0, 0.0, 0.75).into(),
+      handle: Box::new(FrameRect::color((0.0, 0.0, 1.))),
+      track: Box::new(FrameRect::color((0.5, 0.5, 0.5))),
+      track_active: Box::new(FrameRect::color((0.0, 0.0, 0.75))),
       track_height_ratio: 0.25,
+      handle_width: 15.0,
       follow_mode: SliderFollowMode::default(),
       on_change: None
     }
@@ -121,50 +117,67 @@ impl UiElement for Slider {
     //Compute handle size:
     // This is kinda counter-intuitive, but if the handle is transparent, we treat it as completely disabled
     // To prevent confusing offset from the edge of the slider, we set the handle size to 0
-    let handle_size = if self.handle_color.is_transparent() {
-      Vec2::ZERO
-    } else {
-      vec2(15., ctx.measure.size.y)
-    };
+    // let handle_size = if self.handle_color.is_transparent() {
+    //   Vec2::ZERO
+    // } else {
+    //   vec2(15., ctx.measure.size.y)
+    // };
+
+    let handle_size = vec2(self.handle_width, ctx.measure.size.y);
 
     //Draw the track
     //If the active part is opaque and value >= 1., we don't need to draw the background as the active part will cover it
     //However, if the handle is not opaque, we need to draw the background as the active part won't quite reach the end
     //Of corse, if it's fully transparent, we don't need to draw it either
-    if !(self.track_color.is_transparent() || (self.track_active_color.is_opaque() && self.handle_color.is_opaque() && self.value >= 1.)) {
-      ctx.draw.add(UiDrawCommand::Rectangle {
-        position: ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height_ratio / 2.),
-        size: ctx.measure.size * vec2(1., self.track_height_ratio),
-        color: self.track_color.into(),
-        texture: None,
-        rounded_corners: None,
-      });
-    }
+    // if !(self.track_color.is_transparent() || (self.track_active_color.is_opaque() && self.handle_color.is_opaque() && self.value >= 1.)) {
+    //   ctx.draw.add(UiDrawCommand::Rectangle {
+    //     position: ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height_ratio / 2.),
+    //     size: ctx.measure.size * vec2(1., self.track_height_ratio),
+    //     color: self.track_color.into(),
+    //     texture: None,
+    //     rounded_corners: None,
+    //   });
+    // }
+    self.track.draw(
+      ctx.draw,
+      ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height_ratio / 2.),
+      ctx.measure.size * vec2(1., self.track_height_ratio),
+    );
 
     //"Active" part of the track
     //We can skip drawing it if it's fully transparent or value <= 0.
     //But if the handle is not opaque, it should be visible even if value is zero
-    if !(self.track_active_color.is_transparent() || (self.value <= 0. && self.handle_color.is_opaque())) {
-      ctx.draw.add(UiDrawCommand::Rectangle {
-        position: ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height_ratio / 2.),
-        size: (ctx.measure.size - handle_size * Vec2::X) * vec2(self.value, self.track_height_ratio) + handle_size * Vec2::X / 2.,
-        color: self.track_active_color.into(),
-        texture: None,
-        rounded_corners: None,
-      });
-    }
+    // if !(self.track_active_color.is_transparent() || (self.value <= 0. && self.handle_color.is_opaque())) {
+    //   ctx.draw.add(UiDrawCommand::Rectangle {
+    //     position: ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height_ratio / 2.),
+    //     size: (ctx.measure.size - handle_size * Vec2::X) * vec2(self.value, self.track_height_ratio) + handle_size * Vec2::X / 2.,
+    //     color: self.track_active_color.into(),
+    //     texture: None,
+    //     rounded_corners: None,
+    //   });
+    // }
+    self.track_active.draw(
+      ctx.draw,
+      ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height_ratio / 2.),
+      (ctx.measure.size - handle_size * Vec2::X) * vec2(self.value, self.track_height_ratio) + handle_size * Vec2::X / 2.,
+    );
 
     // The handle
-    if handle_size.x != 0. && !self.handle_color.is_transparent() {
-      let value = self.value.clamp(0., 1.);
-      ctx.draw.add(UiDrawCommand::Rectangle {
-        position: ctx.layout.position + ((ctx.measure.size.x - handle_size.x) * value) * Vec2::X,
-        size: handle_size,
-        color: self.handle_color.into(),
-        texture: None,
-        rounded_corners: None,
-      });
-    }
+    // if handle_size.x != 0. && !self.handle_color.is_transparent() {
+    //   let value = self.value.clamp(0., 1.);
+    //   ctx.draw.add(UiDrawCommand::Rectangle {
+    //     position: ctx.layout.position + ((ctx.measure.size.x - handle_size.x) * value) * Vec2::X,
+    //     size: handle_size,
+    //     color: self.handle_color.into(),
+    //     texture: None,
+    //     rounded_corners: None,
+    //   });
+    // }
+    self.handle.draw(
+      ctx.draw,
+      ctx.layout.position + ((ctx.measure.size.x - handle_size.x) * self.value) * Vec2::X,
+      handle_size,
+    );
 
     //handle events
     if let Some(res) = ctx.input.check_active(ctx.measure.rect(ctx.layout.position)) {

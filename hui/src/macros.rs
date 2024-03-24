@@ -64,9 +64,13 @@ macro_rules! size {
 /// Helper macro for constructing a `FrameRect`
 #[macro_export]
 macro_rules! frame_rect {
-  () => {
+  {} => {
     $crate::frame::FrameRect::default()
   };
+
+  // () => {
+  //   $crate::frame::FrameRect::default()
+  // };
 
   ($expr:expr) => {
     {
@@ -88,10 +92,22 @@ macro_rules! frame_rect {
       // construct the FrameRect
       {
         let mut frame_rect = $crate::frame::FrameRect::default();
+        let mut _color_is_set = false;
+        let mut _image_is_set = false;
         $(
-          let $ident = ($expr).into();
-          frame_rect.$ident = $ident;
+          {
+            frame_rect.$ident = ($expr).into();
+            if stringify!($ident) == "image" {
+              _image_is_set = true;
+            }
+            if stringify!($ident) == "color" {
+              _color_is_set = true;
+            }
+          }
         )+
+        if frame_rect.image.is_some() && _image_is_set && !_color_is_set {
+          frame_rect.color = (1., 1., 1., 1.).into();
+        }
         frame_rect
       }
     }

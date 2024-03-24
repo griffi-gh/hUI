@@ -40,8 +40,10 @@ builtin_font = []
 
 ## Round all vertex positions to nearest integer coordinates (not recommended)
 pixel_perfect = ["pixel_perfect_text"]
+
 ## Apply pixel-perfect rendering hack to text (fixes blurry text rendering)
 pixel_perfect_text = []
+
 #! Make sure to disable both features if you are not rendering UI "as-is" at 1:1 scale\
 #! For exmaple, you should disable them if using DPI (or any other form of) scaling while passing the virtual resolution to the ui or rendering it in 3d space
 

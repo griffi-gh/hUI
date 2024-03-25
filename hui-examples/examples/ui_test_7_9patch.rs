@@ -56,6 +56,10 @@ ui_main!(
             (0., 0., 1.),
           )))
           .add_child(ui);
+        Text::new("Slider customized with `NinePatchFrame`s:")
+          .with_color(color::BLACK)
+          .with_text_size(32)
+          .add_child(ui);
         Slider::new(0.33)
           .with_size(size!(50%, 30))
           .with_track_height(1.)

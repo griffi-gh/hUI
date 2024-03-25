@@ -1,7 +1,5 @@
 //! draw commands, tesselation and UI rendering.
 
-//TODO: 9-slice draw command
-
 use crate::{
   rect::Corners,
   text::{FontHandle, TextRenderer}
@@ -169,22 +167,26 @@ impl UiDrawCall {
             .flatten()
             .map(|guv| {
               if let Some(texture_uv) = texture_uv {
-                //XXX: this assumes that it's not rotated :p
-                //hell will break loose if it is
-                //seriously, i fvcking despise this code, and i hope to never touch this file ever again
-                //FIXME: this is only valid if top_left is acutally the min (e.g. only for rectangular crops)
-                //We currently only need rectangular crops so i don't give a fvck
-                let uv_size = guv.bottom_right - guv.top_left;
-                let mut uv_mapped = *texture_uv;
-                uv_mapped.top_left *= uv_size;
-                uv_mapped.top_right *= uv_size;
-                uv_mapped.bottom_left *= uv_size;
-                uv_mapped.bottom_right *= uv_size;
-                uv_mapped.top_left += guv.top_left;
-                uv_mapped.top_right += guv.top_left;
-                uv_mapped.bottom_left += guv.top_left;
-                uv_mapped.bottom_right += guv.top_left;
-                uv_mapped
+                //XXX: this may not work if the texture is rotated
+                //also is this slow?
+
+                let top = guv.top_left.lerp(guv.top_right, texture_uv.top_left.x);
+                let bottom = guv.bottom_left.lerp(guv.bottom_right, texture_uv.top_left.x);
+                let top_left = top.lerp(bottom, texture_uv.top_left.y);
+
+                let top = guv.top_left.lerp(guv.top_right, texture_uv.top_right.x);
+                let bottom = guv.bottom_left.lerp(guv.bottom_right, texture_uv.top_right.x);
+                let top_right = top.lerp(bottom, texture_uv.top_right.y);
+
+                let top = guv.top_left.lerp(guv.top_right, texture_uv.bottom_left.x);
+                let bottom = guv.bottom_left.lerp(guv.bottom_right, texture_uv.bottom_left.x);
+                let bottom_left = top.lerp(bottom, texture_uv.bottom_left.y);
+
+                let top = guv.top_left.lerp(guv.top_right, texture_uv.bottom_right.x);
+                let bottom = guv.bottom_left.lerp(guv.bottom_right, texture_uv.bottom_right.x);
+                let bottom_right = top.lerp(bottom, texture_uv.bottom_right.y);
+
+                Corners { top_left, top_right, bottom_left, bottom_right }
               } else {
                 guv
               }

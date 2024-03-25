@@ -95,7 +95,7 @@ impl UiInstance {
   ///   (this will change to a soft error in the future)
   #[cfg(feature = "image")]
   pub fn add_image_file_path(&mut self, path: impl AsRef<std::path::Path>) -> Result<ImageHandle, std::io::Error> {
-    use std::io::Read;
+    use std::io::{Read, Seek};
 
     // Open the file (and wrap it in a bufreader)
     let mut file = std::io::BufReader::new(std::fs::File::open(path)?);
@@ -106,6 +106,7 @@ impl UiInstance {
     let mut magic = [0; 64];
     file.read_exact(&mut magic)?;
     let format = image::guess_format(&magic).expect("Invalid image data (FORMAT)");
+    file.seek(std::io::SeekFrom::Start(0))?;
 
     //Parse the image and read the raw uncompressed rgba data
     let image = image::load(file, format).expect("Invalid image data");

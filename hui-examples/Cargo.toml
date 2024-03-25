@@ -14,5 +14,6 @@ glium = "0.34"
 winit = "0.29"
 glam = "0.27"
 log = "0.4"
+image = { version = "0.25", features = ["jpeg", "png"] }
 
 #created as a workaround for rust-analyzer dependency cycle (which should be allowed)

@@ -13,6 +13,7 @@ impl Frame for ImageHandle {
       size: parent_size,
       color: color::WHITE.into(),
       texture: Some(*self),
+      texture_uv: None,
       rounded_corners: None,
     })
   }
@@ -29,6 +30,7 @@ impl Frame for FillColor {
       size: parent_size,
       color: self.corners(),
       texture: None,
+      texture_uv: None,
       rounded_corners: None,
     })
   }

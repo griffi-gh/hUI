@@ -79,6 +79,7 @@ impl UiElement for Image {
         size: ctx.measure.size,
         color: self.color.corners(),
         texture: Some(self.image),
+        texture_uv: None,
         rounded_corners: (self.corner_radius.max_f32() > 0.).then_some({
           RoundedCorners::from_radius(self.corner_radius)
         }),

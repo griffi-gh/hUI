@@ -87,6 +87,7 @@ impl UiElement for ProgressBar {
         size: ctx.measure.size,
         color: self.background.corners(),
         texture: None,
+        texture_uv: None,
         rounded_corners
       });
     }
@@ -96,6 +97,7 @@ impl UiElement for ProgressBar {
         size: ctx.measure.size * vec2(value, 1.0),
         color: self.foreground.corners(),
         texture: None,
+        texture_uv: None,
         rounded_corners,
       });
     }

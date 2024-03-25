@@ -35,6 +35,8 @@ pub enum UiDrawCommand {
     color: Corners<Vec4>,
     ///Texture
     texture: Option<ImageHandle>,
+    ///Sub-UV coordinates for the texture
+    texture_uv: Option<Corners<Vec2>>,
     ///Rounded corners
     rounded_corners: Option<RoundedCorners>,
   },
@@ -161,10 +163,32 @@ impl UiDrawCall {
             v.position += center;
           }
         },
-        UiDrawCommand::Rectangle { position, size, color, texture, rounded_corners } => {
+        UiDrawCommand::Rectangle { position, size, color, texture, texture_uv, rounded_corners } => {
           let uvs = texture
             .map(|x| atlas.get_uv(x))
             .flatten()
+            .map(|guv| {
+              if let Some(texture_uv) = texture_uv {
+                //XXX: this assumes that it's not rotated :p
+                //hell will break loose if it is
+                //seriously, i fvcking despise this code, and i hope to never touch this file ever again
+                //FIXME: this is only valid if top_left is acutally the min (e.g. only for rectangular crops)
+                //We currently only need rectangular crops so i don't give a fvck
+                let uv_size = guv.bottom_right - guv.top_left;
+                let mut uv_mapped = *texture_uv;
+                uv_mapped.top_left *= uv_size;
+                uv_mapped.top_right *= uv_size;
+                uv_mapped.bottom_left *= uv_size;
+                uv_mapped.bottom_right *= uv_size;
+                uv_mapped.top_left += guv.top_left;
+                uv_mapped.top_right += guv.top_left;
+                uv_mapped.bottom_left += guv.top_left;
+                uv_mapped.bottom_right += guv.top_left;
+                uv_mapped
+              } else {
+                guv
+              }
+            })
             .unwrap_or(Corners::all(Vec2::ZERO));
 
           let vidx = draw_call.vertices.len() as u32;

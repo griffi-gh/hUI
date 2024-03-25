@@ -1,5 +1,5 @@
 use super::Corners;
-use glam::{Vec3, Vec4, vec4};
+use glam::{Vec2, Vec3, Vec4, vec4};
 
 /// Represents the fill color of a rectangle
 ///
@@ -68,6 +68,14 @@ impl FillColor {
   /// Get a list of the colors for each corner
   pub const fn corners(&self) -> Corners<Vec4> {
     self.0
+  }
+
+  /// Interpolate color on position, assuming a linear gradient
+  pub fn interpolate(&self, uv: Vec2) -> Vec4 {
+    let c = self.corners();
+    let top = c.top_left.lerp(c.top_right, uv.x);
+    let bottom = c.bottom_left.lerp(c.bottom_right, uv.x);
+    top.lerp(bottom, uv.y)
   }
 }
 

@@ -4,6 +4,7 @@ use crate::draw::UiDrawCommandList;
 pub mod point;
 mod rect;
 pub mod stack;
+pub mod nine_patch;
 mod impls;
 
 pub use rect::FrameRect;

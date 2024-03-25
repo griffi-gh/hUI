@@ -2,7 +2,7 @@ use std::time::Instant;
 use glam::vec2;
 use hui::{
   color, element::{
-    container::Container, fill_rect::FillRect, text::Text, UiElementExt
+    container::Container, fill_rect::FillRect, slider::Slider, text::Text, UiElementExt
   }, frame::nine_patch::{NinePatchAsset, NinePatchFrame}, frame_rect, layout::{Alignment, Direction}, rect::Rect, size
 };
 
@@ -55,6 +55,14 @@ ui_main!(
             (1., 1., 0.),
             (0., 0., 1.),
           )))
+          .add_child(ui);
+        Slider::new(0.33)
+          .with_size(size!(50%, 30))
+          .with_track_height(1.)
+          .with_handle_size((20., 0.9))
+          .with_handle(NinePatchFrame::from_asset(*asset).with_color(color::CYAN))
+          .with_track(NinePatchFrame::from_asset(*asset))
+          .with_track_active(color::TRANSPARENT)
           .add_child(ui);
       })
       .add_root(ui, size);

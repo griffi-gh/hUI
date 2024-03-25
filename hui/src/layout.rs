@@ -86,17 +86,15 @@ pub enum Size {
   #[default]
   Auto,
 
-  /// Size as a ratio of parent size\
-  /// Valid range: 0.0-1.0 (0-100%)
-  ///
-  /// Out of range values are allowed, but are not guaranteed to work as expected\
-  /// (especially with negative values)
-  Relative(f32),
-
-  //TODO FractionRemaining(f32),
-
   /// Static size in pixels
   Absolute(f32),
+
+  /// Size as a ratio of parent element size
+  ///
+  /// Expected range: `0.0..=1.0`
+  Relative(f32),
+
+  //TODO Remaining(f32)
 }
 
 impl From<f32> for Size {

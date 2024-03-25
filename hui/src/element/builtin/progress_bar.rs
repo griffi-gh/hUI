@@ -8,6 +8,8 @@ use crate::{
   rect::{Corners, FillColor}
 };
 
+//TODO: Use Frames here instead of FillColor
+
 #[derive(Debug, Clone, Copy, Setters)]
 #[setters(prefix = "with_")]
 pub struct ProgressBar {

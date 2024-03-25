@@ -145,3 +145,6 @@
     <td align="center">-</td>
   </tr> -->
 </table>
+
+<h2>MSRV</h2>
+1.75

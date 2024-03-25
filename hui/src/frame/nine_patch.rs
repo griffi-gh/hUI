@@ -40,6 +40,8 @@ impl Default for NinePatchFrame {
 
 impl Frame for NinePatchFrame {
   fn draw(&self, draw: &mut crate::draw::UiDrawCommandList, position: glam::Vec2, parent_size: glam::Vec2) {
+    //FIXME: this algrorightm shїts itself when parent_size < img_sz
+
     // without this, shїt gets messed up when the position is not a whole number
     //XXX: should we round the size as well?
     let position = position.round();

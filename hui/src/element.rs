@@ -4,7 +4,7 @@ use std::any::Any;
 use crate::{
   draw::{atlas::ImageCtx, UiDrawCommandList},
   input::InputCtx,
-  layout::LayoutInfo,
+  layout::{LayoutInfo, Size2d},
   measure::Response,
   signal::SignalStore,
   state::StateRepo,
@@ -44,6 +44,11 @@ pub trait UiElement {
   ///
   /// For example, "button" or "progress_bar"
   fn name(&self) -> &'static str;
+
+  /// Get the requested UiElement size
+  ///
+  /// You should implement this function whenever possible, otherwise some features may not work at all, such as the `Remaining` size
+  fn size(&self) -> Option<Size2d> { None }
 
   /// Get the unique id used for internal state management\
   /// This value must be unique for each instance of the element

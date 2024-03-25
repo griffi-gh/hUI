@@ -5,7 +5,7 @@ use glam::{Vec2, vec2};
 use crate::{
   element::{ElementList, MeasureContext, ProcessContext, UiElement},
   frame::{Frame, FrameRect},
-  layout::{Alignment, Alignment2d, Direction, LayoutInfo, Size, Size2d, WrapBehavior},
+  layout::{compute_size, Alignment, Alignment2d, Direction, LayoutInfo, Size, Size2d, WrapBehavior},
   measure::{Hints, Response},
   rect::Sides,
 };
@@ -19,6 +19,7 @@ use crate::{
 struct CudLine {
   start_idx: usize,
   content_size: Vec2,
+  remaining_space: f32,
 }
 
 struct ContainerUserData {
@@ -90,19 +91,24 @@ impl Default for Container {
 
 impl Container {
   pub fn measure_max_inner_size(&self, layout: &LayoutInfo) -> Vec2 {
-    let outer_size_x = match self.size.width {
-      Size::Auto => layout.max_size.x,
-      Size::Relative(p) => layout.max_size.x * p,
-      Size::Absolute(p) => p,
-    };
-    let outer_size_y = match self.size.height {
-      Size::Auto => layout.max_size.y,
-      Size::Relative(p) => layout.max_size.y * p,
-      Size::Absolute(p) => p,
-    };
+    // let outer_size_x = match self.size.width {
+    //   Size::Auto => layout.max_size.x,
+    //   Size::Relative(p) => layout.max_size.x * p,
+    //   Size::Absolute(p) => p,
+    //   Size::Remaining(p) => match layout.direction {
+    //     Direction::Horizontal => layout.remaining_space.unwrap_or(layout.max_size.x) * p,
+    //     Direction::Vertical => layout.max_size.x,
+    //   }
+    // };
+    // let outer_size_y = match self.size.height {
+    //   Size::Auto => layout.max_size.y,
+    //   Size::Relative(p) => layout.max_size.y * p,
+    //   Size::Absolute(p) => p,
+    // };
+    let outer_size = compute_size(layout, self.size, layout.max_size);
     vec2(
-      outer_size_x - (self.padding.left + self.padding.right),
-      outer_size_y - (self.padding.top + self.padding.bottom),
+      outer_size.x - (self.padding.left + self.padding.right),
+      outer_size.y - (self.padding.top + self.padding.bottom),
     )
   }
 }
@@ -110,6 +116,10 @@ impl Container {
 impl UiElement for Container {
   fn name(&self) -> &'static str {
     "container"
+  }
+
+  fn size(&self) -> Option<Size2d> {
+    Some(self.size)
   }
 
   fn measure(&self, ctx: MeasureContext) -> Response {
@@ -126,11 +136,13 @@ impl UiElement for Container {
         Size::Auto => ctx.layout.max_size.x,
         Size::Relative(p) => ctx.layout.max_size.x * p,
         Size::Absolute(p) => p,
+        Size::Remaining(p) => ctx.layout.remaining_space.unwrap_or(ctx.layout.max_size.x) * p,
       },
       Direction::Vertical => match self.size.height {
         Size::Auto => ctx.layout.max_size.y,
         Size::Relative(p) => ctx.layout.max_size.y * p,
         Size::Absolute(p) => p,
+        Size::Remaining(p) => ctx.layout.remaining_space.unwrap_or(ctx.layout.max_size.y) * p,
       }
     };
 
@@ -156,10 +168,25 @@ impl UiElement for Container {
       CudLine {
         start_idx: 0,
         content_size: Vec2::ZERO,
+        remaining_space: 0.,
       }
     ];
 
+    //set to true if in the current line there is an element with Remaining size (line will have to be wrapped)
+    // let mut has_remaining = false;
+
     for (idx, element) in self.children.0.iter().enumerate() {
+      if let Some(esize) = element.size() {
+        let pri_size = match self.direction {
+          Direction::Horizontal => esize.width,
+          Direction::Vertical => esize.height,
+        };
+        if matches!(pri_size, Size::Remaining(_)) {
+          //XXX: kinda a hack?
+          continue;
+        }
+      }
+
       let measure = element.measure(MeasureContext{
         state: ctx.state,
         layout: &LayoutInfo {
@@ -172,6 +199,7 @@ impl UiElement for Container {
           //TODO: subtract size already taken by previous children
           max_size: self.measure_max_inner_size(ctx.layout),
           direction: self.direction,
+          remaining_space: None,
         },
         text_measure: ctx.text_measure,
         current_font: ctx.current_font,
@@ -193,12 +221,20 @@ impl UiElement for Container {
         line_size -= leftover_gap;
 
         //update the previous line metadata
-        lines.last_mut().unwrap().content_size = line_size;
+        {
+          let last_line = lines.last_mut().unwrap();
+          last_line.content_size = line_size;
+          last_line.remaining_space = max_line_pri - match self.direction {
+            Direction::Horizontal => line_size.x,
+            Direction::Vertical => line_size.y,
+          };
+        }
 
         //push the line metadata
         lines.push(CudLine {
           start_idx: idx,
           content_size: Vec2::ZERO,
+          remaining_space: 0.,
         });
 
         //Update the total size accordingly
@@ -249,7 +285,14 @@ impl UiElement for Container {
     line_size -= leftover_gap;
 
     //Update the content size of the last line
-    lines.last_mut().unwrap().content_size = line_size;
+    {
+      let cur_line = lines.last_mut().unwrap();
+      cur_line.content_size = line_size;
+      cur_line.remaining_space = max_line_pri - match self.direction {
+        Direction::Horizontal => line_size.x,
+        Direction::Vertical => line_size.y,
+      };
+    }
 
     //Update the total size according to the size of the last line
     match self.direction {
@@ -275,16 +318,26 @@ impl UiElement for Container {
       self.padding.top + self.padding.bottom,
     );
 
+    let computed_size = compute_size(ctx.layout, self.size, total_size);
     match self.size.width {
       Size::Auto => (),
-      Size::Relative(percentage) => total_size.x = ctx.layout.max_size.x * percentage,
-      Size::Absolute(pixels) => total_size.x = pixels,
+      _ => total_size.x = computed_size.x,
     }
     match self.size.height {
       Size::Auto => (),
-      Size::Relative(percentage) => total_size.y = ctx.layout.max_size.y * percentage,
-      Size::Absolute(pixels) => total_size.y = pixels,
+      _ => total_size.y = computed_size.y,
     }
+
+    // match self.size.width {
+    //   Size::Auto => (),
+    //   Size::Relative(percentage) => total_size.x = ctx.layout.max_size.x * percentage,
+    //   Size::Absolute(pixels) => total_size.x = pixels,
+    // }
+    // match self.size.height {
+    //   Size::Auto => (),
+    //   Size::Relative(percentage) => total_size.y = ctx.layout.max_size.y * percentage,
+    //   Size::Absolute(pixels) => total_size.y = pixels,
+    // }
 
     Response {
       size: total_size,
@@ -382,6 +435,7 @@ impl UiElement for Container {
           position: local_position,
           max_size: self.measure_max_inner_size(ctx.layout),
           direction: self.direction,
+          remaining_space: Some(cur_line.remaining_space),
         };
 
         //measure

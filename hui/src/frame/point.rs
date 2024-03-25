@@ -24,11 +24,13 @@ impl From<f32> for FramePoint {
 impl From<Size> for FramePoint {
   /// Convert a `Size` into a `FramePoint`
   ///
-  /// This function behaves just as you would expect, but `Auto` is always treated as `BEGIN`
+  /// This function behaves just as you would expect, but:
+  /// - `Auto` is always treated as `BEGIN`
+  /// - `Remaining` is treated as `Relative`
   fn from(size: Size) -> Self {
     match size {
       Size::Auto => Self::BEGIN,
-      Size::Relative(value) => Self::relative(value),
+      Size::Relative(value) | Size::Remaining(value) => Self::relative(value),
       Size::Absolute(value) => Self::absolute(value),
     }
   }

@@ -6,7 +6,7 @@ use crate::{
   draw::{RoundedCorners, UiDrawCommand},
   element::{MeasureContext, ProcessContext, UiElement},
   frame::{Frame, FrameRect},
-  layout::{Size, Size2d},
+  layout::{compute_size, Size, Size2d},
   measure::Response,
   size
 };
@@ -45,20 +45,13 @@ impl UiElement for FillRect {
     "fill_rect"
   }
 
+  fn size(&self) -> Option<Size2d> {
+    Some(self.size)
+  }
+
   fn measure(&self, ctx: MeasureContext) -> Response {
     Response {
-      size: vec2(
-        match self.size.width {
-          Size::Auto => ctx.layout.max_size.x,
-          Size::Relative(percentage) => ctx.layout.max_size.x * percentage,
-          Size::Absolute(pixels) => pixels,
-        },
-        match self.size.height {
-          Size::Auto => ctx.layout.max_size.y,
-          Size::Relative(percentage) => ctx.layout.max_size.y * percentage,
-          Size::Absolute(pixels) => pixels,
-        },
-      ),
+      size: compute_size(ctx.layout, self.size, ctx.layout.max_size),
       ..Default::default()
     }
   }

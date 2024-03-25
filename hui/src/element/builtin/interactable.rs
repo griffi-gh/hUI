@@ -48,6 +48,10 @@ impl UiElement for Interactable {
     "interactable"
   }
 
+  fn size(&self) -> Option<crate::layout::Size2d> {
+    self.element.size()
+  }
+
   fn measure(&self, ctx: MeasureContext) -> crate::measure::Response {
     self.element.measure(ctx)
   }

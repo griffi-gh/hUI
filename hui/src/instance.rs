@@ -157,6 +157,7 @@ impl UiInstance {
       position: Vec2::ZERO,
       max_size,
       direction: Direction::Vertical,
+      remaining_space: None,
     };
     let measure = element.measure(MeasureContext {
       state: &self.stateful_state,

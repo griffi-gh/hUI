@@ -6,6 +6,8 @@
 /// - `x` - `Size::Absolute(x)`
 /// - `x%` - `Size::Relative(x / 100.)` *(literal only)*
 /// - `x/` - `Size::Relative(x)`
+/// - `x%=` - `Size::Remaining(x / 100.)` *(literal only)*
+/// - `x/=` - `Size::Remaining(x)`
 ///
 /// ...where `x` is a literal, identifier or an expression wrapped in parentheses
 ///
@@ -32,6 +34,12 @@ macro_rules! size {
   ($x:literal /) => {
     $crate::layout::Size::Relative($x as f32)
   };
+  ($x:literal %=) => {
+    $crate::layout::Size::Remaining($x as f32 / 100.)
+  };
+  ($x:literal /=) => {
+    $crate::layout::Size::Remaining($x as f32)
+  };
 
   ($x:ident) => {
     $crate::layout::Size::Absolute($x as f32)
@@ -39,12 +47,18 @@ macro_rules! size {
   ($x:ident /) => {
     $crate::layout::Size::Relative($x as f32)
   };
+  ($x:ident /=) => {
+    $crate::layout::Size::Remaining($x as f32)
+  };
 
   (($x:expr)) => {
     $crate::layout::Size::Absolute(($x) as f32)
   };
   (($x:expr) /) => {
     $crate::layout::Size::Relative(($x) as f32)
+  };
+  (($x:expr) /=) => {
+    $crate::layout::Size::Remaining(($x) as f32)
   };
 
   ($x:tt , $y:tt $($ys:tt)?) => {

@@ -134,7 +134,16 @@ pub enum Size {
   /// Expected range: `0.0..=1.0`
   Relative(f32),
 
-  //TODO Remaining(f32)
+  /// Size as a ratio of remaining space after all other elements have been laid out
+  ///
+  /// Expected range: `0.0..=1.0`
+  ///
+  /// - This feature is experimental and may not work as expected;\
+  ///   Current `Container` implementation:
+  ///     - Assumes that he line is fully filled if any element uses `Remaining` size, even if sum of remaining sizes is less than 1.0
+  ///     - Does not support `Remaining` size in the secondary axis, it will be treated as `Relative`
+  /// - In cases where it's not applicable or not supported, it's defined to behave as `Relative`
+  Remaining(f32),
 }
 
 impl From<f32> for Size {
@@ -197,6 +206,13 @@ pub struct LayoutInfo {
   /// Current direction of the layout\
   /// (Usually matches direction of the parent container)
   pub direction: Direction,
+
+  /// Remaining space in the primary axis\
+  ///
+  /// This value is only available during the layout step and is only likely to be present if the element uses `Size::Remaining`
+  ///
+  /// (Make sure that LayoutInfo::direction is set to the correct direction!)
+  pub remaining_space: Option<f32>,
 }
 
 /// Helper function to calculate the size of an element based on its layout and size information\
@@ -206,11 +222,19 @@ pub fn compute_size(layout: &LayoutInfo, size: Size2d, comfy_size: Vec2) -> Vec2
     Size::Auto => comfy_size.x,
     Size::Relative(fraction) => layout.max_size.x * fraction,
     Size::Absolute(size) => size,
+    Size::Remaining(fraction) => match layout.direction {
+      Direction::Horizontal => layout.remaining_space.unwrap_or(layout.max_size.x) * fraction,
+      Direction::Vertical => layout.max_size.x * fraction,
+    }
   };
   let height = match size.height {
     Size::Auto => comfy_size.y,
     Size::Relative(fraction) => layout.max_size.y * fraction,
     Size::Absolute(size) => size,
+    Size::Remaining(fraction) => match layout.direction {
+      Direction::Horizontal => layout.max_size.y * fraction,
+      Direction::Vertical => layout.remaining_space.unwrap_or(layout.max_size.y) * fraction,
+    }
   };
   vec2(width, height)
 }

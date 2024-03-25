@@ -54,6 +54,10 @@ impl UiElement for Image {
     "image"
   }
 
+  fn size(&self) -> Option<Size2d> {
+    Some(self.size)
+  }
+
   fn measure(&self, ctx: MeasureContext) -> Response {
     let dim = ctx.images.get_size(self.image).expect("invalid image handle");
     let pre_size = compute_size(ctx.layout, self.size, dim.as_vec2());

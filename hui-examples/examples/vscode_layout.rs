@@ -4,6 +4,7 @@ use hui::{
   color, size,
   draw::{ImageHandle, TextureFormat},
   layout::{Alignment, Direction},
+  rect::Sides,
   element::{
     container::Container,
     fill_rect::FillRect,
@@ -38,7 +39,12 @@ ui_main!(
           .with_size(size!(100%, auto))
           .with_direction(Direction::Horizontal)
           .with_align((Alignment::Begin, Alignment::Center))
-          .with_padding(8.)
+          .with_padding(Sides {
+            left: 5.,
+            right: 0.,
+            top: 5.,
+            bottom: 5.,
+          })
           .with_gap(15.)
           .with_background(color::rgb_hex(0x3d3c3e))
           .with_wrap(true) //XXX: not authentic but great for demostration
@@ -51,6 +57,16 @@ ui_main!(
                 .with_text_size(15)
                 .add_child(ui);
             }
+            Container::default()
+              //HACK: due to a bug in the layout system, 100%= doesn't work as expected
+              .with_size(size!(94%=, 100%))
+              .with_align((Alignment::End, Alignment::Center))
+              .with_children(|ui| {
+                Text::new("- ×")
+                  .with_text_size(32)
+                  .add_child(ui);
+              })
+              .add_child(ui);
           })
           .add_child(ui);
         FillRect::default()
@@ -58,9 +74,10 @@ ui_main!(
           .with_frame(color::rgb_hex(0x2d2d30))
           .add_child(ui);
         Container::default()
-          .with_size(size!(100%, 100%))
+          .with_size(size!(100%, 100%=))
           .with_direction(Direction::Horizontal)
           .with_children(|ui| {
+            // Sidebar:
             Container::default()
               .with_size(size!(54, 100%))
               .with_background(color::rgb_hex(0x343334))
@@ -69,6 +86,8 @@ ui_main!(
               .with_size(size!(1, 100%))
               .with_frame(color::rgb_hex(0x2d2d30))
               .add_child(ui);
+
+            // Explorer pane:
             Container::default()
               .with_size(size!(200, 100%))
               .with_padding((15., 8.))
@@ -78,20 +97,16 @@ ui_main!(
                   .add_child(ui);
               })
               .add_child(ui);
+
+            // "Code" pane
             Container::default()
-              .with_size(size!(100%, 100%))
+              .with_size(size!(100%=, 100%))
               .with_background(color::rgb_hex(0x1f1e1f))
               .add_child(ui);
           })
           .add_child(ui);
-      })
-      .add_root(ui, size);
 
-      //Bottom bar (yeah, it's basically fake/overlay)
-      Container::default()
-        .with_size(size!(100%))
-        .with_align((Alignment::Begin, Alignment::End))
-        .with_children(|ui| {
+          //Status bar
           Container::default()
             .with_size(size!(100%, auto))
             .with_background(color::rgb_hex(0x0079cc))
@@ -111,8 +126,8 @@ ui_main!(
                 .with_text_size(15)
                 .add_child(ui);
             })
-            .add_child(ui);
-        })
-        .add_root(ui, size);
+          .add_child(ui);
+      })
+      .add_root(ui, size);
   }
 );

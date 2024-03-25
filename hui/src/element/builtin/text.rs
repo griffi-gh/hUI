@@ -6,7 +6,7 @@ use glam::{vec2, Vec4};
 use crate::{
   draw::UiDrawCommand,
   element::{MeasureContext, ProcessContext, UiElement},
-  layout::{Size, Size2d},
+  layout::{compute_size, Size, Size2d},
   measure::Response,
   text::FontHandle,
 };
@@ -74,6 +74,10 @@ impl UiElement for Text {
     "text"
   }
 
+  fn size(&self) -> Option<Size2d> {
+    Some(self.size)
+  }
+
   fn measure(&self, ctx: MeasureContext) -> Response {
     let mut size = (0., 0.);
     if matches!(self.size.width, Size::Auto) || matches!(self.size.height, Size::Auto) {
@@ -83,18 +87,7 @@ impl UiElement for Text {
       size.1 = res.height;
     }
     Response {
-      size: vec2(
-        match self.size.width {
-          Size::Auto => size.0,
-          Size::Relative(percentage) => ctx.layout.max_size.x * percentage,
-          Size::Absolute(pixels) => pixels,
-        },
-        match self.size.height {
-          Size::Auto => size.1,
-          Size::Relative(percentage) => ctx.layout.max_size.y * percentage,
-          Size::Absolute(pixels) => pixels,
-        },
-      ),
+      size: compute_size(ctx.layout, self.size, size.into()),
       ..Default::default()
     }
   }

@@ -96,6 +96,20 @@
   </tr>
   <tr>
     <td align="center">
+      <code>0.1.0-alpha.4</code>
+    </th>
+    <td>
+      <code>hui-glium = "0.1.0-alpha.4"</code><br>
+      <code>glium = "0.34"</code>
+    </td>
+    <td>
+      <code>hui-winit = "0.1.0-alpha.4"</code><br>
+      <code>winit = "0.29"</code>
+    </td>
+    <td align="center">N/A</td>
+  </tr>
+  <tr>
+    <td align="center">
       <code>0.1.0-alpha.3</code>
     </th>
     <td>

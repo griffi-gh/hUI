@@ -1,6 +1,6 @@
 use std::time::Instant;
 use hui::{
-  element::{
+  color, element::{
     container::Container,
     progress_bar::ProgressBar,
     text::Text,
@@ -43,7 +43,14 @@ ui_main!{
                 .add_child(ui);
               ProgressBar::default()
                 .with_value(mom_ratio)
-                .with_corner_radius(0.125 * ProgressBar::DEFAULT_HEIGHT)
+                .with_background(frame_rect! {
+                  color: color::BLACK,
+                  corner_radius: 0.125 * ProgressBar::DEFAULT_HEIGHT
+                })
+                .with_foreground(frame_rect! {
+                  color: color::BLUE,
+                  corner_radius: 0.125 * ProgressBar::DEFAULT_HEIGHT
+                })
                 .add_child(ui);
               Container::default()
                 .with_direction(Direction::Horizontal)

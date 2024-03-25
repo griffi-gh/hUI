@@ -62,7 +62,7 @@ fn main() {
           children: ElementList(vec![
             Box::new(ProgressBar {
               value: z,
-              corner_radius: Corners::all(0.25 * ProgressBar::DEFAULT_HEIGHT),
+              // corner_radius: Corners::all(0.25 * ProgressBar::DEFAULT_HEIGHT),
               ..Default::default()
             }),
             Box::new(Container {

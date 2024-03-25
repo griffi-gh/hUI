@@ -63,7 +63,7 @@ ui_main!(
           .with_text_size(32)
           .add_child(ui);
         FillRect::default()
-          .with_size(size!(800, 50))
+          .with_size(size!(700, 50))
           .with_frame(NinePatchFrame::from_asset(*asset).with_color((
             (1., 0., 1.),
             (0., 1., 1.),

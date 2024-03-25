@@ -1,28 +1,43 @@
-use std::time::Instant;
 use glam::vec2;
 use hui::{
-  color, element::{
-    container::Container, fill_rect::FillRect, slider::Slider, text::Text, UiElementExt
-  }, frame::nine_patch::{NinePatchAsset, NinePatchFrame}, frame_rect, layout::{Alignment, Direction}, rect::Rect, size
+  color,
+  element::{
+    container::Container,
+    fill_rect::FillRect,
+    slider::Slider,
+    text::Text,
+    UiElementExt
+  },
+  frame::nine_patch::{NinePatchAsset, NinePatchFrame},
+  layout::Alignment,
+  rect::Rect,
+  signal::Signal,
+  size,
 };
 
 #[path = "../boilerplate.rs"]
 #[macro_use]
 mod boilerplate;
 
+struct SetValue(f32);
+impl Signal for SetValue {}
+
 ui_main!(
   "hUI: 9-Patch demo",
   init: |ui| {
-    NinePatchAsset {
-      image: ui.add_image_file_path("./hui-examples/assets/ninepatch_button.png").unwrap(),
-      size: (190, 49),
-      scalable_region: Rect {
-        position: vec2(8. / 190., 8. / 49.),
-        size: vec2(1. - 16. / 190., 1. - 18. / 49.),
+    (
+      NinePatchAsset {
+        image: ui.add_image_file_path("./hui-examples/assets/ninepatch_button.png").unwrap(),
+        size: (190, 49),
+        scalable_region: Rect {
+          position: vec2(8. / 190., 8. / 49.),
+          size: vec2(1. - 16. / 190., 1. - 18. / 49.),
+        },
       },
-    }
+      0.33,
+    )
   },
-  run: |ui, size, asset| {
+  run: |ui, size, (asset, value)| {
     Container::default()
       .with_size(size!(100%))
       .with_align(Alignment::Center)
@@ -60,15 +75,18 @@ ui_main!(
           .with_color(color::BLACK)
           .with_text_size(32)
           .add_child(ui);
-        Slider::new(0.33)
+        Slider::new(*value)
           .with_size(size!(50%, 30))
           .with_track_height(1.)
           .with_handle_size((20., 1.))
           .with_handle(NinePatchFrame::from_asset(*asset).with_color(color::CYAN))
           .with_track(NinePatchFrame::from_asset(*asset))
           .with_track_active(color::TRANSPARENT)
+          .on_change(SetValue)
           .add_child(ui);
       })
       .add_root(ui, size);
+
+    ui.process_signals::<SetValue>(|signal| *value = signal.0);
   }
 );

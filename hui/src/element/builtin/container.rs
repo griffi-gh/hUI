@@ -225,7 +225,8 @@ impl UiElement for Container {
           let last_line = lines.last_mut().unwrap();
           last_line.content_size = line_size;
           //HACK: why? - self.gap, may be different for the last element or if it's the only element in the line
-          last_line.remaining_space = max_line_pri - self.gap - match self.direction {
+          let will_produce_gap = if line_element_count > 1 { self.gap } else { 0. };
+          last_line.remaining_space = max_line_pri - will_produce_gap - match self.direction {
             Direction::Horizontal => line_size.x + self.padding.left + self.padding.right,
             Direction::Vertical => line_size.y + self.padding.top + self.padding.bottom,
           };
@@ -290,7 +291,8 @@ impl UiElement for Container {
       //HACK: why? - self.gap, may be different for the last element or if it's the only element in the line
       let cur_line = lines.last_mut().unwrap();
       cur_line.content_size = line_size;
-      cur_line.remaining_space = max_line_pri - self.gap - match self.direction {
+      let will_produce_gap = if line_element_count > 1 { self.gap } else { 0. };
+      cur_line.remaining_space = max_line_pri - will_produce_gap - match self.direction {
         Direction::Horizontal => line_size.x + self.padding.left + self.padding.right,
         Direction::Vertical => line_size.y + self.padding.top + self.padding.bottom,
       };

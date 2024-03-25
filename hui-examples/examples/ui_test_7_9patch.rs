@@ -11,7 +11,7 @@ use hui::{
   frame::nine_patch::{NinePatchAsset, NinePatchFrame},
   layout::Alignment,
   rect::Rect,
-  signal::Signal,
+  Signal,
   size,
 };
 
@@ -19,8 +19,8 @@ use hui::{
 #[macro_use]
 mod boilerplate;
 
+#[derive(Signal)]
 struct SetValue(f32);
-impl Signal for SetValue {}
 
 ui_main!(
   "hUI: 9-Patch demo",

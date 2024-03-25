@@ -1,7 +1,6 @@
 use hui::{
-  color, size,
+  color, size, Signal,
   draw::TextureFormat,
-  signal::Signal,
   layout::{Alignment, Direction},
   element::{
     container::Container,
@@ -13,11 +12,11 @@ use hui::{
   },
 };
 
+#[derive(Signal)]
 enum CounterSignal {
   Increment,
   Decrement,
 }
-impl Signal for CounterSignal {}
 
 #[path = "../boilerplate.rs"]
 #[macro_use]

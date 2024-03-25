@@ -9,14 +9,13 @@ use hui::{
     UiElementExt,
   },
   layout::{Alignment, Direction},
-  signal::Signal,
-  size,
+  size, Signal,
 };
 
+#[derive(Signal)]
 enum CounterSignal {
   ChangeValue(u32)
 }
-impl Signal for CounterSignal {}
 
 #[path = "../boilerplate.rs"]
 #[macro_use]

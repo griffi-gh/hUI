@@ -1,3 +1,5 @@
+//! frame-relative positioning/size
+
 use glam::{Vec2, vec2};
 use derive_more::{Add, AddAssign, Sub, SubAssign};
 use crate::layout::{Size, Size2d};

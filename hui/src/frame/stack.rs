@@ -1,7 +1,10 @@
+//! allows stacking two frames on top of each other
+
 use glam::Vec2;
 use crate::draw::UiDrawCommandList;
 use super::Frame;
 
+/// A frame that draws two frames on top of each other
 pub struct FrameStack(pub Box<dyn Frame>, pub Box<dyn Frame>);
 
 impl Frame for FrameStack {
@@ -17,6 +20,7 @@ impl Frame for FrameStack {
 }
 
 pub trait FrameStackExt: Frame {
+  /// Stack another frame on top of this one
   fn stack(self, other: impl Frame + 'static) -> FrameStack;
 }
 

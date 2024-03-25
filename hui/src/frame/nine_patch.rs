@@ -1,16 +1,26 @@
-use glam::{vec2, UVec2, Vec2, Vec4};
+//! nine-patch frame implementation
+//!
+//! A 9-patch image is an image that can be scaled in a way that preserves the corners and edges of the image while scaling the center.
+//! This is useful for creating scalable UI elements like buttons, windows, etc.
+
+use glam::{vec2, UVec2, Vec2};
 use crate::{color, draw::{ImageHandle, UiDrawCommand}, rect::{Corners, FillColor, Rect}};
 use super::Frame;
 
+/// Represents a 9-patch image asset
 #[derive(Clone, Copy, Debug)]
 pub struct NinePatchAsset {
   pub image: ImageHandle,
-  //TODO: remove this
+  //TODO: remove this:
   pub size: (u32, u32),
   pub scalable_region: Rect,
 }
 
 //TODO allow scaling/moving corners
+
+/// A 9-patch frame
+///
+/// Can optionally be tinted with a color (works well with grayscale assets)
 #[derive(Clone, Copy, Debug)]
 pub struct NinePatchFrame {
   pub asset: NinePatchAsset,

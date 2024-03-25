@@ -1,19 +1,17 @@
 use std::rc::Rc;
 use glam::Vec2;
 use glium::{
-  Blend, DrawParameters, IndexBuffer, Program, Surface, VertexBuffer,
-  implement_vertex, uniform,
-  backend::{Context, Facade},
-  index::PrimitiveType,
-  texture::{RawImage2d, Texture2d},
-  uniforms::{MagnifySamplerFilter, MinifySamplerFilter, Sampler, SamplerBehavior, SamplerWrapFunction},
+  backend::{Context, Facade}, implement_vertex, index::PrimitiveType, texture::{RawImage2d, Texture2d}, uniform, uniforms::{MagnifySamplerFilter, MinifySamplerFilter, Sampler, SamplerBehavior, SamplerWrapFunction}, Api, Blend, DrawParameters, IndexBuffer, Program, Surface, VertexBuffer
 };
 use hui::{
   draw::{TextureAtlasMeta, UiDrawCall, UiVertex}, UiInstance
 };
 
-const VERTEX_SHADER: &str = include_str!("../shaders/vertex.vert");
-const FRAGMENT_SHADER: &str = include_str!("../shaders/fragment.frag");
+const VERTEX_SHADER_GLES3: &str = include_str!("../shaders/vertex.es.vert");
+const FRAGMENT_SHADER_GLES3: &str = include_str!("../shaders/fragment.es.frag");
+
+const VERTEX_SHADER_150: &str = include_str!("../shaders/vertex.150.vert");
+const FRAGMENT_SHADER_150: &str = include_str!("../shaders/fragment.150.frag");
 
 #[derive(Clone, Copy)]
 #[repr(C)]
@@ -122,7 +120,10 @@ impl GliumUiRenderer {
   pub fn new<F: Facade>(facade: &F) -> Self {
     log::info!("initializing hui-glium");
     Self {
-      program: Program::from_source(facade, VERTEX_SHADER, FRAGMENT_SHADER, None).unwrap(),
+      program: match facade.get_context().get_supported_glsl_version().0 {
+        Api::Gl => Program::from_source(facade, VERTEX_SHADER_150, FRAGMENT_SHADER_150, None).unwrap(),
+        Api::GlEs => Program::from_source(facade, VERTEX_SHADER_GLES3, FRAGMENT_SHADER_GLES3, None).unwrap(),
+      },
       context: Rc::clone(facade.get_context()),
       ui_texture: None,
       buffer_pair: None,

@@ -2,6 +2,46 @@
 
 use glam::{vec2, Vec2};
 
+/// Controls wrapping behavior of elements
+#[derive(Clone, Copy, PartialEq, Eq, Debug, PartialOrd, Ord, Default)]
+pub enum WrapBehavior {
+  /// No wrapping is allowed, even if explicit line breaks is requested by the element
+  Disable = 0,
+
+  /// Allow wrapping if the element explicitly requests it (default behavior)
+  #[default]
+  Allow = 1,
+
+  /// Elements will be wrapped automatically when they reach the maximum width/height of the container
+  Enable = 2,
+}
+
+impl From<bool> for WrapBehavior {
+  #[inline]
+  fn from(value: bool) -> Self {
+    match value {
+      true => Self::Enable,
+      false => Self::Disable,
+    }
+  }
+}
+
+impl WrapBehavior {
+  /// Check if wrapping is allowed for the element
+  #[inline]
+  pub fn is_allowed(&self) -> bool {
+    *self != Self::Disable
+  }
+
+  /// Check if wrapping is enabled for the element
+  ///
+  /// (Wrapping will be done automatically when the element reaches the maximum width/height)
+  #[inline]
+  pub fn is_enabled(&self) -> bool {
+    *self == Self::Enable
+  }
+}
+
 /// Alignment along a single axis
 #[derive(Clone, Copy, PartialEq, Eq, Debug, Default, PartialOrd, Ord)]
 pub enum Alignment {

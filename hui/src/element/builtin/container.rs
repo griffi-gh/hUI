@@ -4,10 +4,10 @@ use derive_setters::Setters;
 use glam::{Vec2, vec2};
 use crate::{
   element::{ElementList, MeasureContext, ProcessContext, UiElement},
-  layout::{Alignment, Alignment2d, Direction, LayoutInfo, Size, Size2d},
   frame::{Frame, FrameRect},
+  layout::{Alignment, Alignment2d, Direction, LayoutInfo, Size, Size2d, WrapBehavior},
   measure::{Hints, Response},
-  rect::{Sides, FillColor},
+  rect::Sides,
 };
 
 //XXX: add Order/Direction::Forward/Reverse or sth?
@@ -52,13 +52,9 @@ pub struct Container {
   #[setters(skip)]
   pub background_frame: Box<dyn Frame>,
 
-  /// Set this to `true` to allow the elements wrap automatically
-  ///
-  /// Disabling/enabling this does not affect explicit wrapping\
-  /// (for example, `Br`, or any other element with `should_wrap` set to `true`)
-  ///
-  /// This is an experimental feature and may not work as expected
-  pub wrap: bool,
+  /// Controls if wrapping is enabled
+  #[setters(into)]
+  pub wrap: WrapBehavior,
 
   /// List of children elements
   #[setters(skip)]
@@ -86,7 +82,7 @@ impl Default for Container {
       padding: Sides::all(0.),
       align: Alignment2d::default(),
       background_frame: Box::<FrameRect>::default(),
-      wrap: false,
+      wrap: WrapBehavior::Allow,
       children: ElementList(Vec::new()),
     }
   }
@@ -189,7 +185,8 @@ impl UiElement for Container {
       };
 
       //Wrap the element if it exceeds container's size and is not the first element in the line
-      if ((self.wrap && (end_pos_pri > max_line_pri)) || measure.should_wrap) && (line_element_count > 0) {
+      let should_wrap_overflow = self.wrap.is_enabled() && (end_pos_pri > max_line_pri);
+      if self.wrap.is_allowed() && line_element_count > 0 && (measure.should_wrap || should_wrap_overflow) {
         // >>>>>>> WRAP THAT B*TCH!
 
         //Negate the leftover gap from the previous element

@@ -183,7 +183,7 @@ impl GliumUiRenderer {
           tex: Sampler(self.ui_texture.as_ref().unwrap(), SamplerBehavior {
             max_anisotropy: 1,
             magnify_filter: MagnifySamplerFilter::Nearest,
-            minify_filter: MinifySamplerFilter::NearestMipmapNearest,
+            minify_filter: MinifySamplerFilter::Linear,
             wrap_function: (SamplerWrapFunction::Clamp, SamplerWrapFunction::Clamp, SamplerWrapFunction::Clamp),
             ..Default::default()
           }),

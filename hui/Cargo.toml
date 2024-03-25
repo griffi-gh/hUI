@@ -5,7 +5,7 @@ repository = "https://github.com/griffi-gh/hui"
 readme = "../README.md"
 authors = ["griffi-gh <prasol258@gmail.com>"]
 rust-version = "1.75"
-version = "0.1.0-alpha.4"
+version = "0.1.0-alpha.5"
 edition = "2021"
 license = "GPL-3.0-or-later"
 publish = true
@@ -16,7 +16,7 @@ include = [
 ]
 
 [dependencies]
-hui-derive = { version = "0.1.0-alpha.4", path = "../hui-derive", optional = true }
+hui-derive = { version = "0.1.0-alpha.5", path = "../hui-derive", optional = true }
 hashbrown = "0.14"
 nohash-hasher = "0.2"
 glam = "0.27"

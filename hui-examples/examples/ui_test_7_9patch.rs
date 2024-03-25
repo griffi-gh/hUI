@@ -81,7 +81,7 @@ ui_main!(
           .with_handle_size((20., 1.))
           .with_handle(NinePatchFrame::from_asset(*asset).with_color(color::CYAN))
           .with_track(NinePatchFrame::from_asset(*asset))
-          .with_track_active(color::TRANSPARENT)
+          .with_track_active(NinePatchFrame::from_asset(*asset).with_color(color::SKY_BLUE))
           .on_change(SetValue)
           .add_child(ui);
       })

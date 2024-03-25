@@ -101,6 +101,8 @@ pub enum KeyboardKey {
 macro_rules! impl_fits64_for_keyboard_key {
   ($($i:ident = $v:literal),*) => {
     impl Fits64 for KeyboardKey {
+      // SAFETY: not actually doing anything unsafe
+      #[allow(unsafe_code)]
       unsafe fn from_u64(x: u64) -> Self {
         match x {
           $( $v => KeyboardKey::$i, )*

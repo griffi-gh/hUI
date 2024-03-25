@@ -5,9 +5,12 @@
 //! # Features
 #![doc = document_features::document_features!()]
 
-#![allow(unused_parens)]
-//#![forbid(unsafe_code)]
+#![deny(unsafe_code)]
 #![forbid(unsafe_op_in_unsafe_fn)]
+#![allow(unused_parens)]
+
+#[cfg(feature = "derive")]
+pub use hui_derive::*;
 
 mod instance;
 mod macros;

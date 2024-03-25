@@ -1,0 +1,23 @@
+[package]
+name = "hui-derive"
+description = "Derive macros for hUI"
+repository = "https://github.com/griffi-gh/hui"
+readme = "../README.md"
+authors = ["griffi-gh <prasol258@gmail.com>"]
+rust-version = "1.75"
+version = "0.1.0-alpha.4"
+edition = "2021"
+license = "GPL-3.0-or-later"
+publish = true
+include = [
+  "assets/**/*",
+  "src/**/*.rs",
+  "Cargo.toml",
+]
+
+[lib]
+proc-macro = true
+
+[dependencies]
+quote = "1.0"
+syn = "2.0"

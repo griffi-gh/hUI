@@ -16,6 +16,7 @@ include = [
 ]
 
 [dependencies]
+hui-derive = { version = "0.1.0-alpha.4", path = "../hui-derive", optional = true }
 hashbrown = "0.14"
 nohash-hasher = "0.2"
 glam = "0.27"
@@ -29,14 +30,13 @@ tinyset = "0.4"
 image = { version = "0.25", default-features = false, optional = true }
 
 [features]
-default = ["el_all", "image", "builtin_font", "pixel_perfect_text"]
+default = ["el_all", "image", "builtin_font", "pixel_perfect_text", "derive"]
 
-#! Image loading support:
+## Enable derive macros
+derive = ["dep:hui-derive"]
 
 ## Enable image loading support using the `image` crate
 image = ["dep:image"]
-
-#! #### Built-in font:
 
 ## Enable the built-in font (ProggyTiny, adds *35kb* to the executable)
 builtin_font = []

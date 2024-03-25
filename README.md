@@ -1,5 +1,5 @@
 <p></p><p></p>
-<img src="https://raw.githubusercontent.com/griffi-gh/hui/master/.assets/hui.svg" width="120" align="left">
+<img src="https://raw.githubusercontent.com/griffi-gh/hui/master/.assets/hui.svg" width="120" align="left" alt="logo">
 <h1>hUI</h1>
 <div>
   <span>
@@ -17,22 +17,25 @@
 
 <table align="center">
   <td>
-    <img src="https://raw.githubusercontent.com/griffi-gh/hui/master/.assets/demo0.gif" width="300">
+    <img src="https://raw.githubusercontent.com/griffi-gh/hui/master/.assets/demo0.gif" width="300" alt="example: mom_downloader">
   </td>
   <td>
-    <img src="https://raw.githubusercontent.com/griffi-gh/hui/master/.assets/demo1.gif" width="300">
+    <img src="https://raw.githubusercontent.com/griffi-gh/hui/master/.assets/demo1.gif" width="300" alt="example: align_test">
   </td>
 </table>
 
 <h2>Example</h2>
-<img src="https://raw.githubusercontent.com/griffi-gh/hui/master/.assets/exemplaris.png" height="175" align="right" float="right">
+<img src="https://raw.githubusercontent.com/griffi-gh/hui/master/.assets/exemplaris.png"
+  height="175" align="right" float="right" alt="code result">
 <pre lang="rust">Container::default()
   .with_size(size!(100%, 50%))
   .with_align(Alignment::Center)
   .with_padding(5.)
   .with_gap(10.)
-  .with_corner_radius(10.)
-  .with_background(color::WHITE)
+  .with_background(frame_rect! {
+    color: (0.5, 0.5, 0.5, 1.),
+    corner_radius: 10.,
+  })
   .with_children(|ui| {
     Text::default()
       .with_text("Hello, world")
@@ -41,8 +44,10 @@
       .add_child(ui);
     Container::default()
       .with_padding((10., 20.))
-      .with_corner_radius((2.5, 30., 2.5, 2.5))
-      .with_background(color::DARK_RED)
+      .with_background(frame_rect! {
+        color: color::DARK_RED,
+        corner_radius: (2.5, 30., 2.5, 2.5),
+      })
       .with_children(|ui| {
         Text::default()
           .with_text("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
@@ -51,7 +56,7 @@
       })
       .add_child(ui);
   })
-  .add_root(&mut hui, resolution);</pre>
+  .add_root(ui, size);</pre>
 
 <h2>Backends</h2>
 <p>

@@ -4,7 +4,6 @@ use hui::{
   color, size,
   draw::{ImageHandle, TextureFormat},
   layout::{Alignment, Direction},
-  rect::Sides,
   element::{
     container::Container,
     fill_rect::FillRect,
@@ -39,12 +38,7 @@ ui_main!(
           .with_size(size!(100%, auto))
           .with_direction(Direction::Horizontal)
           .with_align((Alignment::Begin, Alignment::Center))
-          .with_padding(Sides {
-            left: 5.,
-            right: 0.,
-            top: 5.,
-            bottom: 5.,
-          })
+          .with_padding(5.)
           .with_gap(15.)
           .with_background(color::rgb_hex(0x3d3c3e))
           .with_wrap(true) //XXX: not authentic but great for demostration
@@ -58,8 +52,7 @@ ui_main!(
                 .add_child(ui);
             }
             Container::default()
-              //HACK: due to a bug in the layout system, 100%= doesn't work as expected
-              .with_size(size!(94%=, 100%))
+              .with_size(size!(100%=, 100%))
               .with_align((Alignment::End, Alignment::Center))
               .with_children(|ui| {
                 Text::new("- ×")

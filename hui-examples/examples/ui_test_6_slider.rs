@@ -8,8 +8,9 @@ use hui::{
     text::Text,
     UiElementExt,
   },
+  signal::Signal,
   layout::{Alignment, Direction},
-  size, Signal,
+  size,
 };
 
 #[derive(Signal)]

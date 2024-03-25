@@ -6,6 +6,9 @@ use nohash_hasher::BuildNoHashHasher;
 
 pub mod trigger;
 
+#[cfg(feature = "derive")]
+pub use hui_derive::Signal;
+
 /// A marker trait for UI Signals
 pub trait Signal: Any {}
 

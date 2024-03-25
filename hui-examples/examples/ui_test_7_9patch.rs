@@ -11,7 +11,7 @@ use hui::{
   frame::nine_patch::{NinePatchAsset, NinePatchFrame},
   layout::Alignment,
   rect::Rect,
-  Signal,
+  signal::Signal,
   size,
 };
 

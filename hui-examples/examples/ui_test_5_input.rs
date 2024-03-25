@@ -1,5 +1,6 @@
 use hui::{
-  color, size, Signal,
+  color, size,
+  signal::Signal,
   draw::TextureFormat,
   layout::{Alignment, Direction},
   element::{

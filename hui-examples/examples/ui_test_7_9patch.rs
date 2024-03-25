@@ -59,7 +59,7 @@ ui_main!(
         Slider::new(0.33)
           .with_size(size!(50%, 30))
           .with_track_height(1.)
-          .with_handle_size((20., 0.9))
+          .with_handle_size((20., 1.))
           .with_handle(NinePatchFrame::from_asset(*asset).with_color(color::CYAN))
           .with_track(NinePatchFrame::from_asset(*asset))
           .with_track_active(color::TRANSPARENT)

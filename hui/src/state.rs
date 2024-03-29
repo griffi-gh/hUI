@@ -123,4 +123,20 @@ impl StateRepo {
     std::mem::swap(&mut self.id_stack, &mut self.standby);
     ret
   }
+
+  /// Scope the state repo
+  ///
+  /// Anything pushed or popped will be discarded after the closure,
+  /// and the stack will be restored to its previous state
+  pub fn scope<R>(&mut self, f: impl FnOnce(&mut Self) -> R) -> R {
+    self.standby.clear();
+    self.standby.extend(self.id_stack.iter().copied());
+    let ret = f(self);
+    std::mem::swap(&mut self.id_stack, &mut self.standby);
+    ret
+    //XXX: this is super efficient, but works only for pushes, if anything is popped, it will be lost
+    // let len = self.id_stack.len();
+    // let ret = f(self);
+    // self.id_stack.truncate(len);
+  }
 }

@@ -18,9 +18,7 @@ use crate::{
 /// In most cases, you should only have one instance of this struct, but multiple instances are allowed\
 /// (Please note that it's possible to render multiple UI "roots" using a single instance)
 pub struct UiInstance {
-  //mouse_position: Vec2,
   stateful_state: StateRepo,
-  //event_queue: VecDeque<UiEvent>,
   prev_draw_commands: UiDrawCommandList,
   draw_commands: UiDrawCommandList,
   draw_call: UiDrawCall,
@@ -30,7 +28,7 @@ pub struct UiInstance {
   events: EventQueue,
   input: UiInputState,
   signal: SignalStore,
-  //True if in the middle of a laying out a frame
+  /// True if in the middle of a laying out a frame
   state: bool,
 }
 
@@ -41,7 +39,7 @@ impl UiInstance {
   pub fn new() -> Self {
     UiInstance {
       //mouse_position: Vec2::ZERO,
-      stateful_state: StateRepo::default(),
+      stateful_state: StateRepo::new(),
       //event_queue: VecDeque::new(),
       // root_elements: Vec::new(),
       prev_draw_commands: UiDrawCommandList::default(),

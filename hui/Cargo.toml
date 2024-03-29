@@ -28,6 +28,7 @@ derive_setters = "0.1"
 derive_more = "0.99"
 tinyset = "0.4"
 image = { version = "0.25", default-features = false, optional = true }
+rustc-hash = "1.1"
 
 [features]
 default = ["el_all", "image", "builtin_font", "pixel_perfect_text", "derive"]

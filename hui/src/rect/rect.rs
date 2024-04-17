@@ -88,3 +88,51 @@ impl From<Vec2> for Rect {
     Self::from_size(size)
   }
 }
+
+impl From<(Vec2, Vec2)> for Rect {
+  /// Create a new `Rect` from a tuple of two `Vec2`s, where the first `Vec2` is the position and the second `Vec2` is the size.
+  fn from((position, size): (Vec2, Vec2)) -> Self {
+    Self { position, size }
+  }
+}
+
+impl From<(f32, f32, f32, f32)> for Rect {
+  /// Create a new `Rect` from a tuple of 4 `f32`s, where the first two `f32`s are the x and y positions of the top-left corner and the last two `f32`s are the width and height of the rect respectively.
+  fn from((x, y, width, height): (f32, f32, f32, f32)) -> Self {
+    Self {
+      position: Vec2::new(x, y),
+      size: Vec2::new(width, height),
+    }
+  }
+}
+
+impl From<[f32; 4]> for Rect {
+  /// Create a new `Rect` from an array of 4 `f32`s, where the first two `f32`s are the x and y positions of the top-left corner and the last two `f32`s are the width and height of the rect respectively.
+  fn from([x, y, width, height]: [f32; 4]) -> Self {
+    Self {
+      position: Vec2::new(x, y),
+      size: Vec2::new(width, height),
+    }
+  }
+}
+
+impl From<Rect> for (Vec2, Vec2) {
+  /// Convert a `Rect` into a tuple of two `Vec2`s, where the first `Vec2` is the position and the second `Vec2` is the size.
+  fn from(rect: Rect) -> Self {
+    (rect.position, rect.size)
+  }
+}
+
+impl From<Rect> for (f32, f32, f32, f32) {
+  /// Convert a `Rect` into a tuple of 4 `f32`s, where the first two `f32`s are the x and y positions of the top-left corner and the last two `f32`s are the width and height of the rect respectively.
+  fn from(rect: Rect) -> Self {
+    (rect.position.x, rect.position.y, rect.size.x, rect.size.y)
+  }
+}
+
+impl From<Rect> for [f32; 4] {
+  /// Convert a `Rect` into an array of 4 `f32`s, where the first two `f32`s are the x and y positions of the top-left corner and the last two `f32`s are the width and height of the rect respectively.
+  fn from(rect: Rect) -> Self {
+    [rect.position.x, rect.position.y, rect.size.x, rect.size.y]
+  }
+}

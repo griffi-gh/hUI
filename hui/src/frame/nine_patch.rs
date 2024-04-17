@@ -4,7 +4,11 @@
 //! This is useful for creating scalable UI elements like buttons, windows, etc.
 
 use glam::{vec2, UVec2, Vec2};
-use crate::{color, draw::{ImageHandle, UiDrawCommand}, rect::{Corners, FillColor, Rect}};
+use crate::{
+  color,
+  draw::{ImageHandle, UiDrawCommand, UiDrawCommandList},
+  rect::{Rect, Corners, FillColor}
+};
 use super::Frame;
 
 /// Represents a 9-patch image asset
@@ -49,10 +53,10 @@ impl Default for NinePatchFrame {
 }
 
 impl Frame for NinePatchFrame {
-  fn draw(&self, draw: &mut crate::draw::UiDrawCommandList, position: glam::Vec2, parent_size: glam::Vec2) {
+  fn draw(&self, draw: &mut UiDrawCommandList, rect: Rect) {
     // without this, shїt gets messed up when the position is not a whole number
     //XXX: should we round the size as well?
-    let position = position.round();
+    let position = rect.position.round();
 
     let img_sz = UVec2::from(self.asset.size).as_vec2();
 
@@ -79,13 +83,13 @@ impl Frame for NinePatchFrame {
 
     let size_h = (
       corners_image_px.top_left.x,
-      parent_size.x - corners_image_px.top_left.x - (img_sz.x - corners_image_px.top_right.x),
+      rect.size.x - corners_image_px.top_left.x - (img_sz.x - corners_image_px.top_right.x),
       img_sz.x - corners_image_px.top_right.x,
     );
 
     let size_v = (
       corners_image_px.top_left.y,
-      parent_size.y - corners_image_px.top_left.y - (img_sz.y - corners_image_px.bottom_left.y),
+      rect.size.y - corners_image_px.top_left.y - (img_sz.y - corners_image_px.bottom_left.y),
       img_sz.y - corners_image_px.bottom_left.y,
     );
 

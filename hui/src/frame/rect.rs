@@ -2,7 +2,7 @@ use glam::Vec2;
 use crate::{
   color,
   draw::{ImageHandle, RoundedCorners, UiDrawCommand, UiDrawCommandList},
-  rect::{Corners, FillColor},
+  rect::{Rect, Corners, FillColor},
 };
 use super::{Frame, point::FramePoint2d};
 
@@ -115,12 +115,12 @@ impl Default for RectFrame {
 }
 
 impl Frame for RectFrame {
-  fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2) {
+  fn draw(&self, draw: &mut UiDrawCommandList, rect: Rect) {
     //TODO: handle bottom_right < top_left
-    let top_left = self.top_left.resolve(parent_size);
-    let bottom_right = self.bottom_right.resolve(parent_size);
+    let top_left = self.top_left.resolve(rect.size);
+    let bottom_right = self.bottom_right.resolve(rect.size);
     draw.add(UiDrawCommand::Rectangle {
-      position: position + top_left,
+      position: rect.position + top_left,
       size: bottom_right - top_left,
       color: self.color.corners(),
       texture: self.image,

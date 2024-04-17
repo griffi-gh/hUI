@@ -75,10 +75,10 @@ impl UiElement for ProgressBar {
 
     //FIXME: these optimizations may not be valid
     if value < 1. || !self.foreground.covers_opaque() {
-      self.background.draw(ctx.draw, ctx.layout.position, ctx.measure.size);
+      self.background.draw(ctx.draw, (ctx.layout.position, ctx.measure.size).into());
     }
     if value > 0. {
-      self.foreground.draw(ctx.draw, ctx.layout.position, ctx.measure.size * vec2(value, 1.));
+      self.foreground.draw(ctx.draw, (ctx.layout.position, ctx.measure.size * vec2(value, 1.)).into());
     }
 
     // let rounded_corners =

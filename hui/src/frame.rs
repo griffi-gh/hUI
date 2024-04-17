@@ -1,7 +1,6 @@
 //! modular procedural background system
 
-use glam::Vec2;
-use crate::draw::UiDrawCommandList;
+use crate::{draw::UiDrawCommandList, rect::Rect};
 
 pub mod point;
 mod rect;
@@ -13,8 +12,8 @@ pub use rect::RectFrame;
 
 /// Trait for a drawable frame
 pub trait Frame {
-  /// Draw the frame at the given position and size
-  fn draw(&self, draw: &mut UiDrawCommandList, position: Vec2, parent_size: Vec2);
+  /// Draw the frame at the given rect's position and size
+  fn draw(&self, draw: &mut UiDrawCommandList, rect: Rect);
 
   /// Check if the frame is guaranteed to be fully opaque and fully cover the parent frame regardless of it's size
   ///

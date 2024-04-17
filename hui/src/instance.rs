@@ -1,16 +1,20 @@
 use glam::Vec2;
 use crate::{
+  element::{MeasureContext, ProcessContext, UiElement},
+  layout::{Direction, LayoutInfo},
+  text::{FontHandle, TextRenderer},
   draw::{
-    ImageHandle, TextureFormat, UiDrawCall, UiDrawCommandList,
+    ImageHandle,
+    TextureFormat,
+    UiDrawCall,
+    UiDrawCommandList,
     atlas::{TextureAtlasManager, TextureAtlasMeta},
   },
-  element::{MeasureContext, ProcessContext, UiElement},
+  signal::{Signal, SignalStore},
   event::{EventQueue, UiEvent},
   input::UiInputState,
-  layout::{Direction, LayoutInfo},
-  signal::{SignalStore, Signal},
+  rect::Rect,
   state::StateRepo,
-  text::{FontHandle, TextRenderer}
 };
 
 /// The main instance of the UI system.
@@ -144,16 +148,17 @@ impl UiInstance {
 
   /// Add an element or an element tree to the UI
   ///
-  /// Use the `max_size` parameter to specify the maximum size of the element\
+  /// Use the `rect` parameter to specify the position and size of the element\
   /// (usually, the size of the window/screen)
   ///
   /// ## Panics:
   /// If called while the UI is not active (call [`UiInstance::begin`] first)
-  pub fn add<T: UiElement>(&mut self, element: T, max_size: Vec2) {
+  pub fn add(&mut self, element: impl UiElement, rect: impl Into<Rect>) {
     assert!(self.state, "must call UiInstance::begin before adding elements");
+    let rect: Rect = rect.into();
     let layout = LayoutInfo {
-      position: Vec2::ZERO,
-      max_size,
+      position: rect.position,
+      max_size: rect.size,
       direction: Direction::Vertical,
       remaining_space: None,
     };

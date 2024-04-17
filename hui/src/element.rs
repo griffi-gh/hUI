@@ -1,11 +1,11 @@
 //! element API and built-in elements like `Container`, `Button`, `Text`, etc.
 
-use std::any::Any;
 use crate::{
   draw::{atlas::ImageCtx, UiDrawCommandList},
   input::InputCtx,
   layout::{LayoutInfo, Size2d},
   measure::Response,
+  rect::Rect,
   signal::SignalStore,
   state::StateRepo,
   text::{FontHandle, TextMeasure},
@@ -50,27 +50,6 @@ pub trait UiElement {
   /// You should implement this function whenever possible, otherwise some features may not work at all, such as the `Remaining` size
   fn size(&self) -> Option<Size2d> { None }
 
-  /// Get the unique id used for internal state management\
-  /// This value must be unique for each instance of the element
-  ///
-  /// If the element is stateless, this function should return `None`
-  fn state_id(&self) -> Option<u64> { None }
-
-  /// Check if the element has state.\
-  /// Should not be overridden
-  fn is_stateful(&self) -> bool { self.state_id().is_some() }
-
-  /// Check if the element has no state\
-  /// Should not be overridden
-  fn is_stateless(&self) -> bool { !self.is_stateful() }
-
-  /// Initialize the state of the element\
-  /// This function should be called exactly once during the lifetime of the element,
-  /// or if the state gets reset
-  ///
-  /// This function will not get called for stateless elements
-  fn init_state(&self) -> Option<Box<dyn Any>> { None }
-
   /// Measure step, guaranteed to be called before the `process` step\
   /// May be called multiple times per single frame, so it should not contain any expensive calls\
   /// This function may not mutate any state.\
@@ -108,7 +87,7 @@ pub trait UiElementExt: UiElement {
   fn add_child(self, ui: &mut ElementList);
 
   /// Add element as a ui root.
-  fn add_root(self, ui: &mut UiInstance, max_size: glam::Vec2);
+  fn add_root(self, ui: &mut UiInstance, max_size: impl Into<Rect>);
 }
 
 impl<T: UiElement + 'static> UiElementExt for T {
@@ -116,7 +95,7 @@ impl<T: UiElement + 'static> UiElementExt for T {
     ui.add(self)
   }
 
-  fn add_root(self, ui: &mut UiInstance, max_size: glam::Vec2) {
-    ui.add(self, max_size);
+  fn add_root(self, ui: &mut UiInstance, rect: impl Into<Rect>) {
+    ui.add(self, rect);
   }
 }

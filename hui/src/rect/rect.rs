@@ -11,6 +11,24 @@ pub struct Rect {
 }
 
 impl Rect {
+  pub const fn new(position: Vec2, size: Vec2) -> Self {
+    Self { position, size }
+  }
+
+  pub const fn from_position(position: Vec2) -> Self {
+    Self {
+      position,
+      size: Vec2::ZERO,
+    }
+  }
+
+  pub const fn from_size(size: Vec2) -> Self {
+    Self {
+      position: Vec2::ZERO,
+      size,
+    }
+  }
+
   /// Check if the rect contains a point.
   pub fn contains_point(&self, point: Vec2) -> bool {
     point.cmpge(self.position).all() && point.cmple(self.position + self.size).all()
@@ -61,5 +79,12 @@ impl Rect {
       bottom_left: self.position + Vec2::new(0.0, self.size.y),
       bottom_right: self.position + self.size,
     }
+  }
+}
+
+impl From<Vec2> for Rect {
+  /// Create a new `Rect` from a `Vec2`, where x and y are the width and height of the rect respectively.
+  fn from(size: Vec2) -> Self {
+    Self::from_size(size)
   }
 }

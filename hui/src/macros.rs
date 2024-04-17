@@ -79,7 +79,7 @@ macro_rules! size {
 ///
 /// # Example:
 /// ```
-/// frame_rect! {
+/// _frame! {
 ///   color: (0.2, 0.2, 0.3, 1.),
 ///   corner_radius: 5.,
 /// };
@@ -100,8 +100,8 @@ macro_rules! rect_frame {
 
   ($expr:expr) => {
     {
-      let _frame_rect: $crate::frame::RectFrame = $crate::frame::RectFrame::from($expr);
-      _frame_rect
+      let __frame: $crate::frame::RectFrame = $crate::frame::RectFrame::from($expr);
+      __frame
     }
   };
 
@@ -117,56 +117,22 @@ macro_rules! rect_frame {
 
       // construct the RectFrame
       {
-        let mut frame_rect = $crate::frame::RectFrame::default();
+        let mut _frame = $crate::frame::RectFrame::default();
         let mut _color_is_set = false;
         let mut _image_is_set = false;
         $(
           {
-            frame_rect.$ident = ($expr).into();
-            if stringify!($ident) == "image" {
-              _image_is_set = true;
-            }
-            if stringify!($ident) == "color" {
-              _color_is_set = true;
-            }
+            _frame.$ident = ($expr).into();
+            _image_is_set |= stringify!($ident) == "image";
+            _color_is_set |= stringify!($ident) == "color";
           }
         )+
-        if frame_rect.image.is_some() && _image_is_set && !_color_is_set {
-          frame_rect.color = (1., 1., 1., 1.).into();
+        // set color to white if image is set but color is left as default
+        if _frame.image.is_some() && _image_is_set && !_color_is_set {
+          _frame.color = (1., 1., 1., 1.).into();
         }
-        frame_rect
+        _frame
       }
     }
   };
-
-  // {$from:expr, $($ident:ident : $expr:expr),+$(,)?} => {
-  //   {
-  //     // ensure all identifiers are unique
-  //     #[allow(non_upper_case_globals)]
-  //     {
-  //       $(
-  //         const $ident: () = ();
-  //       )+
-  //     }
-  //     // construct the RectFrame
-  //     {
-  //       let mut _frame_rect: $crate::frame::RectFrame = ($from).into();
-  //       $(
-  //         let $ident = ($expr).into();
-  //         _frame_rect.$ident = $ident;
-  //       )+
-  //       _frame_rect
-  //     }
-  //   }
-  // };
 }
-
-// #[allow(unused)]
-// fn test() {
-//   // let _ = frame_rect!(5, 6);
-
-//   let _ = frame_rect! {
-//     color: (0.2, 0.2, 0.3, 1.),
-//     corner_radius: 5.,
-//   };
-// }

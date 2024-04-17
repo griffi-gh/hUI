@@ -3,7 +3,7 @@ use hui::{
   color,
   element::{
     container::Container,
-    fill_rect::FillRect,
+    fill_rect::FrameView,
     slider::Slider,
     text::Text,
     UiElementExt
@@ -54,7 +54,7 @@ ui_main!(
               .add_child(ui);
           })
           .add_child(ui);
-        FillRect::default()
+        FrameView::default()
           .with_size(size!(600, 75))
           .with_frame(NinePatchFrame::from_asset(*asset).with_color(color::GREEN))
           .add_child(ui);
@@ -62,7 +62,7 @@ ui_main!(
           .with_color(color::BLACK)
           .with_text_size(32)
           .add_child(ui);
-        FillRect::default()
+        FrameView::default()
           .with_size(size!(700, 50))
           .with_frame(NinePatchFrame::from_asset(*asset).with_color((
             (1., 0., 1.),

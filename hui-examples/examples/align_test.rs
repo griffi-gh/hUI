@@ -9,7 +9,7 @@ use winit::{
 };
 use hui::{
   element::{
-    container::Container, fill_rect::FillRect, progress_bar::ProgressBar, ElementList, UiElement
+    container::Container, fill_rect::FrameView, progress_bar::ProgressBar, ElementList, UiElement
   }, frame::FrameRect, layout::{Alignment, Direction, Size}, rect::{Corners, Sides}, UiInstance
 };
 use hui_glium::GliumUiRenderer;
@@ -71,11 +71,11 @@ fn main() {
               padding: Sides::all(5.),
               gap: 10.,
               children: ElementList(vec![
-                Box::new(FillRect {
+                Box::new(FrameView {
                   size: (Size::Relative(0.5), Size::Absolute(30.)).into(),
                   frame: Box::new(vec4(0.75, 0., 0., 1.)),
                 }),
-                Box::new(FillRect {
+                Box::new(FrameView {
                   size: (Size::Relative(z / 2. + 0.5), Size::Absolute(30.)).into(),
                   frame: Box::new(Corners::left_right(
                     vec4(1., 0., 0., 1.),
@@ -85,7 +85,7 @@ fn main() {
               ]),
               ..Default::default()
             }),
-            Box::new(FillRect {
+            Box::new(FrameView {
               size: (Size::Relative(z / 2. + 0.5), Size::Absolute(30.)).into(),
               frame: Box::new(vec4(0., 0.75, 0., 1.)),
             }),
@@ -97,7 +97,7 @@ fn main() {
               children: {
                 let mut x: Vec<Box<dyn UiElement>> = vec![];
                 for i in 0..10 {
-                  x.push(Box::new(FillRect {
+                  x.push(Box::new(FrameView {
                     size: (Size::Absolute(50.), Size::Absolute(50.)).into(),
                     frame: Box::new(if i == 1 {
                       vec4(0.75, 0.75, 0.75, 0.75)
@@ -124,7 +124,7 @@ fn main() {
                 right: 40.,
               },
               children: ElementList(vec![
-                Box::new(FillRect {
+                Box::new(FrameView {
                   size: (Size::Absolute(50.), Size::Absolute(50.)).into(),
                   frame: Box::new(vec4(1., 1., 1., 0.75)),
                 }),

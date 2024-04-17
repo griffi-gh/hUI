@@ -9,7 +9,7 @@ use winit::{
 };
 use hui::{
   element::{
-    container::Container, fill_rect::FillRect, spacer::Spacer, text::Text, ElementList
+    container::Container, fill_rect::FrameView, spacer::Spacer, text::Text, ElementList
   }, frame::FrameRect, layout::Size, UiInstance
 };
 use hui_glium::GliumUiRenderer;
@@ -71,11 +71,11 @@ fn main() {
                 ..Default::default()
               }));
             }
-            elem.push(Box::new(FillRect {
+            elem.push(Box::new(FrameView {
               size: (Size::Relative(1.), Size::Absolute(10.)).into(),
               frame: Box::new(vec4(0., 0., 1., 1.)),
             }));
-            elem.push(Box::new(FillRect {
+            elem.push(Box::new(FrameView {
               size: (Size::Relative(1.), Size::Absolute(10.)).into(),
               frame: Box::new(vec4(1., 1., 0., 1.)),
             }));
@@ -86,11 +86,11 @@ fn main() {
               ..Default::default()
             }));
             if instant.elapsed().as_secs() & 1 != 0 {
-              elem.push(Box::new(FillRect {
+              elem.push(Box::new(FrameView {
                 size: (Size::Relative(1.), Size::Absolute(10.)).into(),
                 frame: Box::new(vec4(1., 0., 0., 1.)),
               }));
-              elem.push(Box::new(FillRect {
+              elem.push(Box::new(FrameView {
                 size: (Size::Relative(1.), Size::Absolute(10.)).into(),
                 frame: Box::new(vec4(0., 0., 0., 1.)),
               }));

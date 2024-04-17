@@ -1,20 +1,18 @@
-//! Simple filled rectangle with the specified size, background and corner radius
+//! Simple element that displays the specified frame
 
 use derive_setters::Setters;
-use glam::vec2;
 use crate::{
-  draw::{RoundedCorners, UiDrawCommand},
   element::{MeasureContext, ProcessContext, UiElement},
   frame::{Frame, FrameRect},
-  layout::{compute_size, Size, Size2d},
+  layout::{compute_size, Size2d},
   measure::Response,
   size
 };
 
-/// Simple filled rectangle with the specified size, background, and corner radius
+/// Simple rectangle that displays the specified frame
 #[derive(Setters)]
 #[setters(prefix = "with_")]
-pub struct FillRect {
+pub struct FrameView {
   /// Size of the rectangle
   #[setters(into)]
   pub size: Size2d,
@@ -24,14 +22,22 @@ pub struct FillRect {
   pub frame: Box<dyn Frame>,
 }
 
-impl FillRect {
+impl FrameView {
+  pub fn new(frame: impl Frame + 'static) -> Self {
+    Self {
+      size: size!(10, 10),
+      frame: Box::new(frame),
+    }
+  }
+
+  //setters:
   pub fn with_frame(mut self, frame: impl Frame + 'static) -> Self {
     self.frame = Box::new(frame);
     self
   }
 }
 
-impl Default for FillRect {
+impl Default for FrameView {
   fn default() -> Self {
     Self {
       size: size!(10, 10),
@@ -40,9 +46,9 @@ impl Default for FillRect {
   }
 }
 
-impl UiElement for FillRect {
+impl UiElement for FrameView {
   fn name(&self) -> &'static str {
-    "fill_rect"
+    "frame_view"
   }
 
   fn size(&self) -> Option<Size2d> {

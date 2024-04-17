@@ -6,7 +6,7 @@ use hui::{
   layout::{Alignment, Direction},
   element::{
     container::Container,
-    fill_rect::FillRect,
+    fill_rect::FrameView,
     image::Image,
     text::Text,
     UiElementExt
@@ -62,7 +62,7 @@ ui_main!(
               .add_child(ui);
           })
           .add_child(ui);
-        FillRect::default()
+        FrameView::default()
           .with_size(size!(100%, 1))
           .with_frame(color::rgb_hex(0x2d2d30))
           .add_child(ui);
@@ -75,7 +75,7 @@ ui_main!(
               .with_size(size!(54, 100%))
               .with_background(color::rgb_hex(0x343334))
               .add_child(ui);
-            FillRect::default()
+            FrameView::default()
               .with_size(size!(1, 100%))
               .with_frame(color::rgb_hex(0x2d2d30))
               .add_child(ui);

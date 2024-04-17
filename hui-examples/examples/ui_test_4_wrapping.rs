@@ -2,7 +2,7 @@ use std::time::Instant;
 use hui::{
   color, element::{
     container::Container,
-    fill_rect::FillRect,
+    fill_rect::FrameView,
     UiElementExt
   }, frame_rect, layout::{Alignment, Direction}, size
 };
@@ -28,7 +28,7 @@ ui_main!(
       .with_wrap(true)
       .with_children(|ui| {
         for i in 0..10 {
-          FillRect::default()
+          FrameView::default()
             .with_size(size!((40 + i * 10)))
             .with_frame(frame_rect! {
               color: color::DARK_RED,

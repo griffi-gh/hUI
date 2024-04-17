@@ -75,7 +75,7 @@ macro_rules! size {
   };
 }
 
-/// Helper macro for constructing a `FrameRect`
+/// Helper macro for constructing a `RectFrame`
 ///
 /// # Example:
 /// ```
@@ -89,24 +89,24 @@ macro_rules! size {
 /// - If the `image` field is set, but not `color`, the `color` field will default to [`WHITE`](crate::color::WHITE) (to ensure visibility)
 /// - If both `color` and `image` are not set, the `color` field will default to [`TRANSPARENT`](crate::color::TRANSPARENT)
 #[macro_export]
-macro_rules! frame_rect {
+macro_rules! rect_frame {
   {} => {
-    $crate::frame::FrameRect::default()
+    $crate::frame::RectFrame::default()
   };
 
   // () => {
-  //   $crate::frame::FrameRect::default()
+  //   $crate::frame::RectFrame::default()
   // };
 
   ($expr:expr) => {
     {
-      let _frame_rect: $crate::frame::FrameRect = $crate::frame::FrameRect::from($expr);
+      let _frame_rect: $crate::frame::RectFrame = $crate::frame::RectFrame::from($expr);
       _frame_rect
     }
   };
 
   ($image:expr, $color:expr) => {
-    $crate::frame::FrameRect::color_image($color, $image)
+    $crate::frame::RectFrame::color_image($color, $image)
   };
 
   {$($ident:ident : $expr:expr),+$(,)?} => {
@@ -115,9 +115,9 @@ macro_rules! frame_rect {
       #[allow(non_upper_case_globals)]
       {$(const $ident: () = ();)+}
 
-      // construct the FrameRect
+      // construct the RectFrame
       {
-        let mut frame_rect = $crate::frame::FrameRect::default();
+        let mut frame_rect = $crate::frame::RectFrame::default();
         let mut _color_is_set = false;
         let mut _image_is_set = false;
         $(
@@ -148,9 +148,9 @@ macro_rules! frame_rect {
   //         const $ident: () = ();
   //       )+
   //     }
-  //     // construct the FrameRect
+  //     // construct the RectFrame
   //     {
-  //       let mut _frame_rect: $crate::frame::FrameRect = ($from).into();
+  //       let mut _frame_rect: $crate::frame::RectFrame = ($from).into();
   //       $(
   //         let $ident = ($expr).into();
   //         _frame_rect.$ident = $ident;

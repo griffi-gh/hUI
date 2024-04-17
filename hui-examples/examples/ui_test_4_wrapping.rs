@@ -4,7 +4,7 @@ use hui::{
     container::Container,
     frame_view::FrameView,
     UiElementExt
-  }, frame_rect, layout::{Alignment, Direction}, size
+  }, rect_frame, layout::{Alignment, Direction}, size
 };
 
 #[path = "../boilerplate.rs"]
@@ -30,7 +30,7 @@ ui_main!(
         for i in 0..10 {
           FrameView::default()
             .with_size(size!((40 + i * 10)))
-            .with_frame(frame_rect! {
+            .with_frame(rect_frame! {
               color: color::DARK_RED,
               corner_radius: 8.
             })

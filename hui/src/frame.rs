@@ -9,7 +9,7 @@ pub mod stack;
 pub mod nine_patch;
 mod impls;
 
-pub use rect::FrameRect;
+pub use rect::RectFrame;
 
 /// Trait for a drawable frame
 pub trait Frame {

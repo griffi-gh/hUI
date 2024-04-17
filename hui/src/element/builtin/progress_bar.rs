@@ -2,7 +2,7 @@ use derive_setters::Setters;
 use glam::vec2;
 use crate::{
   element::{MeasureContext, ProcessContext, UiElement},
-  frame::{Frame, FrameRect},
+  frame::{Frame, RectFrame},
   layout::{compute_size, Size, Size2d},
   measure::Response,
 };
@@ -47,8 +47,8 @@ impl Default for ProgressBar {
     Self {
       value: 0.,
       size: Size::Auto.into(),
-      foreground: Box::new(FrameRect::color((0.0, 0.0, 1.0, 1.0))),
-      background: Box::new(FrameRect::color((0.0, 0.0, 0.0, 1.0))),
+      foreground: Box::new(RectFrame::color((0.0, 0.0, 1.0, 1.0))),
+      background: Box::new(RectFrame::color((0.0, 0.0, 0.0, 1.0))),
     }
   }
 }

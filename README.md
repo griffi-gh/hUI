@@ -32,7 +32,7 @@
   .with_align(Alignment::Center)
   .with_padding(5.)
   .with_gap(10.)
-  .with_background(frame_rect! {
+  .with_background(rect_frame! {
     color: (0.5, 0.5, 0.5, 1.),
     corner_radius: 10.,
   })
@@ -44,7 +44,7 @@
       .add_child(ui);
     Container::default()
       .with_padding((10., 20.))
-      .with_background(frame_rect! {
+      .with_background(rect_frame! {
         color: color::DARK_RED,
         corner_radius: (2.5, 30., 2.5, 2.5),
       })

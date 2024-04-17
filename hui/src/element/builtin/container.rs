@@ -4,7 +4,7 @@ use derive_setters::Setters;
 use glam::{Vec2, vec2};
 use crate::{
   element::{ElementList, MeasureContext, ProcessContext, UiElement},
-  frame::{Frame, FrameRect},
+  frame::{Frame, RectFrame},
   layout::{compute_size, Alignment, Alignment2d, Direction, LayoutInfo, Size, Size2d, WrapBehavior},
   measure::{Hints, Response},
   rect::Sides,
@@ -82,7 +82,7 @@ impl Default for Container {
       gap: 0.,
       padding: Sides::all(0.),
       align: Alignment2d::default(),
-      background_frame: Box::<FrameRect>::default(),
+      background_frame: Box::<RectFrame>::default(),
       wrap: WrapBehavior::Allow,
       children: ElementList(Vec::new()),
     }

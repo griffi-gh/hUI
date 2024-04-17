@@ -3,7 +3,7 @@
 use derive_setters::Setters;
 use crate::{
   element::{MeasureContext, ProcessContext, UiElement},
-  frame::{Frame, FrameRect},
+  frame::{Frame, RectFrame},
   layout::{compute_size, Size2d},
   measure::Response,
   size
@@ -41,7 +41,7 @@ impl Default for FrameView {
   fn default() -> Self {
     Self {
       size: size!(10, 10),
-      frame: Box::new(FrameRect::color((0., 0., 0., 0.5))),
+      frame: Box::new(RectFrame::color((0., 0., 0., 0.5))),
     }
   }
 }

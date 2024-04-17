@@ -5,7 +5,7 @@ use hui::{
     progress_bar::ProgressBar,
     text::Text,
     UiElementExt,
-  }, frame::FrameRect, frame_rect, layout::{Alignment, Direction}, size
+  }, frame::RectFrame, rect_frame, layout::{Alignment, Direction}, size
 };
 
 #[path = "../boilerplate.rs"]
@@ -31,7 +31,7 @@ ui_main!{
           .with_gap(5.)
           .with_padding(10.)
           .with_size(size!(450, auto))
-          .with_background(frame_rect! {
+          .with_background(rect_frame! {
             color: (0.2, 0.2, 0.5),
             corner_radius: 8.
           })
@@ -43,11 +43,11 @@ ui_main!{
                 .add_child(ui);
               ProgressBar::default()
                 .with_value(mom_ratio)
-                .with_background(frame_rect! {
+                .with_background(rect_frame! {
                   color: color::BLACK,
                   corner_radius: 0.125 * ProgressBar::DEFAULT_HEIGHT
                 })
-                .with_foreground(frame_rect! {
+                .with_foreground(rect_frame! {
                   color: color::BLUE,
                   corner_radius: 0.125 * ProgressBar::DEFAULT_HEIGHT
                 })

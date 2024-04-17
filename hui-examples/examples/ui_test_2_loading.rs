@@ -1,6 +1,6 @@
 use glam::vec4;
 use hui::{
-  size, frame_rect,
+  size, rect_frame,
   color,
   element::{
     container::Container,
@@ -8,7 +8,7 @@ use hui::{
     text::Text,
     UiElementExt
   },
-  frame::FrameRect,
+  frame::RectFrame,
   layout::Alignment,
   rect::Corners,
   text::FontHandle
@@ -45,7 +45,7 @@ ui_main!(
       .with_children(|ui| {
         Container::default()
           .with_padding((10., 15.))
-          .with_background(frame_rect! {
+          .with_background(rect_frame! {
             color: (0., 0., 0., 0.5),
             corner_radius: 8.,
           })
@@ -70,7 +70,7 @@ ui_main!(
           .with_align((Alignment::Center, Alignment::Begin))
           .with_padding(15.)
           .with_gap(10.)
-          .with_background(frame_rect! {
+          .with_background(rect_frame! {
             color: (0., 0., 0., 0.5),
             corner_radius: 8.,
           })
@@ -111,7 +111,7 @@ ui_main!(
       .with_children(|ui| {
         Container::default()
           .with_padding(10.)
-          .with_background(frame_rect!{
+          .with_background(rect_frame!{
             color: (0., 0., 0., 0.5),
             corner_radius: 8.,
           })

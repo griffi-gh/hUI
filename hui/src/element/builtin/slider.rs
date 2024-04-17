@@ -4,7 +4,7 @@ use derive_setters::Setters;
 use glam::{Vec2, vec2};
 
 use crate::{
-  draw::UiDrawCommand, element::{MeasureContext, ProcessContext, UiElement}, frame::{Frame, FrameRect}, layout::{compute_size, Size2d}, measure::Response, rect::FillColor, signal::{trigger::SignalTriggerArg, Signal}
+  draw::UiDrawCommand, element::{MeasureContext, ProcessContext, UiElement}, frame::{Frame, RectFrame}, layout::{compute_size, Size2d}, measure::Response, rect::FillColor, signal::{trigger::SignalTriggerArg, Signal}
 };
 
 
@@ -79,9 +79,9 @@ impl Default for Slider {
     Self {
       value: 0.0,
       size: Size2d::default(),
-      handle: Box::new(FrameRect::color((0.0, 0.0, 1.))),
-      track: Box::new(FrameRect::color((0.5, 0.5, 0.5))),
-      track_active: Box::new(FrameRect::color((0.0, 0.0, 0.75))),
+      handle: Box::new(RectFrame::color((0.0, 0.0, 1.))),
+      track: Box::new(RectFrame::color((0.5, 0.5, 0.5))),
+      track_active: Box::new(RectFrame::color((0.0, 0.0, 0.75))),
       track_height: 0.25,
       handle_size: (15.0, 1.),
       follow_mode: SliderFollowMode::default(),

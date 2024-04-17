@@ -10,7 +10,7 @@ use winit::{
 use hui::{
   element::{
     container::Container, frame_view::FrameView, progress_bar::ProgressBar, ElementList, UiElement
-  }, frame::FrameRect, layout::{Alignment, Direction, Size}, rect::{Corners, Sides}, UiInstance
+  }, frame::RectFrame, layout::{Alignment, Direction, Size}, rect::{Corners, Sides}, UiInstance
 };
 use hui_glium::GliumUiRenderer;
 
@@ -92,7 +92,7 @@ fn main() {
             Box::new(Container {
               gap: 5.,
               padding: Sides::all(5.),
-              background_frame: Box::new(FrameRect::color(vec4(0., 0., 0., 0.5))),
+              background_frame: Box::new(RectFrame::color(vec4(0., 0., 0., 0.5))),
               direction: Direction::Horizontal,
               children: {
                 let mut x: Vec<Box<dyn UiElement>> = vec![];
@@ -111,7 +111,7 @@ fn main() {
               ..Default::default()
             }),
             Box::new(Container {
-              background_frame: Box::new(FrameRect::color((1., 0., 0.)).with_corner_radius(Corners {
+              background_frame: Box::new(RectFrame::color((1., 0., 0.)).with_corner_radius(Corners {
                 top_left: 0.,
                 top_right: 30.,
                 bottom_left: 0.,

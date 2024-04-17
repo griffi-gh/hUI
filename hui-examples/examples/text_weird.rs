@@ -10,7 +10,7 @@ use winit::{
 use hui::{
   element::{
     container::Container, frame_view::FrameView, spacer::Spacer, text::Text, ElementList
-  }, frame::FrameRect, layout::Size, UiInstance
+  }, frame::RectFrame, layout::Size, UiInstance
 };
 use hui_glium::GliumUiRenderer;
 
@@ -49,7 +49,7 @@ fn main() {
 
         hui.add(Container {
           size: (Size::Relative(1.), Size::Relative(1.)).into(),
-          background_frame: Box::new(FrameRect::color((0.1, 0.1, 0.1, 1.))),
+          background_frame: Box::new(RectFrame::color((0.1, 0.1, 0.1, 1.))),
           children: elements(|elem| {
             elem.push(Box::new(Text {
               text: "THIS LINE SHOULD BE SHARP!".into(),

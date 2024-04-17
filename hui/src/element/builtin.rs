@@ -3,8 +3,8 @@
 #[cfg(feature = "el_container")]
 pub mod container;
 
-#[cfg(feature = "el_fill_rect")]
-pub mod fill_rect;
+#[cfg(feature = "el_frame_view")]
+pub mod frame_view;
 
 #[cfg(feature = "el_spacer")]
 pub mod spacer;

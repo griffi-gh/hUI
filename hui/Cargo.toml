@@ -58,7 +58,7 @@ pixel_perfect_text = []
 ## Enable all built-in elements
 el_all = [
   "el_container",
-  "el_fill_rect",
+  "el_frame_view",
   "el_spacer",
   "el_br",
   "el_text",
@@ -72,8 +72,8 @@ el_all = [
 ## Enable the built-in `Container` element
 el_container = []
 
-## Enable the built-in `FillRect` element
-el_fill_rect = []
+## Enable the built-in `FrameView` element
+el_frame_view = []
 
 ## Enable the built-in `Spacer` element
 el_spacer = []

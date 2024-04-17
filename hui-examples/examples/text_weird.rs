@@ -9,7 +9,7 @@ use winit::{
 };
 use hui::{
   element::{
-    container::Container, fill_rect::FrameView, spacer::Spacer, text::Text, ElementList
+    container::Container, frame_view::FrameView, spacer::Spacer, text::Text, ElementList
   }, frame::FrameRect, layout::Size, UiInstance
 };
 use hui_glium::GliumUiRenderer;

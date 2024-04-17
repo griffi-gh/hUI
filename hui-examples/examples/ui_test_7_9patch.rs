@@ -3,7 +3,7 @@ use hui::{
   color,
   element::{
     container::Container,
-    fill_rect::FrameView,
+    frame_view::FrameView,
     slider::Slider,
     text::Text,
     UiElementExt

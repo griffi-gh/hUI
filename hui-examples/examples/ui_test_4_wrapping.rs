@@ -2,7 +2,7 @@ use std::time::Instant;
 use hui::{
   color, element::{
     container::Container,
-    fill_rect::FrameView,
+    frame_view::FrameView,
     UiElementExt
   }, frame_rect, layout::{Alignment, Direction}, size
 };

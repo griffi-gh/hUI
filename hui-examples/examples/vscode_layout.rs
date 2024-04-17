@@ -6,7 +6,7 @@ use hui::{
   layout::{Alignment, Direction},
   element::{
     container::Container,
-    fill_rect::FrameView,
+    frame_view::FrameView,
     image::Image,
     text::Text,
     UiElementExt

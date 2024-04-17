@@ -127,7 +127,7 @@ macro_rules! rect_frame {
             _color_is_set |= stringify!($ident) == "color";
           }
         )+
-        // set color to white if image is set but color is left as default
+        // set color to white if image is explicitly set to Some(...) but color is left as the default
         if _frame.image.is_some() && _image_is_set && !_color_is_set {
           _frame.color = (1., 1., 1., 1.).into();
         }

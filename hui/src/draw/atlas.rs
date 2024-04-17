@@ -38,6 +38,8 @@ pub struct TextureAtlasMeta<'a> {
 
 /// Texture handle, stores the internal index of a texture within the texture atlas and can be cheaply copied.
 ///
+/// Please note that dropping a handle does not deallocate the texture from the atlas, you must do it manually.
+///
 /// Only valid for the `UiInstance` that created it.\
 /// Using it with other instances may result in panics or unexpected behavior.
 ///

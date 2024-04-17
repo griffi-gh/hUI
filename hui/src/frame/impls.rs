@@ -87,7 +87,7 @@ impl Frame for Corners<Vec3> {
     FillColor::from(*self).draw(draw, rect)
   }
   fn covers_opaque(&self) -> bool {
-    FillColor::from(*self).is_opaque()
+    true
   }
 }
 
@@ -96,7 +96,7 @@ impl Frame for (Vec3, Vec3, Vec3, Vec3) {
     FillColor::from(*self).draw(draw, rect)
   }
   fn covers_opaque(&self) -> bool {
-    FillColor::from(*self).is_opaque()
+    true
   }
 }
 
@@ -105,7 +105,7 @@ impl Frame for ((f32, f32, f32), (f32, f32, f32), (f32, f32, f32), (f32, f32, f3
     FillColor::from(*self).draw(draw, rect)
   }
   fn covers_opaque(&self) -> bool {
-    FillColor::from(*self).is_opaque()
+    true
   }
 }
 
@@ -114,7 +114,7 @@ impl Frame for [[f32; 3]; 4] {
     FillColor::from(*self).draw(draw, rect)
   }
   fn covers_opaque(&self) -> bool {
-    FillColor::from(*self).is_opaque()
+    true
   }
 }
 
@@ -154,7 +154,7 @@ impl Frame for Vec3 {
     FillColor::from(*self).draw(draw, rect)
   }
   fn covers_opaque(&self) -> bool {
-    FillColor::from(*self).is_opaque()
+    true
   }
 }
 
@@ -163,7 +163,7 @@ impl Frame for (f32, f32, f32) {
     FillColor::from(*self).draw(draw, rect)
   }
   fn covers_opaque(&self) -> bool {
-    FillColor::from(*self).is_opaque()
+    true
   }
 }
 
@@ -172,6 +172,6 @@ impl Frame for [f32; 3] {
     FillColor::from(*self).draw(draw, rect)
   }
   fn covers_opaque(&self) -> bool {
-    FillColor::from(*self).is_opaque()
+    true
   }
 }

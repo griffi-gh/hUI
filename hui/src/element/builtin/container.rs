@@ -444,8 +444,8 @@ impl UiElement for Container {
 
         //measure
         let el_measure = element.measure(MeasureContext {
-          state: ctx.state,
           layout: &el_layout,
+          state: ctx.state,
           text_measure: ctx.text_measure,
           current_font: ctx.current_font,
           images: ctx.images,
@@ -486,15 +486,13 @@ impl UiElement for Container {
         //process
         element.process(ProcessContext {
           measure: &el_measure,
-          state: ctx.state,
           layout: &el_layout,
           draw: ctx.draw,
+          state: ctx.state,
           text_measure: ctx.text_measure,
           current_font: ctx.current_font,
           images: ctx.images,
           input: ctx.input,
-          //HACK: i have no idea what to do with this
-          //this sucks
           signal: ctx.signal,
         });
 

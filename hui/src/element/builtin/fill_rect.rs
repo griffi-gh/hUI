@@ -57,17 +57,6 @@ impl UiElement for FillRect {
   }
 
   fn process(&self, ctx: ProcessContext) {
-    // if !self.background.is_transparent() {
-    //   ctx.draw.add(UiDrawCommand::Rectangle {
-    //     position: ctx.layout.position,
-    //     size: ctx.measure.size,
-    //     color: self.background.corners(),
-    //     texture: None,
-    //     rounded_corners: (self.corner_radius.max_f32() > 0.).then_some({
-    //       RoundedCorners::from_radius(self.corner_radius)
-    //     }),
-    //   });
-    // }
     self.frame.draw(ctx.draw, ctx.layout.position, ctx.measure.size);
   }
 }

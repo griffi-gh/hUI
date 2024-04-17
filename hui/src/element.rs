@@ -17,8 +17,8 @@ pub use builtin::*;
 
 /// Context for the `Element::measure` function
 pub struct MeasureContext<'a> {
-  pub state: &'a StateRepo,
   pub layout: &'a LayoutInfo,
+  pub state: &'a StateRepo,
   pub text_measure: TextMeasure<'a>,
   pub current_font: FontHandle,
   pub images: ImageCtx<'a>,
@@ -29,9 +29,9 @@ pub struct MeasureContext<'a> {
 /// Context for the `Element::process` function
 pub struct ProcessContext<'a> {
   pub measure: &'a Response,
-  pub state: &'a mut StateRepo,
   pub layout: &'a LayoutInfo,
   pub draw: &'a mut UiDrawCommandList,
+  pub state: &'a mut StateRepo,
   pub text_measure: TextMeasure<'a>,
   pub current_font: FontHandle,
   pub images: ImageCtx<'a>,

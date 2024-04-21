@@ -23,7 +23,7 @@ pub trait FrameStackExt: Frame {
   fn stack(self, other: impl Frame + 'static) -> FrameStack;
 
   /// Stack another frame below this one
-  fn stack_bottom(self, other: impl Frame + 'static) -> FrameStack;
+  fn stack_below(self, other: impl Frame + 'static) -> FrameStack;
 }
 
 impl<T: Frame + 'static> FrameStackExt for T {
@@ -31,7 +31,7 @@ impl<T: Frame + 'static> FrameStackExt for T {
     FrameStack(Box::new(self), Box::new(other))
   }
 
-  fn stack_bottom(self, other: impl Frame + 'static) -> FrameStack {
+  fn stack_below(self, other: impl Frame + 'static) -> FrameStack {
     FrameStack(Box::new(other), Box::new(self))
   }
 }

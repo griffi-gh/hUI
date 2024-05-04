@@ -15,6 +15,12 @@ include = [
 
 [dependencies]
 hui = { version = "=0.1.0-alpha.5", path = "../hui", default-features = false }
-winit = { version = "0.29", default-features = false }
+winit_30 = { package = "winit", version = "0.30", default-features = false, optional = true }
+winit_29 = { package = "winit", version = "0.29", default-features = false, optional = true }
 glam = "0.27"
 log = "0.4"
+
+[features]
+default = []
+winit_30 = ["dep:winit_30"]
+winit_29 = ["dep:winit_29"]

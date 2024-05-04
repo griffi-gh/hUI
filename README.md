@@ -90,7 +90,7 @@
     </td>
     <td>
       <code>hui-winit = &lt;master&gt;</code><br>
-      <code>winit = "0.29"</code>
+      <code>winit = "0.30"</code> or <code>winit = "0.29"</code>
     </td>
     <td align="center">(support planned)</td>
   </tr>

@@ -8,7 +8,7 @@ publish = false
 [dev-dependencies]
 hui = { path = "../hui" }
 hui-glium = { path = "../hui-glium" }
-hui-winit = { path = "../hui-winit" }
+hui-winit = { path = "../hui-winit", features = ["winit_29"] }
 kubi-logging = { git = "https://github.com/griffi-gh/kubi", rev = "c162893fd" }
 glium = "0.34"
 winit = "0.29"

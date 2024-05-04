@@ -25,6 +25,9 @@ impl Frame for ImageHandle {
 
 impl Frame for FillColor {
   fn draw(&self, draw: &mut UiDrawCommandList, rect: Rect) {
+    if self.is_transparent() {
+      return
+    }
     draw.add(UiDrawCommand::Rectangle {
       position: rect.position,
       size: rect.size,

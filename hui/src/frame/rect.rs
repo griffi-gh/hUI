@@ -116,6 +116,9 @@ impl Default for RectFrame {
 
 impl Frame for RectFrame {
   fn draw(&self, draw: &mut UiDrawCommandList, rect: Rect) {
+    if self.color.is_transparent() {
+      return
+    }
     //TODO: handle bottom_right < top_left
     let top_left = self.top_left.resolve(rect.size);
     let bottom_right = self.bottom_right.resolve(rect.size);

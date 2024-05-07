@@ -1,1 +1,7 @@
-//TODO
+pub struct WgpuUiRenderer {
+
+}
+
+impl WgpuUiRenderer {
+
+}

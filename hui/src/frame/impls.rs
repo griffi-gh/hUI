@@ -1,4 +1,4 @@
-use glam::{Vec2, Vec3, Vec4};
+use glam::{Vec3, Vec4};
 use super::Frame;
 use crate::{
   color,

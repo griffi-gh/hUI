@@ -92,7 +92,10 @@
       <code>hui-winit = &lt;master&gt;</code><br>
       <code>winit = "0.30"</code> or <code>winit = "0.29"</code>
     </td>
-    <td align="center">(support planned)</td>
+    <td>
+      <code>hui-wgpu = &lt;master&gt;</code><br>
+      <code>wgpu = "0.20"</code>
+    </td>
   </tr>
   <tr>
     <td align="center">

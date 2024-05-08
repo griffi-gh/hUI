@@ -1,4 +1,4 @@
-use glam::Vec2;
+use glam::{vec2, Vec2};
 use hui::{draw::{TextureAtlasMeta, UiDrawCall, UiVertex}, UiInstance};
 
 const DEFAULT_BUFFER_SIZE: u64 = 1024;
@@ -202,12 +202,15 @@ impl WgpuUiRenderer {
       .copied()
       .map(|x| {
         let mut v = x;
-        v.position = (v.position / resolution) * 2.0 - 1.0;
+        v.position = vec2(1., -1.) * ((v.position / resolution) * 2.0 - 1.0);
         v
       })
       .map(WgpuVertex::from)
       .collect::<Vec<_>>();
     let data_idx = &call.indices[..];
+
+    let data_vtx_view = bytemuck::cast_slice(&data_vtx);
+    let data_idx_view = bytemuck::cast_slice(data_idx);
 
     self.vertex_count = call.vertices.len();
     self.index_count = call.indices.len();
@@ -216,26 +219,26 @@ impl WgpuUiRenderer {
       return
     }
 
-    if data_vtx.len() as u64 > self.vertex_buffer.size() {
+    if data_vtx_view.len() as u64 > self.vertex_buffer.size() {
       self.vertex_buffer = device.create_buffer(&wgpu::BufferDescriptor {
         label: Some("ui_vertex_buffer"),
-        size: (data_vtx.len() as u64).next_power_of_two(),
+        size: (data_vtx_view.len() as u64).next_power_of_two(),
         usage: wgpu::BufferUsages::VERTEX | wgpu::BufferUsages::COPY_DST,
         mapped_at_creation: false,
       });
     }
 
-    if data_idx.len() as u64 > self.index_buffer.size() {
+    if data_idx_view.len() as u64 > self.index_buffer.size() {
       self.index_buffer = device.create_buffer(&wgpu::BufferDescriptor {
         label: Some("ui_index_buffer"),
-        size: (data_idx.len() as u64).next_power_of_two(),
+        size: (data_idx_view.len() as u64).next_power_of_two(),
         usage: wgpu::BufferUsages::INDEX | wgpu::BufferUsages::COPY_DST,
         mapped_at_creation: false,
       });
     }
 
-    queue.write_buffer(&self.vertex_buffer, 0, bytemuck::cast_slice(&data_vtx));
-    queue.write_buffer(&self.index_buffer, 0, bytemuck::cast_slice(data_idx));
+    queue.write_buffer(&self.vertex_buffer, 0, data_vtx_view);
+    queue.write_buffer(&self.index_buffer, 0, data_idx_view);
   }
 
   fn update_texture(&self, meta: TextureAtlasMeta, queue: &wgpu::Queue) {
@@ -289,6 +292,10 @@ impl WgpuUiRenderer {
     encoder: &mut wgpu::CommandEncoder,
     surface_view: &wgpu::TextureView,
   ) {
+    if self.vertex_count == 0 || self.index_count == 0 {
+      return
+    }
+
     let mut rpass = encoder.begin_render_pass(&wgpu::RenderPassDescriptor {
       label: Some("ui_render_pass"),
       color_attachments: &[Some(wgpu::RenderPassColorAttachment {

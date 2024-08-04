@@ -11,10 +11,11 @@
 #![forbid(unsafe_op_in_unsafe_fn)]
 #![allow(unused_parens)]
 
+pub use hui_shared::*;
+
 mod instance;
 mod macros;
 pub mod layout;
-pub mod rect;
 pub mod element;
 pub mod event;
 pub mod input;

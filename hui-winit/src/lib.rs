@@ -1,9 +1,9 @@
-#[cfg(all(feature = "winit_30", feature = "winit_29"))]
-compile_error!("Only one of the winit_30 and winit_29 features can be enabled at a time");
-#[cfg(not(any(feature = "winit_30", feature = "winit_29")))]
-compile_error!("One of the winit_30 and winit_29 features must be enabled");
-#[cfg(feature = "winit_30")] extern crate winit_30 as winit;
-#[cfg(feature = "winit_29")] extern crate winit_29 as winit;
+// #[cfg(all(feature = "winit_30", feature = "winit_29"))]
+// compile_error!("Only one of the winit_30 and winit_29 features can be enabled at a time");
+// #[cfg(not(any(feature = "winit_30", feature = "winit_29")))]
+// compile_error!("One of the winit_30 and winit_29 features must be enabled");
+// #[cfg(feature = "winit_30")] extern crate winit_30 as winit;
+// #[cfg(feature = "winit_29")] extern crate winit_29 as winit;
 
 use glam::vec2;
 use hui::{event::UiEvent, UiInstance};

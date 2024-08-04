@@ -8,11 +8,11 @@ publish = false
 [dev-dependencies]
 hui = { path = "../hui" }
 hui-glium = { path = "../hui-glium" }
-hui-winit = { path = "../hui-winit", features = ["winit_29"] }
+hui-winit = { path = "../hui-winit" }
 kubi-logging = { git = "https://github.com/griffi-gh/kubi", rev = "c162893fd" }
-glium = "0.34"
-winit = "0.29"
-glam = "0.27"
+glium = "0.35"
+winit = "0.30"
+glam = "0.28"
 log = "0.4"
 image = { version = "0.25", features = ["jpeg", "png"] }
 

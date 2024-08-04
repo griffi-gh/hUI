@@ -1,22 +1,20 @@
 [package]
-name = "hui-glium"
-description = "glium render backend for `hui`"
+name = "hui-painter"
+description = "UI rendering middleware for hUI, abstracts away triangulation, text rendering and all the other hard stuff."
 repository = "https://github.com/griffi-gh/hui"
 readme = "../README.md"
 authors = ["griffi-gh <prasol258@gmail.com>"]
-version = "0.1.0-alpha.5"
 rust-version = "1.75"
+version = "0.1.0-alpha.5"
 edition = "2021"
 license = "GPL-3.0-or-later"
 publish = true
 include = [
-  "shaders/**/*",
+  "assets/**/*",
   "src/**/*.rs",
   "Cargo.toml",
 ]
 
 [dependencies]
-hui = { version = "=0.1.0-alpha.5", path = "../hui", default-features = false }
-glium = { version = "0.35", default-features = false }
+hui-shared = { version = "0.1.0-alpha.5", path = "../hui-shared" }
 glam = "0.28"
-log = "0.4"

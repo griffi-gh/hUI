@@ -86,11 +86,11 @@
     </th>
     <td>
       <code>hui-glium = &lt;master&gt;</code><br>
-      <code>glium = "0.34"</code>
+      <code>glium = "0.35"</code>
     </td>
     <td>
       <code>hui-winit = &lt;master&gt;</code><br>
-      <code>winit = "0.30"</code> or <code>winit = "0.29"</code>
+      <code>winit = "0.30"</code>
     </td>
     <td>
       <code>hui-wgpu = &lt;master&gt;</code><br>

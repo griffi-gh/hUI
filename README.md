@@ -164,4 +164,5 @@
 </table>
 
 <h2>MSRV</h2>
-1.75
+1.80 (or latest stable at the time of the last major release)<br>
+bumps to MSRV are considered a breaking change

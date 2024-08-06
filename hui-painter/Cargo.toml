@@ -1,6 +1,6 @@
 [package]
 name = "hui-painter"
-description = "UI rendering middleware for hUI, abstracts away triangulation, text rendering and all the other hard stuff."
+description = "UI rendering middleware for hUI, abstracts away triangulation, text layout and rendering and all the other hard stuff."
 repository = "https://github.com/griffi-gh/hui"
 readme = "../README.md"
 authors = ["griffi-gh <prasol258@gmail.com>"]
@@ -10,7 +10,6 @@ edition = "2021"
 license = "GPL-3.0-or-later"
 publish = true
 include = [
-  "assets/**/*",
   "src/**/*.rs",
   "Cargo.toml",
 ]
@@ -18,3 +17,7 @@ include = [
 [dependencies]
 hui-shared = { version = "0.1.0-alpha.5", path = "../hui-shared" }
 glam = "0.28"
+log = "0.4"
+rect_packer = "0.2" # TODO: use sth else like `crunch` instead?
+hashbrown = "0.14"
+nohash-hasher = "0.2"

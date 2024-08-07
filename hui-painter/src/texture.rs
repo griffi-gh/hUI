@@ -1,2 +1,2 @@
-pub(crate) mod atlas;
-pub use atlas::TextureHandle;
+mod atlas;
+pub use atlas::*;

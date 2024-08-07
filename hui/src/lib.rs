@@ -23,7 +23,6 @@ pub mod draw;
 pub mod measure;
 pub mod state;
 pub mod text;
-pub mod color;
 pub mod signal;
 pub mod frame;
 

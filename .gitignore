@@ -4,3 +4,4 @@ Cargo.lock
 **/*.rs.bk
 *.pdb
 rustc-ice-*.txt
+.direnv

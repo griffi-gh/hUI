@@ -53,6 +53,9 @@ pub fn ui<T>(
         WindowEvent::CloseRequested => {
           window_target.exit();
         },
+        WindowEvent::Resized(size) => {
+          display.resize((size.width, size.height));
+        },
         WindowEvent::RedrawRequested => {
           let mut frame = display.draw();
           frame.clear_color_srgb(0.5, 0.5, 0.5, 1.);

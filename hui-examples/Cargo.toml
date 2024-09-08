@@ -9,7 +9,7 @@ publish = false
 hui = { path = "../hui" }
 hui-glium = { path = "../hui-glium" }
 hui-winit = { path = "../hui-winit" }
-kubi-logging = { git = "https://github.com/griffi-gh/kubi", rev = "c162893fd" }
+kubi-logging = { git = "https://github.com/griffi-gh/kubi", rev = "be1e24ba0c9e6d24128e7d0e74bebd8b90c23be7" }
 glium = "0.35"
 winit = "0.30"
 glam = "0.28"

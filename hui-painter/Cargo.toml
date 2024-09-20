@@ -21,3 +21,4 @@ log = "0.4"
 rect_packer = "0.2" # TODO: use sth else like `crunch` instead?
 hashbrown = "0.14"
 nohash-hasher = "0.2"
+fontdue = "0.9"

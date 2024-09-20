@@ -5,7 +5,8 @@ use texture::TextureAtlas;
 
 #[derive(Default)]
 pub struct Painter {
-  atlas: TextureAtlas,
+  pub(crate) atlas: TextureAtlas,
+  // ftm: FontTextureManager,
 }
 
 impl Painter {

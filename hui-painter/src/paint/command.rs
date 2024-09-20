@@ -1,4 +1,4 @@
-use crate::paint::buffer::PaintBuffer;
+use crate::{paint::buffer::PaintBuffer, Painter};
 
 mod transform;
 pub use transform::PaintTransform;
@@ -10,5 +10,5 @@ mod text;
 pub use text::PaintText;
 
 pub trait PaintCommand {
-  fn paint(&self, into: &mut PaintBuffer);
+  fn paint(&self, ctx: &mut Painter, into: &mut PaintBuffer);
 }

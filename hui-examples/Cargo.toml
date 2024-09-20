@@ -7,6 +7,7 @@ publish = false
 
 [dev-dependencies]
 hui = { path = "../hui" }
+hui-painter = { path = "../hui-painter" }
 hui-glium = { path = "../hui-glium" }
 hui-winit = { path = "../hui-winit" }
 kubi-logging = { git = "https://github.com/griffi-gh/kubi", rev = "be1e24ba0c9e6d24128e7d0e74bebd8b90c23be7" }

@@ -1,4 +1,5 @@
-use glam::{UVec2, uvec2, ivec2};
+use glam::{ivec2, uvec2, vec2, UVec2, Vec2};
+use hui_shared::rect::Corners;
 use rect_packer::DensePacker;
 use hashbrown::HashMap;
 use nohash_hasher::BuildNoHashHasher;
@@ -341,6 +342,22 @@ impl TextureAtlas {
     self.update(handle, format, data);
 
     handle
+  }
+
+  /// Get uv coordinates for the texture handle.
+  pub(crate) fn get_uv(&self, handle: TextureHandle) -> Option<Corners<Vec2>> {
+    let TextureAllocation { offset, size, .. } = self.allocations
+      .get(&handle.id)?;
+    let p0x = offset.x as f32 / self.size.x as f32;
+    let p1x = (offset.x as f32 + size.x as f32) / self.size.x as f32;
+    let p0y = offset.y as f32 / self.size.y as f32;
+    let p1y = (offset.y as f32 + size.y as f32) / self.size.y as f32;
+    Some(Corners {
+      top_left: vec2(p0x, p0y),
+      top_right: vec2(p1x, p0y),
+      bottom_left: vec2(p0x, p1y),
+      bottom_right: vec2(p1x, p1y),
+    })
   }
 }
 

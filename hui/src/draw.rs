@@ -211,7 +211,7 @@ impl UiDrawCall {
             //TODO: fix some corners tris being invisible (but it's already close enough lol)
             let rounded_corner_verts = corner.point_count.get() as u32;
             for i in 0..rounded_corner_verts {
-              let cratio = i as f32 / rounded_corner_verts as f32;
+              let cratio = i as f32 / (rounded_corner_verts - 1) as f32;
               let angle = cratio * std::f32::consts::PI * 0.5;
               let x = angle.sin();
               let y = angle.cos();

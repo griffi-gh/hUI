@@ -1,15 +1,16 @@
 use std::{borrow::Cow, sync::Arc};
 use fontdue::layout::{CoordinateSystem, Layout};
-use crate::{paint::{
-  buffer::PaintBuffer,
-  command::PaintCommand,
-}, Painter};
-
-pub struct FontHandle(Arc<fontdue::Font>);
+use crate::{
+  Painter,
+  paint::{
+    buffer::PaintBuffer,
+    command::PaintCommand,
+  },
+};
 
 pub struct TextChunk {
   pub text: Cow<'static, str>,
-  pub font: FontHandle,
+  pub font: (),
   pub size: f32,
 }
 

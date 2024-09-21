@@ -1,5 +1,6 @@
 pub mod paint;
 pub mod texture;
+pub mod text;
 
 use texture::TextureAtlas;
 

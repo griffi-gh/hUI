@@ -1,9 +1,10 @@
-use crate::{paint::{
-  buffer::PaintBuffer,
-  command::PaintCommand,
-}, Painter};
-
-//TODO: use generics instead
+use crate::{
+  Painter,
+  paint::{
+    buffer::PaintBuffer,
+    command::PaintCommand,
+  },
+};
 
 pub struct PaintTransform {
   pub transform: glam::Affine2,

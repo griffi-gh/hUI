@@ -12,6 +12,12 @@ pub struct PaintTransform {
 }
 
 impl PaintCommand for PaintTransform {
+  fn pre_paint(&self, ctx: &mut Painter) {
+    for child in &self.children {
+      child.pre_paint(ctx);
+    }
+  }
+
   fn paint(&self, ctx: &mut Painter, into: &mut PaintBuffer) {
     // remember the starting index
     let starting_index = into.vertices.len();

@@ -1,31 +1,27 @@
 use crate::{
-  Painter,
+  PainterInstance,
   paint::{
     buffer::PaintBuffer,
     command::PaintCommand,
   },
 };
 
-pub struct PaintTransform {
+pub struct PaintTransform<T: PaintCommand + 'static> {
   pub transform: glam::Affine2,
-  pub children: Vec<Box<dyn PaintCommand>>,
+  pub child: T,
 }
 
-impl PaintCommand for PaintTransform {
-  fn pre_paint(&self, ctx: &mut Painter) {
-    for child in &self.children {
-      child.pre_paint(ctx);
-    }
+impl<T: PaintCommand + 'static> PaintCommand for PaintTransform<T> {
+  fn pre_paint(&self, ctx: &mut PainterInstance) {
+    self.child.pre_paint(ctx);
   }
 
-  fn paint(&self, ctx: &mut Painter, into: &mut PaintBuffer) {
+  fn paint(&self, ctx: &mut PainterInstance, into: &mut PaintBuffer) {
     // remember the starting index
     let starting_index = into.vertices.len();
 
-    // paint children nodes
-    for child in &self.children {
-      child.paint(ctx, into);
-    }
+    // paint children node
+    self.child.paint(ctx, into);
 
     let mut min_point = glam::Vec2::splat(f32::MAX);
     let mut max_point = glam::Vec2::splat(f32::MIN);

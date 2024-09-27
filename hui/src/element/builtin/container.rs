@@ -375,7 +375,7 @@ impl UiElement for Container {
     //   });
     // }
 
-    self.background_frame.draw(ctx.draw, (ctx.layout.position, ctx.measure.size).into());
+    self.background_frame.draw(ctx.paint, (ctx.layout.position, ctx.measure.size).into());
 
     //padding
     position += vec2(self.padding.left, self.padding.top);
@@ -487,7 +487,7 @@ impl UiElement for Container {
         element.process(ProcessContext {
           measure: &el_measure,
           layout: &el_layout,
-          draw: ctx.draw,
+          paint: ctx.paint,
           state: ctx.state,
           text_measure: ctx.text_measure,
           current_font: ctx.current_font,

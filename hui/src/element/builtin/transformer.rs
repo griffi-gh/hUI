@@ -46,20 +46,20 @@ impl UiElement for Transformer {
   }
 
   fn process(&self, ctx: ProcessContext) {
-    ctx.draw.add(UiDrawCommand::PushTransform(self.transform));
+    ctx.paint.add(UiDrawCommand::PushTransform(self.transform));
     //This is stupid:
     self.element.process(ProcessContext {
       measure: ctx.measure,
       state: ctx.state,
       layout: ctx.layout,
-      draw: ctx.draw,
+      paint: ctx.paint,
       text_measure: ctx.text_measure,
       current_font: ctx.current_font,
       images: ctx.images,
       input: ctx.input,
       signal: ctx.signal,
     });
-    ctx.draw.add(UiDrawCommand::PopTransform);
+    ctx.paint.add(UiDrawCommand::PopTransform);
   }
 }
 

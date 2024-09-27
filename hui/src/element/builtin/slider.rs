@@ -155,7 +155,7 @@ impl UiElement for Slider {
     // if !(self.track_color.is_transparent() || (self.track_active_color.is_opaque() && self.handle_color.is_opaque() && self.value >= 1.)) {
     if !(self.track_active.covers_opaque() && self.handle.covers_opaque() && (self.handle_size.1 >= self.track_height) && self.value >= 1.) {
       self.track.draw(
-        ctx.draw,
+        ctx.paint,
         (
           ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height / 2.),
           ctx.measure.size * vec2(1., self.track_height),
@@ -169,7 +169,7 @@ impl UiElement for Slider {
     // if !(self.track_active_color.is_transparent() || (self.value <= 0. && self.handle_color.is_opaque())) {
     if !(self.handle.covers_opaque() && (self.handle_size.1 >= self.track_height) && self.value <= 0.) {
       self.track_active.draw(
-        ctx.draw,
+        ctx.paint,
         (
           ctx.layout.position + ctx.measure.size * vec2(0., 0.5 - self.track_height / 2.),
           (ctx.measure.size - handle_size * Vec2::X) * vec2(self.value, self.track_height) + handle_size * Vec2::X / 2.,
@@ -190,7 +190,7 @@ impl UiElement for Slider {
     // }
     if (self.handle_size.0 > 0. && self.handle_size.1 > 0.) {
       self.handle.draw(
-        ctx.draw,
+        ctx.paint,
         (
           ctx.layout.position +
             ((ctx.measure.size.x - handle_size.x) * self.value) * Vec2::X +

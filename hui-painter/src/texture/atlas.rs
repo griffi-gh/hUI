@@ -141,6 +141,9 @@ pub struct TextureAtlas {
   /// Deallocated allocations that can be reused, sorted by size
   //TODO: use binary heap or btreeset for reuse_allocations instead, but this works for now
   reuse_allocations: Vec<TextureAllocation>,
+
+  /// Version of the texture atlas, incremented every time the atlas is modified
+  version: u64,
 }
 
 impl TextureAtlas {
@@ -158,7 +161,17 @@ impl TextureAtlas {
       next_id: 0,
       allocations: HashMap::default(),
       reuse_allocations: Vec::new(),
+      version: 0,
     }
+  }
+
+  pub fn version(&self) -> u64 {
+    self.version
+  }
+
+  fn mark_modified(&mut self) {
+    // XXX: wrapping_add? will this *ever* overflow?
+    self.version = self.version.wrapping_add(1);
   }
 
   /// Get the next handle
@@ -303,6 +316,8 @@ impl TextureAtlas {
         }
       }
     }
+
+    self.mark_modified();
   }
 
   /// Allocate a texture in the atlas, returning a handle to it.\

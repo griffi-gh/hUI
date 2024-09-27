@@ -96,7 +96,7 @@ impl UiElement for Text {
     if self.text.is_empty() || self.color.w == 0. {
       return
     }
-    ctx.draw.add(UiDrawCommand::Text {
+    ctx.paint.add(UiDrawCommand::Text {
       text: self.text.clone(),
       position: ctx.layout.position,
       size: self.text_size,

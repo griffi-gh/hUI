@@ -78,7 +78,7 @@ impl UiElement for Image {
 
   fn process(&self, ctx: ProcessContext) {
     if !self.color.is_transparent() {
-      ctx.draw.add(UiDrawCommand::Rectangle {
+      ctx.paint.add(UiDrawCommand::Rectangle {
         position: ctx.layout.position,
         size: ctx.measure.size,
         color: self.color.corners(),

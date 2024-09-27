@@ -63,6 +63,6 @@ impl UiElement for FrameView {
   }
 
   fn process(&self, ctx: ProcessContext) {
-    self.frame.draw(ctx.draw, (ctx.layout.position, ctx.measure.size).into());
+    self.frame.draw(ctx.paint, (ctx.layout.position, ctx.measure.size).into());
   }
 }

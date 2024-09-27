@@ -23,7 +23,7 @@ impl FontManager {
   ///
   /// Panics:
   /// - If the font data is invalid.
-  pub fn add_font(&mut self, data: &[u8]) -> FontHandle {
+  pub fn add(&mut self, data: &[u8]) -> FontHandle {
     let font = self.fonts.add_font(data);
     self.ftm.init_font(font);
     font
@@ -33,7 +33,7 @@ impl FontManager {
   ///
   /// Panics:
   /// - If the font handle is invalid.
-  pub fn remove_font(&mut self, font: FontHandle, atlas: &mut TextureAtlas) {
+  pub fn remove(&mut self, font: FontHandle, atlas: &mut TextureAtlas) {
     self.ftm.drop_font(font, atlas);
     self.fonts.remove_font(font);
   }

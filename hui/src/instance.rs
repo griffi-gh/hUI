@@ -1,15 +1,12 @@
-use glam::Vec2;
+use hui_painter::{
+  PainterInstance,
+  paint::command::PaintList,
+  text::FontHandle,
+  texture::{SourceTextureFormat, TextureHandle},
+};
 use crate::{
   element::{MeasureContext, ProcessContext, UiElement},
   layout::{Direction, LayoutInfo},
-  text::{FontHandle, TextRenderer},
-  draw::{
-    ImageHandle,
-    TextureFormat,
-    UiDrawCall,
-    UiDrawCommandList,
-    atlas::{TextureAtlasManager, TextureAtlasMeta},
-  },
   signal::{Signal, SignalStore},
   event::{EventQueue, UiEvent},
   input::UiInputState,
@@ -17,21 +14,26 @@ use crate::{
   state::StateRepo,
 };
 
+pub struct RenderInfo<'a> {
+  pub id: u64,
+  pub list: &'a PaintList,
+}
+
 /// The main instance of the UI system.
 ///
 /// In most cases, you should only have one instance of this struct, but multiple instances are allowed\
 /// (Please note that it's possible to render multiple UI "roots" using a single instance)
 pub struct UiInstance {
   stateful_state: StateRepo,
-  prev_draw_commands: UiDrawCommandList,
-  draw_commands: UiDrawCommandList,
-  draw_call: UiDrawCall,
-  draw_call_modified: bool,
-  text_renderer: TextRenderer,
-  atlas: TextureAtlasManager,
   events: EventQueue,
   input: UiInputState,
   signal: SignalStore,
+
+  painter: PainterInstance,
+  draw_commands: PaintList,
+  prev_draw_commands: PaintList,
+  draw_call_id: u64,
+
   /// True if in the middle of a laying out a frame
   state: bool,
 }
@@ -44,19 +46,12 @@ impl UiInstance {
     UiInstance {
       //mouse_position: Vec2::ZERO,
       stateful_state: StateRepo::new(),
-      //event_queue: VecDeque::new(),
-      // root_elements: Vec::new(),
-      prev_draw_commands: UiDrawCommandList::default(),
-      draw_commands: UiDrawCommandList::default(),
-      draw_call: UiDrawCall::default(),
-      draw_call_modified: false,
-      // ftm: FontTextureManager::default(),
-      text_renderer: TextRenderer::new(),
-      atlas: {
-        let mut atlas = TextureAtlasManager::default();
-        atlas.add_dummy();
-        atlas
-      },
+      painter: PainterInstance::new(),
+
+      draw_commands: PaintList::new_empty(),
+      prev_draw_commands: PaintList::new_empty(),
+      draw_call_id: 0,
+
       events: EventQueue::new(),
       input: UiInputState::new(),
       signal: SignalStore::new(),
@@ -71,8 +66,9 @@ impl UiInstance {
   ///
   /// ## Panics:
   /// If the font data is invalid or corrupt
+  #[deprecated(since = "0.1.0-alpha.5", note = "Use painter.fonts.add_font() instead")]
   pub fn add_font(&mut self, font: &[u8]) -> FontHandle {
-    self.text_renderer.add_font_from_bytes(font)
+    self.painter.fonts.add(font)
   }
 
   /// Add an image to the texture atlas\
@@ -81,14 +77,18 @@ impl UiInstance {
   /// Returns an image handle ([`ImageHandle`])\
   /// This handle can be used to reference the texture in draw commands\
   /// It's a light reference and can be cloned/copied freely, but will not be cleaned up even when dropped
-  pub fn add_image(&mut self, format: TextureFormat, data: &[u8], width: usize) -> ImageHandle {
-    self.atlas.add(width, data, format)
+  #[deprecated(since = "0.1.0-alpha.5", note = "Use painter.atlas.allocate_with_data() instead")]
+  pub fn add_image(&mut self, format: SourceTextureFormat, data: &[u8], width: usize) -> TextureHandle {
+    self.painter.atlas.allocate_with_data(format, data, width)
   }
 
   //TODO better error handling
 
+  /// ## DEPRECATED: This method will be removed in the future
+  ///
+  /// ---
+  ///
   /// Add an image from a file to the texture atlas\
-  /// (experimental, may be removed in the future)
   ///
   /// Requires the `image` feature
   ///
@@ -96,7 +96,8 @@ impl UiInstance {
   /// - If the file exists but contains invalid image data\
   ///   (this will change to a soft error in the future)
   #[cfg(feature = "image")]
-  pub fn add_image_file_path(&mut self, path: impl AsRef<std::path::Path>) -> Result<ImageHandle, std::io::Error> {
+  #[deprecated(since = "0.1.0-alpha.5", note = "Will be removed in the future in favor of modular image loading in hui-painter")]
+  pub fn add_image_file_path(&mut self, path: impl AsRef<std::path::Path>) -> Result<TextureHandle, std::io::Error> {
     use std::io::{Read, Seek};
 
     // Open the file (and wrap it in a bufreader)
@@ -115,35 +116,14 @@ impl UiInstance {
     let image_rgba = image.as_rgba8().unwrap();
 
     //Add the image to the atlas
-    let handle = self.add_image(
-      TextureFormat::Rgba,
+
+    let handle = self.painter.atlas.allocate_with_data(
+      SourceTextureFormat::RGBA8,
       image_rgba,
       image.width() as usize
     );
 
     Ok(handle)
-  }
-
-  /// Push a font to the font stack\
-  /// The font will be used for all text rendering until it is popped
-  ///
-  /// This function is useful for replacing the default font, use sparingly\
-  /// (This library attempts to be stateless, however passing the font to every text element is not very practical)
-  pub fn push_font(&mut self, font: FontHandle) {
-    self.text_renderer.push_font(font);
-  }
-
-  /// Pop a font from the font stack\
-  ///
-  /// ## Panics:
-  /// If the font stack is empty
-  pub fn pop_font(&mut self) {
-    self.text_renderer.pop_font();
-  }
-
-  /// Get the current default font
-  pub fn current_font(&self) -> FontHandle {
-    self.text_renderer.current_font()
   }
 
   /// Add an element or an element tree to the UI
@@ -165,18 +145,13 @@ impl UiInstance {
     let measure = element.measure(MeasureContext {
       state: &self.stateful_state,
       layout: &layout,
-      text_measure: self.text_renderer.to_measure(),
-      current_font: self.text_renderer.current_font(),
-      images: self.atlas.context(),
+      painter: &self.painter,
     });
     element.process(ProcessContext {
       measure: &measure,
       state: &mut self.stateful_state,
       layout: &layout,
-      draw: &mut self.draw_commands,
-      text_measure: self.text_renderer.to_measure(),
-      current_font: self.text_renderer.current_font(),
-      images: self.atlas.context(),
+      painter: &mut self.painter,
       input: self.input.ctx(),
       signal: &mut self.signal,
     });
@@ -202,10 +177,10 @@ impl UiInstance {
     //then, reset the draw commands
     std::mem::swap(&mut self.prev_draw_commands, &mut self.draw_commands);
     self.draw_commands.commands.clear();
-    self.draw_call_modified = false;
+    // self.draw_call_modified = false;
 
     //reset atlas modification flag
-    self.atlas.reset_modified();
+    // self.atlas.reset_modified();
   }
 
   /// End the frame and prepare the UI for rendering\
@@ -225,8 +200,7 @@ impl UiInstance {
     }
 
     //if they have, rebuild the draw call and set the modified flag
-    self.draw_call = UiDrawCall::build(&self.draw_commands, &mut self.atlas, &mut self.text_renderer);
-    self.draw_call_modified = true;
+    self.draw_call_id += 1;
   }
 
   /// Get the draw call information for the current frame
@@ -234,18 +208,19 @@ impl UiInstance {
   /// This function should only be used by the render backend.\
   /// You should not call this directly unless you're implementing a custom render backend
   ///
-  /// Returns a tuple with a boolean indicating if the buffers have been modified since the last frame
-  ///
   /// You should only call this function *after* [`UiInstance::end`]\
   /// Calling it in the middle of a frame will result in a warning but will not cause a panic\
   /// (please note that doing so is probably a mistake and should be fixed in your code)\
   /// Doing so anyway will return draw call data for the previous frame, but the `modified` flag will *always* be incorrect until [`UiInstance::end`] is called
   ///
-  pub fn draw_call(&self) -> (bool, &UiDrawCall) {
+  pub fn draw_call(&self) -> RenderInfo{
     if self.state {
       log::warn!("UiInstance::draw_call called while in the middle of a frame, this is probably a mistake");
     }
-    (self.draw_call_modified, &self.draw_call)
+    RenderInfo {
+      id: self.draw_call_id,
+      list: &self.draw_commands,
+    }
   }
 
   /// Get the texture atlas size and data for the current frame

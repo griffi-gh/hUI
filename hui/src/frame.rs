@@ -1,6 +1,7 @@
 //! modular procedural background system
 
-use crate::{draw::UiDrawCommandList, rect::Rect};
+use crate::rect::Rect;
+use hui_painter::PainterInstance;
 
 pub mod point;
 mod rect;
@@ -13,7 +14,7 @@ pub use rect::RectFrame;
 /// Trait for a drawable frame
 pub trait Frame {
   /// Draw the frame at the given rect's position and size
-  fn draw(&self, draw: &mut UiDrawCommandList, rect: Rect);
+  fn draw(&self, draw: &mut PainterInstance, rect: Rect);
 
   /// Check if the frame is guaranteed to be fully opaque and fully cover the parent frame regardless of it's size
   ///

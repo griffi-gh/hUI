@@ -1,17 +1,19 @@
 pub mod paint;
 pub mod texture;
 pub mod text;
+pub mod util;
 
 use text::FontManager;
 use texture::TextureAtlas;
 
+/// Painter instance, stores textures and fonts needed for rendering
 #[derive(Default)]
-pub struct Painter {
+pub struct PainterInstance {
   pub atlas: TextureAtlas,
   pub fonts: FontManager,
 }
 
-impl Painter {
+impl PainterInstance {
   pub fn new() -> Self {
     Self::default()
   }

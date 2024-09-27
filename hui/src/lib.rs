@@ -11,6 +11,9 @@
 #![forbid(unsafe_op_in_unsafe_fn)]
 #![allow(unused_parens)]
 
+// Re-export hui-painter
+pub use hui_painter as painter;
+
 pub use hui_shared::*;
 
 mod instance;
@@ -19,10 +22,8 @@ pub mod layout;
 pub mod element;
 pub mod event;
 pub mod input;
-pub mod draw;
 pub mod measure;
 pub mod state;
-pub mod text;
 pub mod signal;
 pub mod frame;
 

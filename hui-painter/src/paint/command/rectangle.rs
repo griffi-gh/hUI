@@ -7,7 +7,7 @@ use crate::{
     command::PaintCommand,
   },
   texture::TextureHandle,
-  Painter
+  PainterInstance
 };
 
 /// Calculate the number of points based on the maximum corner radius
@@ -92,7 +92,7 @@ impl PaintRectangle {
 }
 
 impl PaintCommand for PaintRectangle {
-  fn paint(&self, ctx: &mut Painter, into: &mut PaintBuffer) {
+  fn paint(&self, ctx: &mut PainterInstance, into: &mut PaintBuffer) {
     // If texture is set:
     // - Get texture UV
     // - Map local UVs to texture UV coords

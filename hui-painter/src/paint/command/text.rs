@@ -1,11 +1,11 @@
-use std::{borrow::Cow, sync::Arc};
-use fontdue::layout::{self, CoordinateSystem, GlyphRasterConfig, Layout};
+use std::borrow::Cow;
+use fontdue::layout::{CoordinateSystem, Layout};
 use glam::{vec2, Vec2};
 use crate::{
   paint::{
     buffer::PaintBuffer,
     command::PaintCommand,
-  }, text::FontHandle, Painter
+  }, text::FontHandle, PainterInstance
 };
 
 use super::Measurable;
@@ -34,7 +34,7 @@ impl PaintText {
     }
   }
 
-  fn build_font_array<'a>(&self, ctx: &'a Painter) -> Vec<&'a fontdue::Font> {
+  fn build_font_array<'a>(&self, ctx: &'a PainterInstance) -> Vec<&'a fontdue::Font> {
     let font = ctx.fonts.get_fontdue_font(self.text.font)
       .expect("FontHandle is invalid");
     vec![&font]
@@ -55,7 +55,7 @@ impl PaintText {
 }
 
 impl PaintCommand for PaintText {
-  fn pre_paint(&self, ctx: &mut Painter) {
+  fn pre_paint(&self, ctx: &mut PainterInstance) {
     let font_array = self.build_font_array(ctx);
     let layout = self.build_layout(&font_array);
 
@@ -64,7 +64,7 @@ impl PaintCommand for PaintText {
     }
   }
 
-  fn paint(&self, ctx: &mut Painter, into: &mut PaintBuffer) {
+  fn paint(&self, ctx: &mut PainterInstance, into: &mut PaintBuffer) {
     // let font_array = self.build_font_array(ctx);
     // let layout = self.build_layout(&font_array);
 
@@ -80,7 +80,7 @@ impl PaintCommand for PaintText {
 }
 
 impl Measurable for PaintText {
-  fn size(&self, ctx: &Painter) -> Vec2 {
+  fn size(&self, ctx: &PainterInstance) -> Vec2 {
     let font_array = self.build_font_array(ctx);
     let layout = self.build_layout(&font_array);
 

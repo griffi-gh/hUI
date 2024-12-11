@@ -17,7 +17,7 @@ include = [
 
 [dependencies]
 hui = { version = "=0.1.0-alpha.5", path = "../hui", default-features = false }
-wgpu = { version = "0.20", default-features = false, features = ["wgsl"]}
+wgpu = { version = "23", default-features = false, features = ["wgsl"]}
 bytemuck = "1.15"
 log = "0.4"
-glam = "0.28"
+glam = "0.29"

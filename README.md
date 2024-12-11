@@ -86,7 +86,7 @@
     </th>
     <td>
       <code>hui-glium = &lt;master&gt;</code><br>
-      <code>glium = "0.35"</code>
+      <code>glium = "0.36"</code>
     </td>
     <td>
       <code>hui-winit = &lt;master&gt;</code><br>
@@ -94,9 +94,26 @@
     </td>
     <td>
       <code>hui-wgpu = &lt;master&gt;</code><br>
-      <code>wgpu = "0.20"</code>
+      <code>wgpu = "23"</code>
     </td>
   </tr>
+  <!-- <tr>
+    <td align="center">
+      <code>0.1.0-alpha.5</code>
+    </th>
+    <td>
+      <code>hui-glium = &lt;master&gt;</code><br>
+      <code>glium = "0.36"</code>
+    </td>
+    <td>
+      <code>hui-winit = &lt;master&gt;</code><br>
+      <code>winit = "0.30"</code>
+    </td>
+    <td>
+      <code>hui-wgpu = &lt;master&gt;</code><br>
+      <code>wgpu = "23"</code>
+    </td>
+  </tr> -->
   <tr>
     <td align="center">
       <code>0.1.0-alpha.4</code>

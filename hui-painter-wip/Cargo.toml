@@ -1,5 +1,5 @@
 [package]
-name = "hui-painter"
+name = "hui-painter-wip"
 description = "UI rendering middleware for hUI, abstracts away triangulation, text layout and rendering and all the other hard stuff."
 repository = "https://github.com/griffi-gh/hui"
 readme = "../README.md"
@@ -8,7 +8,7 @@ rust-version = "1.75"
 version = "0.1.0-alpha.5"
 edition = "2021"
 license = "GPL-3.0-or-later"
-publish = true
+publish = false # TODO: change to true once ready
 include = [
   "src/**/*.rs",
   "Cargo.toml",

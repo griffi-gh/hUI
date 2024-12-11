@@ -44,7 +44,7 @@
           glslang
         ];
         LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath buildInputs;
-        # RUSTFLAGS = "-Zthreads=8"; (causes rustc to ICE)
+        RUSTFLAGS = "-Zthreads=8"; # (may cause rustc to ice?)
         MANGOHUD_DLSYM = "1"; # mangohud glium fix
       };
     });

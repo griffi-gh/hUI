@@ -163,7 +163,9 @@ impl TextureAtlasManager {
       //If the size does not match the requested size, the texture was rotated
       rotated: ALLOW_ROTATION && (result.width != size.x as i32),
     };
-    self.allocations.insert_unique_unchecked(index, allocation);
+    unsafe {
+      self.allocations.insert_unique_unchecked(index, allocation);
+    }
     Some(ImageHandle { index })
   }
 

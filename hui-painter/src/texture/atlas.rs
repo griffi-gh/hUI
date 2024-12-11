@@ -204,12 +204,14 @@ impl TextureAtlas {
       if allocation.max_size.x >= size.x && allocation.max_size.y >= size.y {
         let allocation = self.reuse_allocations.remove(idx);
         let handle = self.next_handle(size);
-        self.allocations.insert_unique_unchecked(handle.id, TextureAllocation {
-          handle,
-          offset: allocation.offset,
-          size,
-          max_size: allocation.max_size,
-        });
+        unsafe {
+          self.allocations.insert_unique_unchecked(handle.id, TextureAllocation {
+            handle,
+            offset: allocation.offset,
+            size,
+            max_size: allocation.max_size,
+          });
+        }
         return handle;
       }
     }
@@ -228,7 +230,9 @@ impl TextureAtlas {
     // Allocate the texture
     let handle = self.next_handle(size);
     let allocation = TextureAllocation::new(handle, offset, size);
-    self.allocations.insert_unique_unchecked(handle.id, allocation);
+    unsafe {
+      self.allocations.insert_unique_unchecked(handle.id, allocation);
+    }
 
     handle
   }

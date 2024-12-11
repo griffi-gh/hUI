@@ -7,7 +7,7 @@
 
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
-#![deny(unsafe_code)]
+// #![deny(unsafe_code)]
 #![forbid(unsafe_op_in_unsafe_fn)]
 #![allow(unused_parens)]
 

@@ -29,7 +29,7 @@ impl FontHandleManager {
   /// - If the font data is invalid.
   pub fn add_font(&mut self, data: &[u8]) -> FontHandle {
     let font = fontdue::Font::from_bytes(data, fontdue::FontSettings::default()).unwrap();
-    self.fonts.insert_unique_unchecked(self.idc, FontRepr { font });
+    unsafe { self.fonts.insert_unique_unchecked(self.idc, FontRepr { font }); }
     self.idc += 1;
     FontHandle(self.idc - 1)
   }

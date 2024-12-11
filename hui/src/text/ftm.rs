@@ -53,7 +53,9 @@ impl FontTextureManager {
       metrics,
       texture
     });
-    self.glyph_cache.insert_unique_unchecked(key, Arc::clone(&entry));
+    unsafe {
+      self.glyph_cache.insert_unique_unchecked(key, Arc::clone(&entry));
+    }
     entry
   }
 

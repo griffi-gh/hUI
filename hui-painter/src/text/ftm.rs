@@ -46,7 +46,7 @@ impl FontTextureManager {
   /// - If the partition for the font already exists.
   pub(crate) fn init_font(&mut self, font: FontHandle) {
     assert!(!self.partition.contains_key(&font.0), "Font handle already initialized");
-    self.partition.insert_unique_unchecked(font.0, HashMap::default());
+    unsafe { self.partition.insert_unique_unchecked(font.0, HashMap::default()) };
   }
 
   /// Render a glyph and cache it in the texture atlas.
@@ -81,7 +81,7 @@ impl FontTextureManager {
 
     // Create a texture item struct and insert it into the partition
     let itm = RasterizedGlyphInternal { handle, metrics };
-    partition.insert_unique_unchecked(config, itm);
+    unsafe { partition.insert_unique_unchecked(config, itm); }
 
     return handle;
   }

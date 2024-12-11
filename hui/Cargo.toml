@@ -21,7 +21,7 @@ hui-shared = { version = "0.1.0-alpha.5", path = "../hui-shared" }
 # hui-painter = { version = "0.1.0-alpha.5", path = "../hui-painter" }
 hashbrown = "0.14"
 nohash-hasher = "0.2"
-glam = "0.28.0"
+glam = "0.29""
 fontdue = "0.9"
 rect_packer = "0.2"
 log = "0.4"

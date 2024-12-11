@@ -97,7 +97,7 @@
       <code>wgpu = "23"</code>
     </td>
   </tr>
-  <!-- <tr>
+  <tr>
     <td align="center">
       <code>0.1.0-alpha.5</code>
     </th>
@@ -113,7 +113,7 @@
       <code>hui-wgpu = &lt;master&gt;</code><br>
       <code>wgpu = "23"</code>
     </td>
-  </tr> -->
+  </tr>
   <tr>
     <td align="center">
       <code>0.1.0-alpha.4</code>

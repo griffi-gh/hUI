@@ -242,10 +242,25 @@ impl WgpuUiRenderer {
     queue.write_buffer(&self.index_buffer, 0, data_idx_view);
   }
 
-  fn update_texture(&self, meta: TextureAtlasMeta, queue: &wgpu::Queue) {
+  fn update_texture(&mut self, meta: TextureAtlasMeta, queue: &wgpu::Queue, device: &wgpu::Device) {
     //TODO URGENCY:HIGH resize texture if needed
     if meta.data.len() as u32 > (self.texture.size().width * self.texture.size().height * 4) {
-      unimplemented!("texture resize not implemented");
+      self.texture.destroy();
+      // unimplemented!("texture resize not implemented");
+      self.texture = device.create_texture(&wgpu::TextureDescriptor {
+        label: Some("ui_texture"),
+        size: wgpu::Extent3d {
+          width: DEFAULT_TEXTURE_SIZE,
+          height: DEFAULT_TEXTURE_SIZE,
+          depth_or_array_layers: 1,
+        },
+        mip_level_count: 1,
+        sample_count: 1,
+        dimension: wgpu::TextureDimension::D2,
+        format: wgpu::TextureFormat::Rgba8UnormSrgb,
+        usage: wgpu::TextureUsages::COPY_DST | wgpu::TextureUsages::TEXTURE_BINDING,
+        view_formats: &[],
+      });
     }
     queue.write_texture(
       wgpu::ImageCopyTexture {
@@ -282,7 +297,7 @@ impl WgpuUiRenderer {
 
     let meta = instance.atlas();
     if self.modified || meta.modified {
-      self.update_texture(meta, queue);
+      self.update_texture(meta, queue, device);
     }
 
     self.modified = false;

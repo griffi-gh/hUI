@@ -1,11 +1,15 @@
 use std::time::Instant;
 use hui::{
-  color, element::{
+  color,
+  element::{
     container::Container,
     progress_bar::ProgressBar,
     text::Text,
     UiElementExt,
-  }, frame::RectFrame, rect_frame, layout::{Alignment, Direction}, size
+  },
+  layout::{Alignment, Direction},
+  rect_frame,
+  size
 };
 
 #[path = "../boilerplate.rs"]

@@ -256,7 +256,7 @@ pub struct ActiveCheckResponse {
 #[derive(Clone, Copy)]
 pub struct InputCtx<'a>(&'a UiInputState);
 
-impl<'a> InputCtx<'a> {
+impl InputCtx<'_> {
   /// Get the current position of the mouse pointer
   ///
   /// Do not use this function to check for hover, use [`InputCtx::check_hover`] instead

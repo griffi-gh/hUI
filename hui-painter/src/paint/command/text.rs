@@ -43,7 +43,7 @@ impl PaintText {
   fn build_layout(&self, font_array: &[&fontdue::Font]) -> Layout {
     let mut layout = Layout::new(CoordinateSystem::PositiveYDown);
     layout.append(
-      &font_array,
+      font_array,
       &fontdue::layout::TextStyle::new(
         &self.text.text,
         self.text.size,

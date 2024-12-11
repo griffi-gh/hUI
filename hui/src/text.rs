@@ -74,7 +74,7 @@ pub struct TextMeasureResponse {
 #[derive(Clone, Copy)]
 pub struct TextMeasure<'a>(&'a TextRenderer);
 
-impl<'a> TextMeasure<'a> {
+impl TextMeasure<'_> {
   /// Measure the given string of text with the given font and size
   pub fn measure(&self, font: FontHandle, size: u16, text: &str) -> TextMeasureResponse {
     use fontdue::layout::{Layout, CoordinateSystem, TextStyle};

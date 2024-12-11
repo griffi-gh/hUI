@@ -1,5 +1,5 @@
 use std::num::NonZeroU16;
-use glam::{vec2, Vec2, Vec4};
+use glam::{vec2, Vec2};
 use hui_shared::{color, rect::{Corners, FillColor}};
 use crate::{
   paint::{
@@ -99,8 +99,7 @@ impl PaintCommand for PaintRectangle {
     // Otherwise, if texture handle is not set or invalid, use the bottom left
     // corner of the texture which contains a white pixel.
     let uvs = self.texture
-      .map(|handle| ctx.atlas.get_uv(handle))
-      .flatten()
+      .and_then(|handle| ctx.atlas.get_uv(handle))
       .map(|global_uv| {
         let texture_uv = self.texture_uv;
         let texture_uv_is_default =
@@ -155,7 +154,7 @@ impl PaintCommand for PaintRectangle {
       // No border radius:
       // Draw a simple quad (2 tris)
       let indices = Corners {
-        top_left: idx_base + 0,
+        top_left: idx_base,
         top_right: idx_base + 1,
         bottom_left: idx_base + 2,
         bottom_right: idx_base + 3,

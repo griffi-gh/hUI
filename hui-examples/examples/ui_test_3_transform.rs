@@ -7,7 +7,12 @@ use hui::{
     text::Text,
     transformer::ElementTransformExt,
     UiElementExt
-  }, frame::RectFrame, rect_frame, layout::Alignment, rect::Corners, size, text::FontHandle
+  },
+  layout::Alignment,
+  rect::Corners,
+  text::FontHandle,
+  rect_frame,
+  size,
 };
 
 #[path = "../boilerplate.rs"]

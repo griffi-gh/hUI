@@ -1,7 +1,6 @@
 use hui::{
   color, size, rect_frame,
   element::{container::Container, text::Text, UiElementExt},
-  frame::RectFrame,
   layout::Alignment,
 };
 

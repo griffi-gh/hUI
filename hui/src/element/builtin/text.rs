@@ -2,7 +2,7 @@
 
 use std::borrow::Cow;
 use derive_setters::Setters;
-use glam::{vec2, Vec4};
+use glam::Vec4;
 use crate::{
   draw::UiDrawCommand,
   element::{MeasureContext, ProcessContext, UiElement},

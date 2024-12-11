@@ -83,7 +83,7 @@ impl FontTextureManager {
     let itm = RasterizedGlyphInternal { handle, metrics };
     unsafe { partition.insert_unique_unchecked(config, itm); }
 
-    return handle;
+    handle
   }
 }
 

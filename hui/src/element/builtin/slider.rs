@@ -4,9 +4,12 @@ use derive_setters::Setters;
 use glam::{Vec2, vec2};
 
 use crate::{
-  draw::UiDrawCommand, element::{MeasureContext, ProcessContext, UiElement}, frame::{Frame, RectFrame}, layout::{compute_size, Size2d}, measure::Response, rect::FillColor, signal::{trigger::SignalTriggerArg, Signal}
+  element::{MeasureContext, ProcessContext, UiElement},
+  frame::{Frame, RectFrame},
+  layout::{compute_size, Size2d},
+  measure::Response,
+  signal::{trigger::SignalTriggerArg, Signal},
 };
-
 
 //TODO: use state for slider?
 // ^ useful if the user only hanldes the drag end event or has large step sizes with relative mode

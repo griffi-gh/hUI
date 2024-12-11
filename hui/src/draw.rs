@@ -145,8 +145,8 @@ impl UiDrawCall {
           //Kinda a hack:
           //We want to apply the transform aronnd the center, so we need to compute the center of the vertices
           //We won't actually do that, we will compute the center of the bounding box of the vertices
-          let mut min = Vec2::splat(std::f32::INFINITY);
-          let mut max = Vec2::splat(std::f32::NEG_INFINITY);
+          let mut min = Vec2::splat(f32::INFINITY);
+          let mut max = Vec2::splat(f32::NEG_INFINITY);
           for v in &draw_call.vertices[idx as usize..] {
             min = min.min(v.position);
             max = max.max(v.position);

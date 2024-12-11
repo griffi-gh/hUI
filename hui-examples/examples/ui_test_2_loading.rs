@@ -8,7 +8,6 @@ use hui::{
     text::Text,
     UiElementExt
   },
-  frame::RectFrame,
   layout::Alignment,
   rect::Corners,
   text::FontHandle

@@ -14,4 +14,4 @@ include = [
 ]
 
 [dependencies]
-glam = "0.29"
+glam = "0.30"

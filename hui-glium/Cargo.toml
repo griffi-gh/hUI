@@ -18,5 +18,5 @@ include = [
 [dependencies]
 hui = { version = "=0.1.0-alpha.6", path = "../hui", default-features = false }
 glium = { version = "0.36", default-features = false }
-glam = "0.29"
+glam = "0.30"
 log = "0.4"

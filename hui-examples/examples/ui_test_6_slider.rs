@@ -30,7 +30,7 @@ ui_main!(
     let image = ui.add_image(TextureFormat::Rgba, IMAGE_DATA, 32);
     (0, image)
   },
-  run: |ui, size, (ref mut counter, image)| {
+  run: |ui, size, &mut (ref mut counter, image)| {
     Container::default()
       .with_size(size!(100%))
       .with_padding(10.)
@@ -68,7 +68,7 @@ ui_main!(
           .add_child(ui);
         Break.add_child(ui);
         for _ in 0..*counter {
-          Image::new(*image)
+          Image::new(image)
             .with_size(size!(48, 48))
             .add_child(ui);
         }

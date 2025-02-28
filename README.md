@@ -99,6 +99,23 @@
   </tr>
   <tr>
     <td align="center">
+      <code>0.1.0-alpha.6</code>
+    </th>
+    <td>
+      <code>hui-glium = "0.1.0-alpha.6"</code><br>
+      <code>glium = "0.36"</code>
+    </td>
+    <td>
+      <code>hui-winit = "0.1.0-alpha.6"</code><br>
+      <code>winit = "0.30"</code>
+    </td>
+    <td>
+      <code>hui-wgpu = "0.1.0-alpha.6"</code><br>
+      <code>wgpu = "24"</code>
+    </td>
+  </tr>
+  <tr>
+    <td align="center">
       <code>0.1.0-alpha.5</code>
     </th>
     <td>

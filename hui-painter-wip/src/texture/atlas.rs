@@ -76,7 +76,7 @@ type TextureId = u32;
 ///
 /// Can be cheaply copied and passed around.\
 /// The handle is only valid for the texture atlas it was created from.
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Hash, PartialEq, Eq, Debug)]
 pub struct TextureHandle {
   pub(crate) id: TextureId,
   pub(crate) size: UVec2,

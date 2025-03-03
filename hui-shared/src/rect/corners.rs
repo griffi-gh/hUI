@@ -1,10 +1,38 @@
+use std::mem::ManuallyDrop;
+
 /// Represents 4 corners of a rectangular shape.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Default)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
 pub struct Corners<T> {
   pub top_left: T,
   pub top_right: T,
   pub bottom_left: T,
   pub bottom_right: T,
+}
+
+impl<T> Corners<T> {
+  #[inline]
+  pub fn to_array(self) -> [T; 4] {
+    [self.top_left, self.top_right, self.bottom_left, self.bottom_right]
+  }
+
+  #[inline]
+  pub fn as_array(&self) -> [&T; 4] {
+    [
+      &self.top_left,
+      &self.top_right,
+      &self.bottom_left,
+      &self.bottom_right,
+    ]
+  }
+
+  pub fn as_array_mut(&mut self) -> [&mut T; 4] {
+    [
+      &mut self.top_left,
+      &mut self.top_right,
+      &mut self.bottom_left,
+      &mut self.bottom_right,
+    ]
+  }
 }
 
 impl<T: Clone> Corners<T> {
@@ -83,3 +111,61 @@ impl<T> From<(T, T, T, T)> for Corners<T> {
     }
   }
 }
+
+impl<T> IntoIterator for Corners<T> {
+  type Item = T;
+  type IntoIter = std::array::IntoIter<Self::Item, 4>;
+  fn into_iter(self) -> Self::IntoIter {
+    self.to_array().into_iter()
+  }
+}
+
+impl<'a, T> IntoIterator for &'a Corners<T> {
+  type Item = &'a T;
+  type IntoIter = std::array::IntoIter<Self::Item, 4>;
+
+  fn into_iter(self) -> Self::IntoIter {
+    self.as_array().into_iter()
+  }
+}
+
+impl<'a, T> IntoIterator for &'a mut Corners<T> {
+  type Item = &'a mut T;
+  type IntoIter = std::array::IntoIter<Self::Item, 4>;
+
+  fn into_iter(self) -> Self::IntoIter {
+    self.as_array_mut().into_iter()
+  }
+}
+
+// over-engineered :p
+
+// struct CornersIter<T> {
+//   values: [ManuallyDrop<T>; 4],
+//   curr: u8,
+// }
+
+// impl<T> Iterator for CornersIter<T> {
+//   type Item = T;
+
+//   fn next(&mut self) -> Option<Self::Item> {
+//     if self.curr >= 4 {
+//       return None
+//     }
+//     let result = unsafe {
+//       ManuallyDrop::take(&mut self.values[self.curr as usize])
+//     };
+//     self.curr += 1;
+//     Some(result)
+//   }
+// }
+
+// impl<T> Drop for CornersIter<T> {
+//   fn drop(&mut self) {
+//     for i in self.curr..4 {
+//       unsafe {
+//         ManuallyDrop::drop(&mut self.values[i as usize]);
+//       }
+//     }
+//   }
+// }

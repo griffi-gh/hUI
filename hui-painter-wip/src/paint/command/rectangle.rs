@@ -1,4 +1,4 @@
-use std::num::NonZeroU16;
+use std::{hash::Hasher, num::NonZeroU16};
 use glam::{vec2, Vec2};
 use hui_shared::{color, rect::{Corners, FillColor}};
 use crate::{
@@ -7,7 +7,8 @@ use crate::{
     command::PaintCommand,
   },
   texture::TextureHandle,
-  PainterInstance
+  util::{hash_vec2, hash_vec3, hash_vec4},
+  PainterInstance,
 };
 
 /// Calculate the number of points based on the maximum corner radius
@@ -271,7 +272,21 @@ impl PaintCommand for PaintRectangle {
         ]);
       }
 
-      unimplemented!("Border radius is not supported yet");
+      // unimplemented!("Border radius is not supported yet");
     }
   }
+
+  fn size(&self, ctx: &PainterInstance) -> Vec2 {
+    self.size
+  }
+
+  fn cache_hash(&self) -> u64 {
+    let mut hasher = rustc_hash::FxHasher::default();
+    hash_vec2(&mut hasher, self.size);
+    for corner in self.color.corners() {
+      hash_vec4(&mut hasher, corner);
+    }
+    hasher.finish()
+  }
+
 }

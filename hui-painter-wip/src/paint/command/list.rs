@@ -1,3 +1,5 @@
+use std::hash::Hasher;
+
 use crate::PainterInstance;
 
 use super::PaintCommand;
@@ -41,5 +43,21 @@ impl PaintCommand for PaintList {
     for command in &self.commands {
       command.paint(ctx, into);
     }
+  }
+
+  fn cache_hash(&self) -> u64 {
+    let mut hasher = rustc_hash::FxHasher::default();
+    for command in self.commands.iter() {
+      hasher.write_u64(command.cache_hash());
+    }
+    hasher.finish()
+  }
+
+  fn size(&self, ctx: &PainterInstance) -> glam::Vec2 {
+    let mut size = glam::Vec2::ZERO;
+    for command in &self.commands {
+      size = size.max(command.size(ctx));
+    }
+    size
   }
 }

@@ -1,3 +1,5 @@
+use std::hash::Hash;
+
 use glam::Vec2;
 use crate::{paint::buffer::PaintBuffer, PainterInstance};
 
@@ -29,14 +31,16 @@ pub trait PaintCommand {
   /// Do not allocate new textures or cache glyphs here, use `pre_paint` instead!\
   /// (Doing this WILL lead to atlas corruption flicker for a single frame if it's forced to resize!)
   fn paint(&self, ctx: &mut PainterInstance, into: &mut PaintBuffer);
-}
 
-pub trait Measurable: PaintCommand {
+  /// Hash of the parameters that affect command's appearance
+  ///
+  /// Must be unique for each possilbe combination of parameters
+  fn cache_hash(&self) -> u64;
+
   fn size(&self, ctx: &PainterInstance) -> Vec2;
 }
 
 // TODO move paint_root to PaintCommand instead of separate trait?
-
 pub trait PaintRoot: PaintCommand {
   /// Paint the root command, calling `pre_paint` before painting
   ///

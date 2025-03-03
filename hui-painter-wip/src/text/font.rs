@@ -3,7 +3,7 @@ use nohash_hasher::BuildNoHashHasher;
 
 pub(crate) type FontId = u16;
 
-#[derive(Clone, Copy)]
+#[derive(Clone, Copy, Hash, PartialEq, Eq)]
 pub struct FontHandle(pub(crate) FontId);
 
 pub(crate) struct FontRepr {

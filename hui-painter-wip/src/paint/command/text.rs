@@ -1,4 +1,4 @@
-use std::borrow::Cow;
+use std::{borrow::Cow, hash::{Hash, Hasher}};
 use fontdue::layout::{CoordinateSystem, Layout};
 use glam::{vec2, Vec2};
 use crate::{
@@ -8,7 +8,6 @@ use crate::{
   }, text::FontHandle, PainterInstance
 };
 
-use super::Measurable;
 
 // TODO align, multichunk etc
 
@@ -75,11 +74,11 @@ impl PaintCommand for PaintText {
     //   let glyph_raster = ctx.fonts().render_glyph(atlas, font, config);
     // }
 
-    todo!()
-  }
-}
+    // todo!()
 
-impl Measurable for PaintText {
+    // TODO text rendering
+  }
+
   fn size(&self, ctx: &PainterInstance) -> Vec2 {
     let font_array = self.build_font_array(ctx);
     let layout = self.build_layout(&font_array);
@@ -93,5 +92,13 @@ impl Measurable for PaintText {
     let height = layout.height();
 
     vec2(width, height)
+  }
+
+  fn cache_hash(&self) -> u64 {
+    let mut hasher = rustc_hash::FxHasher::default();
+    self.text.font.hash(&mut hasher);
+    hasher.write_u32(self.text.size.to_bits());
+    hasher.write(self.text.text.as_bytes());
+    hasher.finish()
   }
 }

@@ -1,5 +1,7 @@
 use std::hash::Hasher;
 
+use hui_shared::rect::Rect;
+
 use crate::PainterInstance;
 
 use super::PaintCommand;
@@ -53,11 +55,20 @@ impl PaintCommand for PaintList {
     hasher.finish()
   }
 
-  fn size(&self, ctx: &PainterInstance) -> glam::Vec2 {
-    let mut size = glam::Vec2::ZERO;
-    for command in &self.commands {
-      size = size.max(command.size(ctx));
+  fn bounds(&self, ctx: &PainterInstance) -> Rect {
+    if self.commands.is_empty() {
+      return Rect::ZERO;
     }
-    size
+    let mut position = glam::Vec2::splat(f32::MAX);
+    let mut size = glam::Vec2::splat(f32::MIN);
+    for command in &self.commands {
+      let bounds = command.bounds(ctx);
+      position = position.min(bounds.position);
+      size = size.max(bounds.size);
+    }
+    Rect {
+      position,
+      size,
+    }
   }
 }

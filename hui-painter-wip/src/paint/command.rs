@@ -1,6 +1,7 @@
 use std::hash::Hash;
 
 use glam::Vec2;
+use hui_shared::rect::Rect;
 use crate::{paint::buffer::PaintBuffer, PainterInstance};
 
 // mod root;
@@ -37,7 +38,7 @@ pub trait PaintCommand {
   /// Must be unique for each possilbe combination of parameters
   fn cache_hash(&self) -> u64;
 
-  fn size(&self, ctx: &PainterInstance) -> Vec2;
+  fn bounds(&self, ctx: &PainterInstance) -> Rect;
 }
 
 // TODO move paint_root to PaintCommand instead of separate trait?

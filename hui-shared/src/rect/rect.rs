@@ -11,6 +11,18 @@ pub struct Rect {
 }
 
 impl Rect {
+  /// A rect with both position and size set to zero.
+  pub const ZERO: Self = Self {
+    position: Vec2::ZERO,
+    size: Vec2::ZERO,
+  };
+
+  /// A rect with size of 1x1 and position of zero.
+  pub const UNIT: Self = Self {
+    position: Vec2::ZERO,
+    size: Vec2::ONE,
+  };
+
   pub const fn new(position: Vec2, size: Vec2) -> Self {
     Self { position, size }
   }

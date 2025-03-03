@@ -1,6 +1,7 @@
 use std::{borrow::Cow, hash::{Hash, Hasher}};
 use fontdue::layout::{CoordinateSystem, Layout};
 use glam::{vec2, Vec2};
+use hui_shared::rect::Rect;
 use crate::{
   paint::{
     buffer::PaintBuffer,
@@ -76,10 +77,10 @@ impl PaintCommand for PaintText {
 
     // todo!()
 
-    // TODO text rendering
+    // TODO_IMPORTANT text rendering
   }
 
-  fn size(&self, ctx: &PainterInstance) -> Vec2 {
+  fn bounds(&self, ctx: &PainterInstance) -> Rect {
     let font_array = self.build_font_array(ctx);
     let layout = self.build_layout(&font_array);
 
@@ -91,7 +92,10 @@ impl PaintCommand for PaintText {
     }).unwrap_or(0.);
     let height = layout.height();
 
-    vec2(width, height)
+    Rect {
+      position: vec2(0., 0.),
+      size: vec2(width, height),
+    }
   }
 
   fn cache_hash(&self) -> u64 {

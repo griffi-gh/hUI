@@ -1,6 +1,6 @@
 use std::{hash::Hasher, num::NonZeroU16};
 use glam::{vec2, Vec2};
-use hui_shared::{color, rect::{Corners, FillColor}};
+use hui_shared::{color, rect::{Corners, FillColor, Rect}};
 use crate::{
   paint::{
     buffer::{PaintBuffer, Vertex},
@@ -94,6 +94,11 @@ impl PaintRectangle {
 
 impl PaintCommand for PaintRectangle {
   fn paint(&self, ctx: &mut PainterInstance, into: &mut PaintBuffer) {
+    // Offset from (0, 0) to the actual origin
+    // We calculate positions in the range of [0, size] for simplicity
+    // And then subtract this offset to get the actual position of a rectangle centered at (0, 0)
+    // let origin_offset = self.size / 2.;
+
     // If texture is set:
     // - Get texture UV
     // - Map local UVs to texture UV coords
@@ -166,22 +171,22 @@ impl PaintCommand for PaintRectangle {
       ]);
       into.vertices.extend([
         Vertex {
-          position: vec2(0., 0.) * self.size,
+          position: vec2(0., 0.) * self.size, // - origin_offset,
           uv: uvs.top_left,
           color: colors.top_left,
         },
         Vertex {
-          position: vec2(1., 0.) * self.size,
+          position: vec2(1., 0.) * self.size, // - origin_offset,
           uv: uvs.top_right,
           color: colors.top_right,
         },
         Vertex {
-          position: vec2(0., 1.) * self.size,
+          position: vec2(0., 1.) * self.size, // - origin_offset,
           uv: uvs.bottom_left,
           color: colors.bottom_left,
         },
         Vertex {
-          position: vec2(1., 1.) * self.size,
+          position: vec2(1., 1.) * self.size, // - origin_offset,
           uv: uvs.bottom_right,
           color: colors.bottom_right,
         },
@@ -208,7 +213,7 @@ impl PaintCommand for PaintRectangle {
           uvs.bottom_left * (1. - point_uv.x) * point_uv.y +
           uvs.top_left * (1. - point_uv.x) * (1. - point_uv.y);
         Vertex {
-          position: point,
+          position: point, // - origin_offset,
           color: color_at_point,
           uv: uv_at_point,
         }
@@ -276,8 +281,15 @@ impl PaintCommand for PaintRectangle {
     }
   }
 
-  fn size(&self, ctx: &PainterInstance) -> Vec2 {
-    self.size
+  fn bounds(&self, _: &PainterInstance) -> Rect {
+    // Rect {
+    //   position: -self.size / 2.,
+    //   size: self.size / 2.,
+    // }
+    Rect {
+      position: Vec2::ZERO,
+      size: self.size,
+    }
   }
 
   fn cache_hash(&self) -> u64 {
@@ -288,5 +300,4 @@ impl PaintCommand for PaintRectangle {
     }
     hasher.finish()
   }
-
 }

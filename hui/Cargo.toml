@@ -18,7 +18,7 @@ include = [
 [dependencies]
 hui-derive = { version = "0.1.0-alpha.6", path = "../hui-derive", optional = true }
 hui-shared = { version = "0.1.0-alpha.6", path = "../hui-shared" }
-# hui-painter = { version = "0.1.0-alpha.6", path = "../hui-painter" }
+hui-painter = { version = "0.1.0-alpha.6", path = "../hui-painter" }
 hashbrown = "0.15"
 nohash-hasher = "0.2"
 glam = "0.30"
@@ -33,7 +33,7 @@ image = { version = "0.25", default-features = false, optional = true }
 rustc-hash = "2.0"
 
 [features]
-default = ["el_all", "image", "builtin_font", "pixel_perfect_text", "derive"]
+default = ["el_all", "image", "builtin_font", "derive"]
 
 ## Enable derive macros
 derive = ["dep:hui-derive"]
@@ -43,17 +43,6 @@ image = ["dep:image"]
 
 ## Enable the built-in font (ProggyTiny, adds *35kb* to the executable)
 builtin_font = []
-
-#! #### Pixel-perfect rendering:
-
-## Round all vertex positions to nearest integer coordinates (not recommended)
-pixel_perfect = ["pixel_perfect_text"]
-
-## Apply pixel-perfect rendering hack to text (fixes blurry text rendering)
-pixel_perfect_text = []
-
-#! Make sure to disable both features if you are not rendering UI "as-is" at 1:1 scale\
-#! For exmaple, you should disable them if using DPI (or any other form of) scaling while passing the virtual resolution to the ui or rendering it in 3d space
 
 #! #### Built-in elements:
 

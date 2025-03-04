@@ -3,10 +3,10 @@
 //! A 9-patch image is an image that can be scaled in a way that preserves the corners and edges of the image while scaling the center.
 //! This is useful for creating scalable UI elements like buttons, windows, etc.
 
-use glam::{vec2, UVec2, Vec2};
+use glam::{vec2, Affine2, UVec2, Vec2};
+use hui_painter::{paint::command::{PaintList, PaintRectangle, PaintTransform}, texture::TextureHandle};
 use crate::{
   color,
-  draw::{ImageHandle, UiDrawCommand, UiDrawCommandList},
   rect::{Rect, Corners, FillColor}
 };
 use super::Frame;
@@ -14,7 +14,7 @@ use super::Frame;
 /// Represents a 9-patch image asset
 #[derive(Clone, Copy, Debug)]
 pub struct NinePatchAsset {
-  pub image: ImageHandle,
+  pub image: TextureHandle,
   //TODO: remove this:
   pub size: (u32, u32),
   pub scalable_region: Rect,
@@ -46,14 +46,14 @@ impl Default for NinePatchFrame {
   fn default() -> Self {
     Self {
       //This is not supposed to be left out as the default, so just set it to whatever :p
-      asset: NinePatchAsset { image: ImageHandle::default(), size: (0, 0), scalable_region: Rect::default() },
+      asset: NinePatchAsset { image: TextureHandle::new_broken(), size: (0, 0), scalable_region: Rect::default() },
       color: color::WHITE.into(),
     }
   }
 }
 
 impl Frame for NinePatchFrame {
-  fn draw(&self, draw: &mut UiDrawCommandList, rect: Rect) {
+  fn draw(&self, draw: &mut PaintList, rect: Rect) {
     // without this, shїt gets messed up when the position is not a whole number
     //XXX: should we round the size as well?
     let position = rect.position.round();
@@ -100,13 +100,15 @@ impl Frame for NinePatchFrame {
       bottom_left: vec2(0., region_uv.top_left.y),
       bottom_right: region_uv.top_left,
     };
-    draw.add(UiDrawCommand::Rectangle {
-      position,
-      size: vec2(size_h.0, size_v.0),
-      color: interpolate_color_rect(top_left_patch_uv),
-      texture: Some(self.asset.image),
-      texture_uv: Some(top_left_patch_uv),
-      rounded_corners: None
+    draw.add(PaintTransform {
+      transform: Affine2::from_translation(position),
+      child: PaintRectangle {
+        size: vec2(size_h.0, size_v.0),
+        color: interpolate_color_rect(top_left_patch_uv).into(),
+        texture: Some(self.asset.image),
+        texture_uv: top_left_patch_uv,
+        ..Default::default()
+      },
     });
 
     //Top patch
@@ -116,13 +118,15 @@ impl Frame for NinePatchFrame {
       bottom_left: region_uv.top_left,
       bottom_right: region_uv.top_right,
     };
-    draw.add(UiDrawCommand::Rectangle {
-      position: position + vec2(size_h.0, 0.),
-      size: vec2(size_h.1, size_v.0),
-      color: interpolate_color_rect(top_patch_uv),
-      texture: Some(self.asset.image),
-      texture_uv: Some(top_patch_uv),
-      rounded_corners: None
+    draw.add(PaintTransform {
+      transform: Affine2::from_translation(position + vec2(size_h.0, 0.)),
+      child: PaintRectangle {
+        size: vec2(size_h.1, size_v.0),
+        color: interpolate_color_rect(top_patch_uv).into(),
+        texture: Some(self.asset.image),
+        texture_uv: top_patch_uv,
+        ..Default::default()
+      },
     });
 
     //Top-right patch
@@ -132,13 +136,15 @@ impl Frame for NinePatchFrame {
       bottom_left: region_uv.top_right,
       bottom_right: vec2(1., region_uv.top_right.y),
     };
-    draw.add(UiDrawCommand::Rectangle {
-      position: position + vec2(size_h.0 + size_h.1, 0.),
-      size: vec2(size_h.2, size_v.0),
-      color: interpolate_color_rect(top_right_patch_uv),
-      texture: Some(self.asset.image),
-      texture_uv: Some(top_right_patch_uv),
-      rounded_corners: None
+    draw.add(PaintTransform {
+      transform: Affine2::from_translation(position + vec2(size_h.0 + size_h.1, 0.)),
+      child: PaintRectangle {
+        size: vec2(size_h.2, size_v.0),
+        color: interpolate_color_rect(top_right_patch_uv).into(),
+        texture: Some(self.asset.image),
+        texture_uv: top_right_patch_uv,
+        ..Default::default()
+      },
     });
 
     //Left patch
@@ -148,23 +154,27 @@ impl Frame for NinePatchFrame {
       bottom_left: vec2(0., region_uv.bottom_left.y),
       bottom_right: region_uv.bottom_left,
     };
-    draw.add(UiDrawCommand::Rectangle {
-      position: position + vec2(0., size_v.0),
-      size: vec2(size_h.0, size_v.1),
-      color: interpolate_color_rect(left_patch_uv),
-      texture: Some(self.asset.image),
-      texture_uv: Some(left_patch_uv),
-      rounded_corners: None
+    draw.add(PaintTransform {
+      transform: Affine2::from_translation(position + vec2(0., size_v.0)),
+      child: PaintRectangle {
+        size: vec2(size_h.0, size_v.1),
+        color: interpolate_color_rect(left_patch_uv).into(),
+        texture: Some(self.asset.image),
+        texture_uv: left_patch_uv,
+        ..Default::default()
+      },
     });
 
     // Center patch
-    draw.add(UiDrawCommand::Rectangle {
-      position: position + vec2(size_h.0, size_v.0),
-      size: vec2(size_h.1, size_v.1),
-      color: interpolate_color_rect(region_uv),
-      texture: Some(self.asset.image),
-      texture_uv: Some(region_uv),
-      rounded_corners: None
+    draw.add(PaintTransform {
+      transform: Affine2::from_translation(position + vec2(size_h.0, size_v.0)),
+      child: PaintRectangle {
+        size: vec2(size_h.1, size_v.1),
+        color: interpolate_color_rect(region_uv).into(),
+        texture: Some(self.asset.image),
+        texture_uv: region_uv,
+        ..Default::default()
+      },
     });
 
     //Right patch
@@ -174,13 +184,15 @@ impl Frame for NinePatchFrame {
       bottom_left: region_uv.bottom_right,
       bottom_right: vec2(1., region_uv.bottom_right.y),
     };
-    draw.add(UiDrawCommand::Rectangle {
-      position: position + vec2(size_h.0 + size_h.1, size_v.0),
-      size: vec2(size_h.2, size_v.1),
-      color: interpolate_color_rect(right_patch_uv),
-      texture: Some(self.asset.image),
-      texture_uv: Some(right_patch_uv),
-      rounded_corners: None
+    draw.add(PaintTransform {
+      transform: Affine2::from_translation(position + vec2(size_h.0 + size_h.1, size_v.0)),
+      child: PaintRectangle {
+        size: vec2(size_h.2, size_v.1),
+        color: interpolate_color_rect(right_patch_uv).into(),
+        texture: Some(self.asset.image),
+        texture_uv: right_patch_uv,
+        ..Default::default()
+      },
     });
 
     //Bottom-left patch
@@ -190,13 +202,15 @@ impl Frame for NinePatchFrame {
       bottom_left: vec2(0., 1.),
       bottom_right: vec2(region_uv.bottom_left.x, 1.),
     };
-    draw.add(UiDrawCommand::Rectangle {
-      position: position + vec2(0., size_v.0 + size_v.1),
-      size: vec2(size_h.0, size_v.2),
-      color: interpolate_color_rect(bottom_left_patch_uv),
-      texture: Some(self.asset.image),
-      texture_uv: Some(bottom_left_patch_uv),
-      rounded_corners: None
+    draw.add(PaintTransform {
+      transform: Affine2::from_translation(position + vec2(0., size_v.0 + size_v.1)),
+      child: PaintRectangle {
+        size: vec2(size_h.0, size_v.2),
+        color: interpolate_color_rect(bottom_left_patch_uv).into(),
+        texture: Some(self.asset.image),
+        texture_uv: bottom_left_patch_uv,
+        ..Default::default()
+      },
     });
 
     //Bottom patch
@@ -206,13 +220,15 @@ impl Frame for NinePatchFrame {
       bottom_left: vec2(region_uv.bottom_left.x, 1.),
       bottom_right: vec2(region_uv.bottom_right.x, 1.),
     };
-    draw.add(UiDrawCommand::Rectangle {
-      position: position + vec2(size_h.0, size_v.0 + size_v.1),
-      size: vec2(size_h.1, size_v.2),
-      color: interpolate_color_rect(bottom_patch_uv),
-      texture: Some(self.asset.image),
-      texture_uv: Some(bottom_patch_uv),
-      rounded_corners: None
+    draw.add(PaintTransform {
+      transform: Affine2::from_translation(position + vec2(size_h.0, size_v.0 + size_v.1)),
+      child: PaintRectangle {
+        size: vec2(size_h.1, size_v.2),
+        color: interpolate_color_rect(bottom_patch_uv).into(),
+        texture: Some(self.asset.image),
+        texture_uv: bottom_patch_uv,
+        ..Default::default()
+      },
     });
 
     //Bottom-right patch
@@ -222,13 +238,15 @@ impl Frame for NinePatchFrame {
       bottom_left: vec2(region_uv.bottom_right.x, 1.),
       bottom_right: vec2(1., 1.),
     };
-    draw.add(UiDrawCommand::Rectangle {
-      position: position + vec2(size_h.0 + size_h.1, size_v.0 + size_v.1),
-      size: vec2(size_h.2, size_v.2),
-      color: interpolate_color_rect(bottom_right_patch_uv),
-      texture: Some(self.asset.image),
-      texture_uv: Some(bottom_right_patch_uv),
-      rounded_corners: None
+    draw.add(PaintTransform {
+      transform: Affine2::from_translation(position + vec2(size_h.0 + size_h.1, size_v.0 + size_v.1)),
+      child: PaintRectangle {
+        size: vec2(size_h.2, size_v.2),
+        color: interpolate_color_rect(bottom_right_patch_uv).into(),
+        texture: Some(self.asset.image),
+        texture_uv: bottom_right_patch_uv,
+        ..Default::default()
+      },
     });
   }
 

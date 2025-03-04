@@ -18,6 +18,11 @@ impl PaintBuffer {
       indices: Vec::new(),
     }
   }
+
+  pub fn clear(&mut self) {
+    self.vertices.clear();
+    self.indices.clear();
+  }
 }
 
 impl Default for PaintBuffer {

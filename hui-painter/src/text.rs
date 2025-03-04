@@ -19,10 +19,10 @@ impl FontManager {
     }
   }
 
-  /// Add a font to the manager.
+  /// Add a font to the manager from raw font file data.
   ///
   /// Panics:
-  /// - If the font data is invalid.
+  /// - If the font data is invalid or corrupted
   pub fn add(&mut self, data: &[u8]) -> FontHandle {
     let font = self.fonts.add_font(data);
     self.ftm.init_font(font);

@@ -1,7 +1,7 @@
-use glam::Vec2;
+use glam::{Affine2, Vec2};
+use hui_painter::{paint::command::{PaintList, PaintRectangle, PaintTransform}, texture::TextureHandle};
 use crate::{
   color,
-  draw::{ImageHandle, RoundedCorners, UiDrawCommand, UiDrawCommandList},
   rect::{Rect, Corners, FillColor},
 };
 use super::{Frame, point::FramePoint2d};
@@ -23,7 +23,7 @@ pub struct RectFrame {
   ///
   /// Please note that if the background color is NOT set (or set to transparent), the texture will NOT be visible\
   /// This is because the texture is multiplied by the color, and if the color is transparent, the texture will be too\
-  pub image: Option<ImageHandle>,
+  pub image: Option<TextureHandle>,
 
   /// Top left corner of the rectangle
   pub top_left: FramePoint2d,
@@ -47,8 +47,8 @@ impl From<FillColor> for RectFrame {
   }
 }
 
-impl From<ImageHandle> for RectFrame {
-  fn from(image: ImageHandle) -> Self {
+impl From<TextureHandle> for RectFrame {
+  fn from(image: TextureHandle) -> Self {
     Self::image(image)
   }
 }
@@ -65,7 +65,7 @@ impl RectFrame {
   /// Create a new [`RectFrame`] with the given image\
   ///
   /// Color will be set to [`WHITE`](crate::color::WHITE) to ensure the image is visible
-  pub fn image(image: ImageHandle) -> Self {
+  pub fn image(image: TextureHandle) -> Self {
     Self {
       color: color::WHITE.into(),
       image: Some(image),
@@ -74,7 +74,7 @@ impl RectFrame {
   }
 
   /// Create a new [`RectFrame`] with the given color and image
-  pub fn color_image(color: impl Into<FillColor>, image: ImageHandle) -> Self {
+  pub fn color_image(color: impl Into<FillColor>, image: TextureHandle) -> Self {
     Self {
       color: color.into(),
       image: Some(image),
@@ -115,22 +115,21 @@ impl Default for RectFrame {
 }
 
 impl Frame for RectFrame {
-  fn draw(&self, draw: &mut UiDrawCommandList, rect: Rect) {
+  fn draw(&self, draw: &mut PaintList, rect: Rect) {
     if self.color.is_transparent() {
       return
     }
     //TODO: handle bottom_right < top_left
     let top_left = self.top_left.resolve(rect.size);
     let bottom_right = self.bottom_right.resolve(rect.size);
-    draw.add(UiDrawCommand::Rectangle {
-      position: rect.position + top_left,
-      size: bottom_right - top_left,
-      color: self.color.corners(),
-      texture: self.image,
-      texture_uv: None,
-      rounded_corners: (self.corner_radius.max_f32() > 0.).then_some(
-        RoundedCorners::from_radius(self.corner_radius)
-      ),
+    draw.add(PaintTransform{
+      transform: Affine2::from_translation(rect.position + top_left),
+      child: PaintRectangle {
+        size: bottom_right - top_left,
+        color: self.color,
+        texture: self.image,
+        ..Default::default()
+      },
     });
   }
 

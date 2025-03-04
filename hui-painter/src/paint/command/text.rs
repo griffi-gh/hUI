@@ -66,7 +66,7 @@ impl PaintCommand for PaintText {
     let layout = self.build_layout(&font_array);
 
     for glyph in layout.glyphs() {
-      ctx.fonts.render_glyph(&mut ctx.atlas, self.text.font, glyph.key);
+      ctx.fonts.render_glyph(&mut ctx.textures, self.text.font, glyph.key);
     }
   }
 
@@ -89,28 +89,28 @@ impl PaintCommand for PaintText {
       let font_handle = self.text.font; // TODO use font_index here
 
       let vidx = into.vertices.len() as u32;
-      let glyph_texture = ctx.fonts.render_glyph(&mut ctx.atlas, font_handle, glyph.key);
-      let uv = ctx.atlas.get_uv(glyph_texture).unwrap();
+      let glyph_texture = ctx.fonts.render_glyph(&mut ctx.textures, font_handle, glyph.key);
+      let uv = ctx.textures.get_uv(glyph_texture).unwrap();
 
       into.indices.extend([vidx, vidx + 1, vidx + 2, vidx, vidx + 2, vidx + 3]);
       into.vertices.extend([
         Vertex {
-          position: vec2(glyph.x, glyph.y),
+          position: vec2(glyph.x, glyph.y).round(),
           color: self.text.color,
           uv: uv.top_left,
         },
         Vertex {
-          position: vec2(glyph.x + glyph_texture.size().x as f32, glyph.y),
+          position: vec2(glyph.x + glyph_texture.size().x as f32, glyph.y).round().round(),
           color: self.text.color,
           uv: uv.top_right,
         },
         Vertex {
-          position: vec2(glyph.x + glyph_texture.size().x as f32, glyph.y + glyph_texture.size().y as f32),
+          position: vec2(glyph.x + glyph_texture.size().x as f32, glyph.y + glyph_texture.size().y as f32).round(),
           color: self.text.color,
           uv: uv.bottom_right,
         },
         Vertex {
-          position: vec2(glyph.x, glyph.y + glyph_texture.size().y as f32),
+          position: vec2(glyph.x, glyph.y + glyph_texture.size().y as f32).round(),
           color: self.text.color,
           uv: uv.bottom_left,
         },

@@ -1,8 +1,10 @@
 //! wrapper that allows applying various transformations to an element, such as translation, rotation, or scaling
 
 use glam::{Affine2, Vec2};
+use hui_painter::paint::command::{PaintList, PaintTransform};
 use crate::{
-  draw::UiDrawCommand, element::{MeasureContext, ProcessContext, UiElement}, measure::Response
+  element::{MeasureContext, ProcessContext, UiElement},
+  measure::Response,
 };
 
 pub struct Transformer {
@@ -46,20 +48,27 @@ impl UiElement for Transformer {
   }
 
   fn process(&self, ctx: ProcessContext) {
-    ctx.draw.add(UiDrawCommand::PushTransform(self.transform));
-    //This is stupid:
+    if self.transform == Affine2::IDENTITY {
+      self.element.process(ctx);
+      return;
+    }
+
+    let mut sub_list = PaintList::new_empty();
     self.element.process(ProcessContext {
+      painter: ctx.painter,
       measure: ctx.measure,
       state: ctx.state,
       layout: ctx.layout,
-      draw: ctx.draw,
-      text_measure: ctx.text_measure,
+      paint_target: &mut sub_list,
       current_font: ctx.current_font,
-      images: ctx.images,
       input: ctx.input,
       signal: ctx.signal,
     });
-    ctx.draw.add(UiDrawCommand::PopTransform);
+
+    ctx.paint_target.add(PaintTransform {
+      transform: self.transform,
+      child: sub_list,
+    });
   }
 }
 

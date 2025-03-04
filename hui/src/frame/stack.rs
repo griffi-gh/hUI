@@ -1,13 +1,14 @@
 //! allows stacking two frames on top of each other
 
-use crate::{draw::UiDrawCommandList, rect::Rect};
+use hui_painter::paint::command::PaintList;
+use crate::rect::Rect;
 use super::Frame;
 
 /// A frame that draws two frames on top of each other
 pub struct FrameStack(pub Box<dyn Frame>, pub Box<dyn Frame>);
 
 impl Frame for FrameStack {
-  fn draw(&self, draw: &mut UiDrawCommandList, rect: Rect) {
+  fn draw(&self, draw: &mut PaintList, rect: Rect) {
     self.0.draw(draw, rect);
     self.1.draw(draw, rect);
   }

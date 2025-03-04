@@ -1,7 +1,7 @@
 use derive_setters::Setters;
-use glam::vec2;
+use glam::{vec2, Affine2};
+use hui_painter::{paint::command::{PaintRectangle, PaintTransform}, texture::TextureHandle};
 use crate::{
-  draw::{ImageHandle, RoundedCorners, UiDrawCommand},
   element::{MeasureContext, ProcessContext, UiElement},
   layout::{compute_size, Size, Size2d},
   measure::Response,
@@ -13,7 +13,7 @@ use crate::{
 pub struct Image {
   /// Image handle to draw
   #[setters(skip)]
-  pub image: ImageHandle,
+  pub image: TextureHandle,
 
   /// Size of the image.
   ///
@@ -36,7 +36,7 @@ pub struct Image {
 }
 
 impl Image {
-  pub fn new(handle: ImageHandle) -> Self {
+  pub fn new(handle: TextureHandle) -> Self {
     Self {
       image: handle,
       size: Size2d {
@@ -59,7 +59,7 @@ impl UiElement for Image {
   }
 
   fn measure(&self, ctx: MeasureContext) -> Response {
-    let dim = ctx.images.get_size(self.image).expect("invalid image handle");
+    let dim = self.image.size();
     let pre_size = compute_size(ctx.layout, self.size, dim.as_vec2());
     Response {
       size: compute_size(ctx.layout, self.size, vec2(
@@ -78,16 +78,17 @@ impl UiElement for Image {
 
   fn process(&self, ctx: ProcessContext) {
     if !self.color.is_transparent() {
-      ctx.draw.add(UiDrawCommand::Rectangle {
-        position: ctx.layout.position,
-        size: ctx.measure.size,
-        color: self.color.corners(),
-        texture: Some(self.image),
-        texture_uv: None,
-        rounded_corners: (self.corner_radius.max_f32() > 0.).then_some({
-          RoundedCorners::from_radius(self.corner_radius)
-        }),
-      });
+      ctx.paint_target.add(
+        PaintTransform {
+          transform: Affine2::from_translation(ctx.layout.position),
+          child: PaintRectangle {
+            size: ctx.measure.size,
+            color: self.color,
+            texture: Some(self.image),
+            ..Default::default()
+          },
+        }
+      );
     }
   }
 }

@@ -153,11 +153,11 @@ impl GliumUiRenderer {
   }
 
   pub fn update(&mut self, instance: &UiInstance) {
-    if self.ui_texture.is_none() || instance.atlas().modified {
-      self.update_texture_atlas(&instance.atlas());
+    if self.ui_texture.is_none() || instance.backend_atlas().modified {
+      self.update_texture_atlas(&instance.backend_atlas());
     }
-    if self.buffer_pair.is_none() || instance.draw_call().0 {
-      self.update_buffers(instance.draw_call().1);
+    if self.buffer_pair.is_none() || instance.backend_paint_buffer().0 {
+      self.update_buffers(instance.backend_paint_buffer().1);
     }
   }
 

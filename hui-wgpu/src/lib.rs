@@ -290,12 +290,12 @@ impl WgpuUiRenderer {
     device: &wgpu::Device,
     resolution: Vec2,
   ) {
-    let (modified, call) = instance.draw_call();
+    let (modified, call) = instance.backend_paint_buffer();
     if self.modified || modified {
       self.update_buffers(call, queue, device, resolution);
     }
 
-    let meta = instance.atlas();
+    let meta = instance.backend_atlas();
     if self.modified || meta.modified {
       self.update_texture(meta, queue, device);
     }

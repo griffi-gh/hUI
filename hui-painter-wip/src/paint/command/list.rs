@@ -1,9 +1,6 @@
-use std::hash::Hasher;
-
+use std::{hash::Hasher, ops::RangeFull};
 use hui_shared::rect::Rect;
-
 use crate::PainterInstance;
-
 use super::PaintCommand;
 
 pub struct PaintList {
@@ -56,12 +53,20 @@ impl PaintCommand for PaintList {
   }
 
   fn bounds(&self, ctx: &PainterInstance) -> Rect {
-    if self.commands.is_empty() {
+    self.list_bounds_partial(ctx, ..)
+  }
+}
+
+impl PaintList {
+  /// Get the bounds of a range of commands stored in this list
+  pub fn list_bounds_partial(&self, ctx: &PainterInstance, range: RangeFull) -> Rect {
+    let selector = &self.commands[range];
+    if selector.is_empty() {
       return Rect::ZERO;
     }
     let mut position = glam::Vec2::splat(f32::MAX);
     let mut size = glam::Vec2::splat(f32::MIN);
-    for command in &self.commands {
+    for command in selector {
       let bounds = command.bounds(ctx);
       position = position.min(bounds.position);
       size = size.max(bounds.size);

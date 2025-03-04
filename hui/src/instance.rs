@@ -1,7 +1,7 @@
 use hui_painter::{
   paint::{buffer::PaintBuffer, command::{PaintCommand, PaintList, PaintRoot}},
   text::FontHandle,
-  texture::{SourceTextureFormat, TextureHandle},
+  texture::{SourceTextureFormat, TextureAtlasBackendData, TextureHandle},
   PainterInstance,
 };
 use crate::{
@@ -233,45 +233,15 @@ impl UiInstance {
     self.draw_commands.paint_root(&mut self.painter, &mut self.paint_buffer);
   }
 
-  /// Get the draw call information for the current frame
+  /// Get data intended for rendering backend
   ///
-  /// This function should only be used by the render backend.\
+  /// You should call this function *before* calling [`UiInstance::begin`] or after calling [`UiInstance::end`]\
+  ///
+  /// This function should only be used by the rendering backend.\
   /// You should not call this directly unless you're implementing a custom render backend
-  ///
-  /// Returns a tuple with a unique hash of the draw commands and the draw call data\
-  ///
-  /// You should only call this function *after* [`UiInstance::end`]\
-  /// Calling it in the middle of a frame will result in a warning but will not cause a panic\
-  /// (please note that doing so is probably a mistake and should be fixed in your code)\
-  /// Doing so anyway will return draw call data for the previous frame
-  ///
-  pub fn backend_paint_buffer(&self) -> (u64, &PaintBuffer) {
-    if self.state {
-      log::warn!("UiInstance::draw_call called while in the middle of a frame, this is probably a mistake");
-    }
-    (self.cur_draw_command_hash.unwrap_or_default(), &self.paint_buffer)
-  }
-
-  /// Get the texture atlas size and data for the current frame
-  ///
-  /// This function should only be used by the render backend.\
-  /// You should not call this directly unless you're implementing a custom render backend
-  ///
-  /// You should only call this function *after* [`UiInstance::end`]\
-  /// Calling it in the middle of a frame will result in a warning but will not cause a panic\
-  /// (please note that doing so is probably a mistake and should be fixed in your code)\
-  /// Using this function in the middle of a frame will return partially modified atlas data that may be outdated or incomplete\
-  /// This will lead to rendering artifacts, 1-frame delays and flashes and is probably not what you want
-  ///
-  /// Make sure to check [`TextureAtlasMeta::modified`] to see if the texture has been modified
-  /// since the beginning of the current frame before uploading it to the GPU
-  pub fn backend_atlas(&self) -> TextureAtlasMeta {
-    if self.state {
-      log::warn!("UiInstance::atlas called while in the middle of a frame, this is probably a mistake");
-    }
-    // unimplemented!()
-    // self.painter.textures_mut().
-    // self.backend_atlas.meta()
+  /// or have a very specific usecase (not using one)
+  fn backend_data(&self) -> (&TextureAtlasBackendData, &PaintBuffer) {
+    (&self.painter, &self.paint_buffer)
   }
 
   /// Push a platform event to the UI event queue
@@ -284,7 +254,7 @@ impl UiInstance {
   ///
   /// This function should only be used by the platform backend.\
   /// You should not call this directly unless you're implementing a custom platform backend
-  /// or have a very specific usecase
+  /// or have a very specific usecase (not using one)
   pub fn push_event(&mut self, event: UiEvent) {
     if self.state {
       log::warn!("UiInstance::push_event called while in the middle of a frame, this is probably a mistake");

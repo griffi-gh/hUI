@@ -1,5 +1,5 @@
 [package]
-name = "hui-painter-wip"
+name = "hui-painter"
 description = "UI rendering middleware for hUI, abstracts away triangulation, text layout and rendering and all the other hard stuff."
 repository = "https://github.com/griffi-gh/hui"
 readme = "../README.md"

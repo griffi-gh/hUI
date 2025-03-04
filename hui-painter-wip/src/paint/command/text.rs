@@ -1,14 +1,13 @@
 use std::{borrow::Cow, hash::{Hash, Hasher}};
-use fontdue::layout::{CoordinateSystem, Layout};
-use glam::{vec2, Vec2};
+use fontdue::layout::{CoordinateSystem, GlyphRasterConfig, Layout};
+use glam::{vec2, Vec4};
 use hui_shared::rect::Rect;
 use crate::{
   paint::{
-    buffer::PaintBuffer,
+    buffer::{PaintBuffer, Vertex},
     command::PaintCommand,
   }, text::FontHandle, PainterInstance
 };
-
 
 // TODO align, multichunk etc
 
@@ -16,6 +15,8 @@ pub struct TextChunk {
   pub text: Cow<'static, str>,
   pub font: FontHandle,
   pub size: f32,
+  // TODO support FillColor for text color (should it apply to the whole text or per character?)
+  pub color: Vec4,
 }
 
 pub struct PaintText {
@@ -24,12 +25,13 @@ pub struct PaintText {
 }
 
 impl PaintText {
-  pub fn new(text: impl Into<Cow<'static, str>>, font: FontHandle, size: f32) -> Self {
+  pub fn new(text: impl Into<Cow<'static, str>>, font: FontHandle, size: f32, color: impl Into<Vec4>) -> Self {
     Self {
       text: TextChunk {
         text: text.into(),
         font,
         size,
+        color: color.into(),
       }
     }
   }
@@ -56,6 +58,10 @@ impl PaintText {
 
 impl PaintCommand for PaintText {
   fn pre_paint(&self, ctx: &mut PainterInstance) {
+    if self.text.text.trim().is_empty() {
+      return
+    }
+
     let font_array = self.build_font_array(ctx);
     let layout = self.build_layout(&font_array);
 
@@ -65,19 +71,58 @@ impl PaintCommand for PaintText {
   }
 
   fn paint(&self, ctx: &mut PainterInstance, into: &mut PaintBuffer) {
-    // let font_array = self.build_font_array(ctx);
-    // let layout = self.build_layout(&font_array);
+    if self.text.text.trim().is_empty() {
+      return
+    }
+
+    let font_array = self.build_font_array(ctx);
+    let layout = self.build_layout(&font_array);
+
+    let glyphs = layout.glyphs();
+
+    for glyph in glyphs {
+      if !glyph.char_data.rasterize() {
+        continue
+      }
+
+      // let fontdue_font = font_array[layout_glyph.font_index];
+      let font_handle = self.text.font; // TODO use font_index here
+
+      let vidx = into.vertices.len() as u32;
+      let glyph_texture = ctx.fonts.render_glyph(&mut ctx.atlas, font_handle, glyph.key);
+      let uv = ctx.atlas.get_uv(glyph_texture).unwrap();
+
+      into.indices.extend([vidx, vidx + 1, vidx + 2, vidx, vidx + 2, vidx + 3]);
+      into.vertices.extend([
+        Vertex {
+          position: vec2(glyph.x, glyph.y),
+          color: self.text.color,
+          uv: uv.top_left,
+        },
+        Vertex {
+          position: vec2(glyph.x + glyph_texture.size().x as f32, glyph.y),
+          color: self.text.color,
+          uv: uv.top_right,
+        },
+        Vertex {
+          position: vec2(glyph.x + glyph_texture.size().x as f32, glyph.y + glyph_texture.size().y as f32),
+          color: self.text.color,
+          uv: uv.bottom_right,
+        },
+        Vertex {
+          position: vec2(glyph.x, glyph.y + glyph_texture.size().y as f32),
+          color: self.text.color,
+          uv: uv.bottom_left,
+        },
+      ]);
+    }
 
     // for glyph in layout.glyphs() {
     //   let config = GlyphRasterConfig {
-    //     glyph_index: glyph.font_index
+    //     glyph_index: glyph.font_index as u16,
     //   };
     //   let glyph_raster = ctx.fonts().render_glyph(atlas, font, config);
     // }
-
-    // todo!()
-
-    // TODO_IMPORTANT text rendering
   }
 
   fn bounds(&self, ctx: &PainterInstance) -> Rect {

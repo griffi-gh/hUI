@@ -38,12 +38,6 @@ default = ["el_all", "image", "builtin_font", "derive"]
 ## Enable derive macros
 derive = ["dep:hui-derive"]
 
-## Enable image loading support using the `image` crate
-image = ["dep:image"]
-
-## Enable the built-in font (ProggyTiny, adds *35kb* to the executable)
-builtin_font = []
-
 #! #### Built-in elements:
 
 ## Enable all built-in elements

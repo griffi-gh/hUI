@@ -128,6 +128,7 @@ impl TextureAllocation {
   }
 }
 
+#[derive(Clone, Copy)]
 pub struct TextureAtlasBackendData<'a> {
   pub data: &'a [u8],
   pub size: UVec2,

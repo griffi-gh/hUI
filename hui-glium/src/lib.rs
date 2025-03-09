@@ -1,11 +1,27 @@
 use std::rc::Rc;
 use glam::Vec2;
 use glium::{
-  backend::{Context, Facade}, implement_vertex, index::PrimitiveType, texture::{RawImage2d, Texture2d}, uniform, uniforms::{MagnifySamplerFilter, MinifySamplerFilter, Sampler, SamplerBehavior, SamplerWrapFunction}, Api, Blend, DrawParameters, IndexBuffer, Program, Surface, VertexBuffer
+  backend::{Context, Facade},
+  index::PrimitiveType,
+  texture::{RawImage2d, Texture2d},
+  uniforms::{
+    MagnifySamplerFilter,
+    MinifySamplerFilter,
+    Sampler,
+    SamplerBehavior,
+    SamplerWrapFunction
+  },
+  Api,
+  Blend,
+  DrawParameters,
+  IndexBuffer,
+  Program,
+  Surface,
+  VertexBuffer,
+  implement_vertex,
+  uniform,
 };
-use hui::{
-  draw::{TextureAtlasMeta, UiDrawCall, UiVertex}, UiInstance
-};
+use hui::UiInstance;
 
 const VERTEX_SHADER_GLES3: &str = include_str!("../shaders/vertex.es.vert");
 const FRAGMENT_SHADER_GLES3: &str = include_str!("../shaders/fragment.es.frag");

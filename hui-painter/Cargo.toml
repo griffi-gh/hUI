@@ -8,7 +8,7 @@ rust-version = "1.85"
 version = "0.1.0-alpha.6"
 edition = "2024"
 license = "GPL-3.0-or-later"
-publish = false # TODO: change to true once ready
+publish = true
 include = [
   "src/**/*.rs",
   "Cargo.toml",

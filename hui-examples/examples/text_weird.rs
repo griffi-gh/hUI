@@ -45,7 +45,7 @@ fn main() {
 
         let resolution = UVec2::from(display.get_framebuffer_dimensions()).as_vec2();
 
-        hui.begin();
+        hui.begin_frame();
 
         hui.add(Container {
           size: (Size::Relative(1.), Size::Relative(1.)).into(),

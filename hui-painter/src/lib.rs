@@ -38,20 +38,4 @@ impl PainterInstance {
   pub fn fonts_mut(&mut self) -> &mut FontManager {
     &mut self.fonts
   }
-
-  // pub fn atlas(&self) -> &TextureAtlas {
-  //   &self.atlas
-  // }
-
-  // pub fn atlas_mut(&mut self) -> &mut TextureAtlas {
-  //   &mut self.atlas
-  // }
-
-  // pub fn fonts(&self) -> &FontManager {
-  //   &self.fonts
-  // }
-
-  // pub fn fonts_mut(&mut self) -> &mut FontManager {
-  //   &mut self.fonts
-  // }
 }

@@ -6,7 +6,10 @@ use crate::{
   paint::{
     buffer::{PaintBuffer, Vertex},
     command::PaintCommand,
-  }, text::FontHandle, PainterInstance
+  },
+  text::FontHandle,
+  util::hash_vec4,
+  PainterInstance,
 };
 
 // TODO align, multichunk etc
@@ -145,9 +148,23 @@ impl PaintCommand for PaintText {
 
   fn cache_hash(&self) -> u64 {
     let mut hasher = rustc_hash::FxHasher::default();
+
+    // cache font/size/color
     self.text.font.hash(&mut hasher);
     hasher.write_u32(self.text.size.to_bits());
-    hasher.write(self.text.text.as_bytes());
+    hash_vec4(&mut hasher, self.text.color);
+
+    // cache text content
+    match self.text.text {
+      Cow::Owned(ref s) => hasher.write(s.as_bytes()),
+      Cow::Borrowed(s) => {
+        // since the lifetime is 'static, the str is guaranteed to never change
+        // so we can safely compare the ptr + len instead of the content
+        hasher.write_usize(s.as_ptr() as usize);
+        hasher.write_usize(s.len());
+      }
+    }
+
     hasher.finish()
   }
 }

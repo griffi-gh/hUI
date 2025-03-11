@@ -178,7 +178,18 @@ impl TextureAtlas {
       reuse_allocations: Vec::new(),
       version: 0,
     };
-    this.allocate_with_data(SourceTextureFormat::A8, &[255], 1);
+
+    // HACK?: ensure 0,0 is a white pixel
+    let h = this.allocate_with_data(SourceTextureFormat::A8, &[255], 1);
+    debug_assert!(
+      h.size == uvec2(1, 1) && h.id == 0,
+      "The texture handle was not allocated correctly"
+    );
+    debug_assert!(
+      this.get_uv(h).is_some_and(|x| x.top_left == Vec2::ZERO),
+      "The texture was't allocated in the top-left corner"
+    );
+
     this
   }
 

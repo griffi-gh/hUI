@@ -87,12 +87,24 @@ fn main() {
             }));
             if instant.elapsed().as_secs() & 1 != 0 {
               elem.push(Box::new(FrameView {
-                size: (Size::Relative(1.), Size::Absolute(10.)).into(),
-                frame: Box::new(vec4(1., 0., 0., 1.)),
+                size: (Size::Relative(1.), Size::Absolute(5.)).into(),
+                frame: Box::new(vec4(0.3569, 0.8078, 0.9804, 1.)), // Light Blue (#5BCEFA)
               }));
               elem.push(Box::new(FrameView {
-                size: (Size::Relative(1.), Size::Absolute(10.)).into(),
-                frame: Box::new(vec4(0., 0., 0., 1.)),
+                size: (Size::Relative(1.), Size::Absolute(5.)).into(),
+                frame: Box::new(vec4(0.9608, 0.6627, 0.7216, 1.)), // Pink (#F5A9B8)
+              }));
+              elem.push(Box::new(FrameView {
+                size: (Size::Relative(1.), Size::Absolute(5.)).into(),
+                frame: Box::new(vec4(1.0, 1.0, 1.0, 1.)), // White
+              }));
+              elem.push(Box::new(FrameView {
+                size: (Size::Relative(1.), Size::Absolute(5.)).into(),
+                frame: Box::new(vec4(0.9608, 0.6627, 0.7216, 1.)), // Pink (#F5A9B8)
+              }));
+              elem.push(Box::new(FrameView {
+                size: (Size::Relative(1.), Size::Absolute(5.)).into(),
+                frame: Box::new(vec4(0.3569, 0.8078, 0.9804, 1.)), // Light Blue (#5BCEFA)
               }));
               elem.push(Box::new(Spacer(100.)));
               elem.push(Box::new(Text {

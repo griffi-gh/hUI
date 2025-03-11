@@ -1,3 +1,4 @@
+use alloc::vec::Vec;
 use glam::{Vec2, Vec4};
 
 #[derive(Clone, Copy)]

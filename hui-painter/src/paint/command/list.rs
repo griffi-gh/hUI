@@ -1,4 +1,6 @@
-use std::{hash::Hasher, ops::RangeFull};
+use core::{hash::Hasher, ops::RangeFull};
+
+use alloc::{boxed::Box, vec::Vec};
 use hui_shared::rect::Rect;
 use crate::PainterInstance;
 use super::PaintCommand;

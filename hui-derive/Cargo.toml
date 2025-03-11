@@ -1,6 +1,6 @@
 [package]
 name = "hui-derive"
-description = "Derive macros for hUI"
+description = "internal crate: Provides derive macros for hUI"
 repository = "https://github.com/griffi-gh/hui"
 readme = "../README.md"
 authors = ["griffi-gh <prasol258@gmail.com>"]

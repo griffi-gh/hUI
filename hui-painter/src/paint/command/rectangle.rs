@@ -1,4 +1,4 @@
-use std::{hash::Hasher, num::NonZeroU16};
+use core::{hash::Hasher, num::NonZeroU16};
 use glam::{vec2, Vec2};
 use hui_shared::{color, rect::{Corners, FillColor, Rect}};
 use crate::{
@@ -7,7 +7,7 @@ use crate::{
     command::PaintCommand,
   },
   texture::TextureHandle,
-  util::{hash_vec2, hash_vec3, hash_vec4},
+  util::{hash_vec2, hash_vec4},
   PainterInstance,
 };
 
@@ -224,7 +224,7 @@ impl PaintCommand for PaintRectangle {
 
       for i in 0..point_count as u32 {
         let frac = i as f32 / (point_count - 1) as f32;
-        let angle = frac * std::f32::consts::PI * 0.5;
+        let angle = frac * core::f32::consts::PI * 0.5;
         let x = angle.sin();
         let y = angle.cos();
         into.vertices.extend([

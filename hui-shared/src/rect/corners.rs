@@ -112,7 +112,7 @@ impl<T> From<(T, T, T, T)> for Corners<T> {
 
 impl<T> IntoIterator for Corners<T> {
   type Item = T;
-  type IntoIter = std::array::IntoIter<Self::Item, 4>;
+  type IntoIter = core::array::IntoIter<Self::Item, 4>;
   fn into_iter(self) -> Self::IntoIter {
     self.to_array().into_iter()
   }
@@ -120,7 +120,7 @@ impl<T> IntoIterator for Corners<T> {
 
 impl<'a, T> IntoIterator for &'a Corners<T> {
   type Item = &'a T;
-  type IntoIter = std::array::IntoIter<Self::Item, 4>;
+  type IntoIter = core::array::IntoIter<Self::Item, 4>;
 
   fn into_iter(self) -> Self::IntoIter {
     self.as_array().into_iter()
@@ -129,7 +129,7 @@ impl<'a, T> IntoIterator for &'a Corners<T> {
 
 impl<'a, T> IntoIterator for &'a mut Corners<T> {
   type Item = &'a mut T;
-  type IntoIter = std::array::IntoIter<Self::Item, 4>;
+  type IntoIter = core::array::IntoIter<Self::Item, 4>;
 
   fn into_iter(self) -> Self::IntoIter {
     self.as_array_mut().into_iter()

@@ -1,5 +1,4 @@
-use std::hash::Hasher;
-
+use core::hash::Hasher;
 use glam::vec2;
 use hui_shared::rect::Rect;
 

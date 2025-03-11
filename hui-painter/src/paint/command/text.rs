@@ -1,4 +1,5 @@
-use std::{borrow::Cow, hash::{Hash, Hasher}};
+use core::hash::{Hash, Hasher};
+use alloc::{borrow::Cow, vec::Vec};
 use fontdue::layout::{CoordinateSystem, Layout};
 use glam::{vec2, Vec4};
 use hui_shared::rect::Rect;

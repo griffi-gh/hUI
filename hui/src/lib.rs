@@ -1,3 +1,4 @@
+// #![no_std]
 #![doc(html_logo_url = "https://raw.githubusercontent.com/griffi-gh/hui/master/.assets/hui.svg")]
 //!
 //! Simple UI library for games and other interactive applications
@@ -7,9 +8,11 @@
 
 #![cfg_attr(docsrs, feature(doc_auto_cfg))]
 
-// #![deny(unsafe_code)]
 #![forbid(unsafe_op_in_unsafe_fn)]
 #![allow(unused_parens)]
+
+// #[macro_use]
+// extern crate alloc;
 
 pub use hui_shared::*;
 pub use hui_painter as painter;

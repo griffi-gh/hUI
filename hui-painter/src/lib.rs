@@ -1,3 +1,7 @@
+#![no_std]
+#[macro_use]
+extern crate alloc;
+
 pub mod paint;
 pub mod texture;
 pub mod text;

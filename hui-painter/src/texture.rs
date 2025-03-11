@@ -1,3 +1,4 @@
+use alloc::vec::Vec;
 use glam::{ivec2, uvec2, vec2, UVec2, Vec2};
 use hui_shared::rect::Corners;
 use rect_packer::DensePacker;

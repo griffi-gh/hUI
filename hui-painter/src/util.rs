@@ -1,4 +1,4 @@
-use std::hash::Hasher;
+use core::hash::Hasher;
 
 #[inline]
 pub(crate) fn hash_vec2(hasher: &mut impl Hasher, vec: glam::Vec2) {

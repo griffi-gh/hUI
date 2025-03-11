@@ -1,0 +1,26 @@
+[package]
+name = "hui-loaders"
+description = "Image loader providers for hUI-painter"
+repository = "https://github.com/griffi-gh/hui"
+readme = "../README.md"
+authors = ["griffi-gh <prasol258@gmail.com>"]
+rust-version = "1.85"
+version = "0.1.0-alpha.7"
+edition = "2024"
+license = "GPL-3.0-or-later"
+publish = true
+include = [
+  "src/**/*.rs",
+  "Cargo.toml",
+]
+
+[dependencies]
+hui-painter = { version = "=0.1.0-alpha.7", path = "../hui-painter", default-features = false }
+image = { version = "0.25", default-features = false, optional = true }
+
+[features]
+default = ["loader-file", "loader-image", "image-default-formats"]
+# hui-painter = ["dep:hui-painter"]
+loader-file = []
+loader-image = ["dep:image"]
+image-default-formats = ["loader-image", "image/default-formats"]

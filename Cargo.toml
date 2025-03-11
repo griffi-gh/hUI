@@ -8,5 +8,6 @@ members = [
   "hui-painter",
   "hui-shared",
   "hui-wgpu",
-  "hui-winit"
+  "hui-winit",
+  "hui-loaders",
 ]

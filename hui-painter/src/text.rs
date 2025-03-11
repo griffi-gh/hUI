@@ -12,11 +12,15 @@ pub struct FontManager {
 }
 
 impl FontManager {
-  pub fn new() -> Self {
-    let mut this = Self {
+  pub(crate) fn new_internal() -> Self {
+    Self {
       fonts: font::FontHandleManager::new(),
       ftm: ftm::FontTextureManager::new(),
-    };
+    }
+  }
+
+  pub fn new() -> Self {
+    let mut this = Self::new_internal();
     #[cfg(feature="default-font")] {
       this.fonts.idc = 0;
       this.add(include_bytes!("../assets/font/ProggyTiny.ttf"));

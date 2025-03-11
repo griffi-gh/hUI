@@ -26,6 +26,7 @@
             "rust-analyzer"
             "clippy"
           ])
+          cargo-nextest
           pkg-config
           cmake
         ];

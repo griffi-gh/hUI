@@ -166,7 +166,7 @@ impl TextureAtlas {
   pub(crate) fn new(size: UVec2) -> Self {
     assert_size(size);
     let data_bytes = (size.x * size.y) as usize * RGBA_BYTES_PER_PIXEL;
-    Self {
+    let mut this = Self {
       size,
       data: vec![0; data_bytes],
       packer: DensePacker::new(
@@ -177,7 +177,9 @@ impl TextureAtlas {
       allocations: HashMap::default(),
       reuse_allocations: Vec::new(),
       version: 0,
-    }
+    };
+    this.allocate_with_data(SourceTextureFormat::A8, &[255], 1);
+    this
   }
 
   /// The version of the atlas, incremented every time the atlas is modified.

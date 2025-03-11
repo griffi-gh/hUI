@@ -26,9 +26,6 @@ pub struct UiInstance {
   input: UiInputState,
   signal: SignalStore,
   font_stack: FontStack,
-
-  /// Set to true if present has been called since the last begin_frame
-  frame_presented: bool,
 }
 
 impl UiInstance {
@@ -45,7 +42,6 @@ impl UiInstance {
       events: EventQueue::new(),
       input: UiInputState::new(),
       signal: SignalStore::new(),
-      frame_presented: false,
     }
   }
 
@@ -110,52 +106,51 @@ impl UiInstance {
 
   //TODO better error handling
 
-  /// Add an image from a file to the texture atlas\
-  /// (experimental, may be removed in the future)
-  ///
-  /// Requires the `image` feature
-  ///
-  /// # Panics:
-  /// - If the file exists but contains invalid image data\
-  ///   (this will change to a soft error in the future)
-  ///
-  /// Deprecated.
-  #[cfg(feature = "image")]
-  #[deprecated]
-  pub fn add_image_file_path(&mut self, path: impl AsRef<std::path::Path>) -> Result<TextureHandle, std::io::Error> {
-    use std::io::{Read, Seek};
+  // /// Add an image from a file to the texture atlas\
+  // /// (experimental, may be removed in the future)
+  // ///
+  // /// Requires the `image` feature
+  // ///
+  // /// # Panics:
+  // /// - If the file exists but contains invalid image data\
+  // ///   (this will change to a soft error in the future)
+  // ///
+  // /// Deprecated.
+  // #[deprecated]
+  // pub fn add_image_file_path(&mut self, path: impl AsRef<std::path::Path>) -> Result<TextureHandle, std::io::Error> {
+  //   use std::io::{Read, Seek};
 
-    // Open the file (and wrap it in a bufreader)
-    let mut file = std::io::BufReader::new(std::fs::File::open(path)?);
+  //   // Open the file (and wrap it in a bufreader)
+  //   let mut file = std::io::BufReader::new(std::fs::File::open(path)?);
 
-    //Guess the image format from the magic bytes
-    //Read like 64 bytes, which should be enough for magic byte detection
-    //well this would fail if the image is somehow smaller than 64 bytes, but who the fvck cares...
-    let mut magic = [0; 64];
-    file.read_exact(&mut magic)?;
-    let format = image::guess_format(&magic).expect("Invalid image data (FORMAT)");
-    file.seek(std::io::SeekFrom::Start(0))?;
+  //   //Guess the image format from the magic bytes
+  //   //Read like 64 bytes, which should be enough for magic byte detection
+  //   //well this would fail if the image is somehow smaller than 64 bytes, but who the fvck cares...
+  //   let mut magic = [0; 64];
+  //   file.read_exact(&mut magic)?;
+  //   let format = image::guess_format(&magic).expect("Invalid image data (FORMAT)");
+  //   file.seek(std::io::SeekFrom::Start(0))?;
 
-    //Parse the image and read the raw uncompressed rgba data
-    let image = image::load(file, format).expect("Invalid image data");
-    let image_rgba = image.as_rgba8().unwrap();
+  //   //Parse the image and read the raw uncompressed rgba data
+  //   let image = image::load(file, format).expect("Invalid image data");
+  //   let image_rgba = image.as_rgba8().unwrap();
 
-    //Add the image to the atlas
-    let handle = self.add_image(
-      SourceTextureFormat::RGBA8,
-      image_rgba,
-      image.width() as usize
-    );
+  //   //Add the image to the atlas
+  //   let handle = self.add_image(
+  //     SourceTextureFormat::RGBA8,
+  //     image_rgba,
+  //     image.width() as usize
+  //   );
 
-    Ok(handle)
-  }
+  //   Ok(handle)
+  // }
 
   /// Push a font to the font stack\
   /// The font will be used for all text rendering until it is popped
   ///
   /// This function is useful for replacing the default font, use sparingly\
   /// (This library attempts to be stateless, however passing the font to every text element is not very practical)
-  pub fn push_font_stack(&mut self, font: FontHandle) {
+  pub fn font_stack_push(&mut self, font: FontHandle) {
     self.font_stack.push(font);
   }
 
@@ -163,7 +158,7 @@ impl UiInstance {
   ///
   /// ## Panics:
   /// If the font stack is empty
-  pub fn pop_font_stack(&mut self) {
+  pub fn font_stack_pop(&mut self) {
     self.font_stack.pop();
   }
 

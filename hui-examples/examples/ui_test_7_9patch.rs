@@ -24,10 +24,11 @@ struct SetValue(f32);
 
 ui_main!(
   "hUI: 9-Patch demo",
-  init: |ui| {
+  init: |_ui| {
     (
       NinePatchAsset {
-        image: todo!(), //ui.add_image_file_path("./hui-examples/assets/ninepatch_button.png").unwrap(),
+        // FIXME add image loader here
+        image: todo!("FIXME add image loader here"), //ui.add_image_file_path("./hui-examples/assets/ninepatch_button.png").unwrap(),
         size: (190, 49),
         scalable_region: Rect {
           position: vec2(8. / 190., 8. / 49.),

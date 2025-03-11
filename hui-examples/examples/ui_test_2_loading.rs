@@ -20,8 +20,8 @@ mod boilerplate;
 ui_main!(
   "hUI: Loading screen demo",
   init: |ui| {
-    let font = ui.add_font(include_bytes!("../assets/blink/Blink-ynYZ.otf"));
-    ui.push_font_stack(font);
+    let font = ui.fonts_mut().add(include_bytes!("../assets/blink/Blink-ynYZ.otf"));
+    ui.font_stack_push(font);
     (std::time::Instant::now(),)
   },
   run: |ui, size, (instant,)| {

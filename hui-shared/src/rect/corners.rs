@@ -1,5 +1,3 @@
-use std::mem::ManuallyDrop;
-
 /// Represents 4 corners of a rectangular shape.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
 pub struct Corners<T> {

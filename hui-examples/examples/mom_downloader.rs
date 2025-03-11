@@ -19,8 +19,8 @@ mod boilerplate;
 ui_main!{
   "Mom downloader 2000",
   init: |ui| {
-    let font_handle = ui.add_font(include_bytes!("../assets/roboto/Roboto-Regular.ttf"));
-    ui.push_font_stack(font_handle);
+    let font_handle = ui.fonts_mut().add(include_bytes!("../assets/roboto/Roboto-Regular.ttf"));
+    ui.font_stack_push(font_handle);
     Instant::now()
   },
   run: |ui, max_size, instant| {

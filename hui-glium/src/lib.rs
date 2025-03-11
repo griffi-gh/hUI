@@ -57,7 +57,7 @@ struct BufferPair {
 }
 
 impl BufferPair {
-  pub fn new<F: Facade>(facade: &F) -> Self {
+  pub fn new_empty<F: Facade>(facade: &F) -> Self {
     log::debug!("init ui buffers (empty)...");
     Self {
       vertex_buffer: VertexBuffer::empty_dynamic(facade, 1024).unwrap(),

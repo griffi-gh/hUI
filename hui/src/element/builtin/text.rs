@@ -64,10 +64,6 @@ impl Text {
       ..Default::default()
     }
   }
-
-  fn font(&self, f: FontHandle) -> FontHandle {
-    self.font.unwrap_or(f)
-  }
 }
 
 impl Text {
@@ -76,8 +72,8 @@ impl Text {
       text: TextChunk {
         text: self.text.clone(),
         font: self.font.unwrap_or(current_font),
-        size: self.text_size as f32,
-        color: self.color.into(),
+        size: self.text_size,
+        color: self.color,
       }
     }
   }

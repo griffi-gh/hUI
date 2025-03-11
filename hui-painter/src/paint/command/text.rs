@@ -1,5 +1,5 @@
 use std::{borrow::Cow, hash::{Hash, Hasher}};
-use fontdue::layout::{CoordinateSystem, GlyphRasterConfig, Layout};
+use fontdue::layout::{CoordinateSystem, Layout};
 use glam::{vec2, Vec4};
 use hui_shared::rect::Rect;
 use crate::{

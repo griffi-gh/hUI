@@ -30,7 +30,7 @@ fn main() {
   let mut hui = UiInstance::new();
   let mut backend = GliumUiRenderer::new(&display);
 
-  let font_handle = hui.add_font(include_bytes!("../assets/roboto/Roboto-Regular.ttf"));
+  let font_handle = hui.fonts_mut().add(include_bytes!("../assets/roboto/Roboto-Regular.ttf"));
   let instant = Instant::now();
 
   event_loop.run(|event, window_target| {

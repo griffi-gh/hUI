@@ -28,7 +28,10 @@ const IMAGE_DATA: &[u8] = include_bytes!("../assets/icons/visual-studio-code-ico
 ui_main!(
   "hUI: Internal input test",
   init: |ui| {
-    let image = ui.add_image(SourceTextureFormat::RGBA8, IMAGE_DATA, 32);
+    let image = ui.textures_mut().add_with_data(
+      SourceTextureFormat::RGBA8,
+      IMAGE_DATA, 32,
+    );
     (0, image)
   },
   run: |ui, size, &mut (ref mut counter, image)| {

@@ -11,7 +11,7 @@ impl Frame for TextureHandle {
     draw.add(PaintTransform {
       transform: Affine2::from_translation(rect.position),
       child: PaintRectangle {
-        size: rect.size.into(),
+        size: rect.size,
         color: color::WHITE.into(),
         texture: Some(*self),
         ..Default::default()

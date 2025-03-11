@@ -24,10 +24,14 @@ struct Stuff {
 ui_main!(
   "hUI: vscode demo",
   init: |ui| {
-    let handle = ui.add_font(include_bytes!("../assets/fira/FiraSans-Light.ttf"));
-    ui.push_font_stack(handle);
+    let handle = ui.fonts_mut().add(include_bytes!("../assets/fira/FiraSans-Light.ttf"));
+    ui.font_stack_push(handle);
     Stuff {
-      vscode_icon: ui.add_image(SourceTextureFormat::RGBA8, include_bytes!("../assets/icons/visual-studio-code-icon_32x32.rgba"), 32),
+      vscode_icon: ui.textures_mut().add_with_data(
+        SourceTextureFormat::RGBA8,
+        include_bytes!("../assets/icons/visual-studio-code-icon_32x32.rgba"),
+        32
+      ),
     }
   },
   run: |ui, size, stuff| {

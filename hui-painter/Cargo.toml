@@ -18,7 +18,6 @@ include = [
 [dependencies]
 hui-shared = { version = "0.1.0-alpha.7", path = "../hui-shared" }
 glam = "0.30"
-log = "0.4"
 rect_packer = "0.2" # TODO: use sth else like `crunch` instead?
 hashbrown = "0.15"
 nohash-hasher = "0.2"

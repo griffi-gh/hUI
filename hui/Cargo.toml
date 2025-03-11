@@ -19,7 +19,7 @@ include = [
 [dependencies]
 hui-derive = { version = "0.1.0-alpha.7", path = "../hui-derive", optional = true }
 hui-shared = { version = "0.1.0-alpha.7", path = "../hui-shared" }
-hui-painter = { version = "0.1.0-alpha.7", path = "../hui-painter" }
+hui-painter = { version = "0.1.0-alpha.7", path = "../hui-painter", default-features = false }
 hashbrown = "0.15"
 nohash-hasher = "0.2"
 glam = "0.30"

@@ -2,6 +2,8 @@
 name = "hui-derive"
 description = "internal crate: Provides derive macros for hUI"
 repository = "https://github.com/griffi-gh/hui"
+keywords = ["ui", "gui", "portable", "gamedev", "hui"]
+categories = ["no-std", "gui", "game-development"]
 readme = "../README.md"
 authors = ["griffi-gh <prasol258@gmail.com>"]
 rust-version = "1.85"

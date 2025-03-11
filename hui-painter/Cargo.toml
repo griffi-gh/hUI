@@ -1,6 +1,8 @@
 [package]
 name = "hui-painter"
 description = "UI rendering middleware for hUI, abstracts away triangulation, text layout and rendering and all the other hard stuff."
+keywords = ["ui", "gui", "portable", "gamedev", "hui"]
+categories = ["no-std", "gui", "game-development"]
 repository = "https://github.com/griffi-gh/hui"
 readme = "../README.md"
 authors = ["griffi-gh <prasol258@gmail.com>"]

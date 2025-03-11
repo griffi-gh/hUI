@@ -1,6 +1,8 @@
 [package]
 name = "hui-loaders"
 description = "Image loader providers for hUI-painter"
+keywords = ["ui", "gui", "portable", "gamedev", "hui"]
+categories = ["gui", "game-development"]
 repository = "https://github.com/griffi-gh/hui"
 readme = "../README.md"
 authors = ["griffi-gh <prasol258@gmail.com>"]

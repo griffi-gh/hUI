@@ -57,14 +57,14 @@ fn main() {
             }));
             elem.push(Box::new(Text {
               text: "THIS LINE SHOULD BE SHARP!".into(),
-              text_size: 32,
+              text_size: 32.,
               ..Default::default()
             }));
             elem.push(Box::new(Text {
               text: "All lines except 3 and 6 below will be blurry:".into(),
               ..Default::default()
             }));
-            for size in [9, 12, 16, 18, 24, 32] {
+            for size in [9., 12., 16., 18., 24., 32.] {
               elem.push(Box::new(Text {
                 text: "Testing default font, Proggy Tiny".into(),
                 text_size: size,
@@ -82,7 +82,7 @@ fn main() {
             elem.push(Box::new(Text {
               text: "Hello, world!\nżółty liść. życie nie ma sensu i wszyscy zginemy;\nтест кирилиці їїїїїїїїїїї\njapanese text: テスト".into(),
               font: Some(font_handle),
-              text_size: 32,
+              text_size: 32.,
               ..Default::default()
             }));
             if instant.elapsed().as_secs() & 1 != 0 {
@@ -97,7 +97,7 @@ fn main() {
               elem.push(Box::new(Spacer(100.)));
               elem.push(Box::new(Text {
                 text: "FLAG SHOULD NOT OVERLAP WITH TEXT".into(),
-                text_size: 64,
+                text_size: 64.,
                 color: vec4(1., 0., 1., 1.),
                 ..Default::default()
               }));
@@ -108,7 +108,7 @@ fn main() {
 
         hui.end_frame();
 
-        backend.update(&hui);
+        backend.update(&hui.backend_data());
         backend.draw(&mut frame, resolution);
 
         frame.finish().unwrap();

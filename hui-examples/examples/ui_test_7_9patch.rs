@@ -27,7 +27,7 @@ ui_main!(
   init: |ui| {
     (
       NinePatchAsset {
-        image: ui.add_image_file_path("./hui-examples/assets/ninepatch_button.png").unwrap(),
+        image: todo!(), //ui.add_image_file_path("./hui-examples/assets/ninepatch_button.png").unwrap(),
         size: (190, 49),
         scalable_region: Rect {
           position: vec2(8. / 190., 8. / 49.),
@@ -50,7 +50,7 @@ ui_main!(
           .with_padding(10.)
           .with_children(|ui| {
             Text::new("Hello, world!\nThis is a 9-patch frame used as a background \nfor Container with a Text element.\nIt's scalable and looks great!\nBelow, there are two FillRects with the same \n9-patch frame used as the background.")
-              .with_text_size(16)
+              .with_text_size(16.)
               .add_child(ui);
           })
           .add_child(ui);
@@ -60,7 +60,7 @@ ui_main!(
           .add_child(ui);
         Text::new("This one's fancy:")
           .with_color(color::BLACK)
-          .with_text_size(32)
+          .with_text_size(32.)
           .add_child(ui);
         FrameView::default()
           .with_size(size!(700, 50))
@@ -73,7 +73,7 @@ ui_main!(
           .add_child(ui);
         Text::new("Slider customized with `NinePatchFrame`s:")
           .with_color(color::BLACK)
-          .with_text_size(32)
+          .with_text_size(32.)
           .add_child(ui);
         Slider::new(*value)
           .with_size(size!(50%, 30))

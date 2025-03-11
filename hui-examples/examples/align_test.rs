@@ -137,7 +137,7 @@ fn main() {
 
         hui.end_frame();
 
-        backend.update(&hui);
+        backend.update(&hui.backend_data());
         backend.draw(&mut frame, resolution);
 
         frame.finish().unwrap();

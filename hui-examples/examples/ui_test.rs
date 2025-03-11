@@ -21,7 +21,7 @@ ui_main!(|ui, size, _| {
     .with_children(|ui| {
       Text::default()
         .with_text("Hello, world")
-        .with_text_size(100)
+        .with_text_size(100.)
         .with_color(color::BLACK)
         .add_child(ui);
       Container::default()
@@ -33,7 +33,7 @@ ui_main!(|ui, size, _| {
         .with_children(|ui| {
           Text::default()
             .with_text("Lorem ipsum dolor sit amet, consectetur adipiscing elit.")
-            .with_text_size(24)
+            .with_text_size(24.)
             .add_child(ui);
         })
         .add_child(ui);

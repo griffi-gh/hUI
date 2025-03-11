@@ -43,7 +43,7 @@ ui_main!{
             if instant.elapsed().as_secs_f32() < 5. {
               Text::default()
                 .with_text("Downloading your mom...")
-                .with_text_size(24)
+                .with_text_size(24.)
                 .add_child(ui);
               ProgressBar::default()
                 .with_value(mom_ratio)
@@ -63,7 +63,7 @@ ui_main!{
                 .with_children(|ui| {
                   Text::default()
                     .with_text(format!("{:.2}% ({:.1} GB)", mom_ratio * 100., mom_ratio * 10000.))
-                    .with_text_size(16)
+                    .with_text_size(16.)
                     .add_child(ui);
                 })
                 .add_child(ui);
@@ -71,11 +71,11 @@ ui_main!{
               Text::default()
                 .with_text("Error 413: Request Entity Too Large")
                 .with_color((1., 0.125, 0.125, 1.))
-                .with_text_size(20)
+                .with_text_size(20.)
                 .add_child(ui);
               Text::default()
                 .with_text(format!("Exiting in {}...", 10 - instant.elapsed().as_secs()))
-                .with_text_size(16)
+                .with_text_size(16.)
                 .add_child(ui);
             } else {
               std::process::exit(0);

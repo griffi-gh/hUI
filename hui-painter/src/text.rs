@@ -4,7 +4,7 @@ use crate::texture::{TextureAtlas, TextureHandle};
 pub(crate) mod ftm;
 pub(crate) mod font;
 
-pub use font::FontHandle;
+pub use font::{FontHandle, DEFAULT_FONT};
 
 pub struct FontManager {
   fonts: font::FontHandleManager,
@@ -13,10 +13,15 @@ pub struct FontManager {
 
 impl FontManager {
   pub fn new() -> Self {
-    Self {
+    let mut this = Self {
       fonts: font::FontHandleManager::new(),
       ftm: ftm::FontTextureManager::new(),
+    };
+    #[cfg(feature="default-font")] {
+      this.fonts.idc = 0;
+      this.add(include_bytes!("../assets/font/ProggyTiny.ttf"));
     }
+    this
   }
 
   /// Add a font to the manager from raw font file data.

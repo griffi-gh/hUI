@@ -69,6 +69,9 @@ impl PaintCommand for PaintText {
     let layout = self.build_layout(&font_array);
 
     for glyph in layout.glyphs() {
+      if !glyph.char_data.rasterize() {
+        continue;
+      }
       ctx.fonts.render_glyph(&mut ctx.textures, self.text.font, glyph.key);
     }
   }

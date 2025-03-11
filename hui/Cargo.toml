@@ -10,7 +10,6 @@ edition = "2024"
 license = "GPL-3.0-or-later"
 publish = true
 include = [
-  "assets/**/*",
   "src/**/*.rs",
   "Cargo.toml",
 ]
@@ -33,7 +32,10 @@ image = { version = "0.25", default-features = false, optional = true }
 rustc-hash = "2.0"
 
 [features]
-default = ["el_all", "derive"]
+default = ["el_all", "derive", "default-font"]
+
+## Enable the default font (Proggy tiny, \~35kb)
+default-font = ["hui-painter/default-font"]
 
 ## Enable derive macros
 derive = ["dep:hui-derive"]

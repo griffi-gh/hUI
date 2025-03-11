@@ -2,23 +2,32 @@ use hashbrown::HashMap;
 use nohash_hasher::BuildNoHashHasher;
 
 pub(crate) type FontId = u16;
-
 #[derive(Clone, Copy, Hash, PartialEq, Eq)]
 pub struct FontHandle(pub(crate) FontId);
+
+#[cfg(feature = "default-font")]
+pub const DEFAULT_FONT: FontHandle = FontHandle(0);
+
+#[cfg(feature = "default-font")]
+impl Default for FontHandle {
+  fn default() -> Self {
+    DEFAULT_FONT
+  }
+}
 
 pub(crate) struct FontRepr {
   pub(crate) font: fontdue::Font,
 }
 
 pub struct FontHandleManager {
-  idc: FontId,
-  fonts: HashMap<FontId, FontRepr,BuildNoHashHasher<FontId>>,
+  pub(crate) idc: FontId,
+  fonts: HashMap<FontId, FontRepr, BuildNoHashHasher<FontId>>,
 }
 
 impl FontHandleManager {
   pub fn new() -> Self {
     Self {
-      idc: 0,
+      idc: 1,
       fonts: HashMap::default(),
     }
   }

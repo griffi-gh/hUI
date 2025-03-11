@@ -105,7 +105,7 @@ impl PaintCommand for PaintRectangle {
     // Otherwise, if texture handle is not set or invalid, use the bottom left
     // corner of the texture which contains a white pixel.
     let uvs = self.texture
-      .and_then(|handle| ctx.atlas.get_uv(handle))
+      .and_then(|handle| ctx.textures.get_uv(handle))
       .map(|global_uv| {
         let texture_uv = self.texture_uv;
         let texture_uv_is_default =

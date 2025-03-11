@@ -12,6 +12,7 @@
 #![allow(unused_parens)]
 
 pub use hui_shared::*;
+pub use hui_painter as painter;
 
 mod instance;
 mod macros;
@@ -19,11 +20,10 @@ pub mod layout;
 pub mod element;
 pub mod event;
 pub mod input;
-pub mod draw;
 pub mod measure;
 pub mod state;
-pub mod text;
 pub mod signal;
 pub mod frame;
+pub mod font;
 
 pub use instance::UiInstance;

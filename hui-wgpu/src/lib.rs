@@ -1,5 +1,10 @@
 use glam::{vec2, Vec2};
-use hui::{draw::{TextureAtlasMeta, UiDrawCall, UiVertex}, UiInstance};
+use hui_painter::{
+  backend::BackendData,
+  paint::buffer::Vertex,
+  presentation::PresentatationBackendData,
+  texture::TextureAtlasBackendData
+};
 
 const DEFAULT_BUFFER_SIZE: u64 = 1024;
 const DEFAULT_TEXTURE_SIZE: u32 = 512;
@@ -27,8 +32,8 @@ impl WgpuVertex {
   };
 }
 
-impl From<UiVertex> for WgpuVertex {
-  fn from(v: UiVertex) -> Self {
+impl From<Vertex> for WgpuVertex {
+  fn from(v: Vertex) -> Self {
     Self {
       position: v.position.to_array(),
       uv: v.uv.to_array(),
@@ -38,7 +43,9 @@ impl From<UiVertex> for WgpuVertex {
 }
 
 pub struct WgpuUiRenderer {
-  pub modified: bool,
+  // pub modified: bool,
+  pub last_buf_hash: u64,
+  pub last_img_version: u64,
   pub vertex_buffer: wgpu::Buffer,
   pub index_buffer: wgpu::Buffer,
   pub vertex_count: usize,
@@ -184,7 +191,8 @@ impl WgpuUiRenderer {
     });
 
     Self {
-      modified: true,
+      last_buf_hash: 0,
+      last_img_version: 0,
       vertex_buffer,
       index_buffer,
       vertex_count: 0,
@@ -198,8 +206,8 @@ impl WgpuUiRenderer {
     }
   }
 
-  fn update_buffers(&mut self, call: &UiDrawCall, queue: &wgpu::Queue, device: &wgpu::Device, resolution: Vec2) {
-    let data_vtx = call.vertices.iter()
+  fn update_buffers(&mut self, present_data: &PresentatationBackendData, queue: &wgpu::Queue, device: &wgpu::Device, resolution: Vec2) {
+    let data_vtx = present_data.buffer.vertices.iter()
       .copied()
       .map(|x| {
         let mut v = x;
@@ -208,13 +216,13 @@ impl WgpuUiRenderer {
       })
       .map(WgpuVertex::from)
       .collect::<Vec<_>>();
-    let data_idx = &call.indices[..];
+    let data_idx = &present_data.buffer.indices[..];
 
     let data_vtx_view = bytemuck::cast_slice(&data_vtx);
     let data_idx_view = bytemuck::cast_slice(data_idx);
 
-    self.vertex_count = call.vertices.len();
-    self.index_count = call.indices.len();
+    self.vertex_count = present_data.buffer.vertices.len();
+    self.index_count = present_data.buffer.indices.len();
 
     if data_vtx.is_empty() || data_idx.is_empty() {
       return
@@ -240,11 +248,13 @@ impl WgpuUiRenderer {
 
     queue.write_buffer(&self.vertex_buffer, 0, data_vtx_view);
     queue.write_buffer(&self.index_buffer, 0, data_idx_view);
+
+    self.last_buf_hash = present_data.hash;
   }
 
-  fn update_texture(&mut self, meta: TextureAtlasMeta, queue: &wgpu::Queue, device: &wgpu::Device) {
+  fn update_texture(&mut self, atlas: &TextureAtlasBackendData, queue: &wgpu::Queue, device: &wgpu::Device) {
     //TODO URGENCY:HIGH resize texture if needed
-    if meta.data.len() as u32 > (self.texture.size().width * self.texture.size().height * 4) {
+    if atlas.data.len() as u32 > (self.texture.size().width * self.texture.size().height * 4) {
       self.texture.destroy();
       // unimplemented!("texture resize not implemented");
       self.texture = device.create_texture(&wgpu::TextureDescriptor {
@@ -263,44 +273,41 @@ impl WgpuUiRenderer {
       });
     }
     queue.write_texture(
-      wgpu::ImageCopyTexture {
+      wgpu::TexelCopyTextureInfo {
         texture: &self.texture,
         mip_level: 0,
         origin: wgpu::Origin3d::ZERO,
         aspect: wgpu::TextureAspect::All,
       },
-      meta.data,
-      wgpu::ImageDataLayout {
+      atlas.data,
+      wgpu::TexelCopyBufferLayout {
         offset: 0,
-        bytes_per_row: Some(meta.size.x * 4),
-        rows_per_image: Some(meta.size.y),
+        bytes_per_row: Some(atlas.size.x * 4),
+        rows_per_image: Some(atlas.size.y),
       },
       wgpu::Extent3d {
-        width: meta.size.x,
-        height: meta.size.y,
+        width: atlas.size.x,
+        height: atlas.size.y,
         depth_or_array_layers: 1,
       }
     );
+
+    self.last_img_version = atlas.version;
   }
 
   pub fn update(
     &mut self,
-    instance: &UiInstance,
+    data: &BackendData,
     queue: &wgpu::Queue,
     device: &wgpu::Device,
     resolution: Vec2,
   ) {
-    let (modified, call) = instance.draw_call();
-    if self.modified || modified {
-      self.update_buffers(call, queue, device, resolution);
+    if data.presentation.hash != self.last_buf_hash {
+      self.update_buffers(&data.presentation, queue, device, resolution);
     }
-
-    let meta = instance.atlas();
-    if self.modified || meta.modified {
-      self.update_texture(meta, queue, device);
+    if data.atlas.version != self.last_img_version {
+      self.update_texture(&data.atlas, queue, device);
     }
-
-    self.modified = false;
   }
 
   pub fn draw(

@@ -187,7 +187,8 @@ impl UiElement for Container {
         }
       }
 
-      let measure = element.measure(MeasureContext{
+      let measure = element.measure(MeasureContext {
+        painter: ctx.painter,
         state: ctx.state,
         layout: &LayoutInfo {
           //XXX: if the element gets wrapped, this will be inaccurate.
@@ -201,9 +202,7 @@ impl UiElement for Container {
           direction: self.direction,
           remaining_space: None,
         },
-        text_measure: ctx.text_measure,
         current_font: ctx.current_font,
-        images: ctx.images,
       });
 
       //Check the position of the side of element closest to the end on the primary axis
@@ -375,7 +374,7 @@ impl UiElement for Container {
     //   });
     // }
 
-    self.background_frame.draw(ctx.draw, (ctx.layout.position, ctx.measure.size).into());
+    self.background_frame.draw(ctx.paint_target, (ctx.layout.position, ctx.measure.size).into());
 
     //padding
     position += vec2(self.padding.left, self.padding.top);
@@ -444,11 +443,10 @@ impl UiElement for Container {
 
         //measure
         let el_measure = element.measure(MeasureContext {
+          painter: ctx.painter,
           layout: &el_layout,
           state: ctx.state,
-          text_measure: ctx.text_measure,
           current_font: ctx.current_font,
-          images: ctx.images,
         });
 
         //align (on sec. axis)
@@ -485,13 +483,12 @@ impl UiElement for Container {
 
         //process
         element.process(ProcessContext {
+          painter: ctx.painter,
           measure: &el_measure,
           layout: &el_layout,
-          draw: ctx.draw,
+          paint_target: ctx.paint_target,
           state: ctx.state,
-          text_measure: ctx.text_measure,
           current_font: ctx.current_font,
-          images: ctx.images,
           input: ctx.input,
           signal: ctx.signal,
         });

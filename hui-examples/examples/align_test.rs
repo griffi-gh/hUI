@@ -36,7 +36,7 @@ fn main() {
 
         let resolution = UVec2::from(display.get_framebuffer_dimensions()).as_vec2();
 
-        hui.begin();
+        hui.begin_frame();
 
         let z = instant.elapsed().as_secs_f32().sin().powi(2);
 
@@ -135,9 +135,9 @@ fn main() {
           ..Default::default()
         }, resolution);
 
-        hui.end();
+        hui.end_frame();
 
-        backend.update(&hui);
+        backend.update(&hui.backend_data());
         backend.draw(&mut frame, resolution);
 
         frame.finish().unwrap();

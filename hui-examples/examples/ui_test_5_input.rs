@@ -1,7 +1,6 @@
 use hui::{
   color, size,
   signal::Signal,
-  draw::TextureFormat,
   layout::{Alignment, Direction},
   element::{
     container::Container,
@@ -12,6 +11,7 @@ use hui::{
     UiElementExt,
   },
 };
+use hui_painter::texture::SourceTextureFormat;
 
 #[derive(Signal)]
 enum CounterSignal {
@@ -28,7 +28,7 @@ const IMAGE_DATA: &[u8] = include_bytes!("../assets/icons/visual-studio-code-ico
 ui_main!(
   "hUI: Internal input test",
   init: |ui| {
-    let image = ui.add_image(TextureFormat::Rgba, IMAGE_DATA, 32);
+    let image = ui.add_image(SourceTextureFormat::RGBA8, IMAGE_DATA, 32);
     (0, image)
   },
   run: |ui, size, &mut (ref mut counter, image)| {
@@ -42,7 +42,7 @@ ui_main!(
       .with_wrap(true)
       .with_children(|ui| {
         Text::new("Number of images:")
-          .with_text_size(24)
+          .with_text_size(24.)
           .add_child(ui);
         Break.add_child(ui);
         Container::default()
@@ -50,7 +50,7 @@ ui_main!(
           .with_background(color::ORANGE)
           .with_children(|ui| {
             Text::new("-")
-              .with_text_size(32)
+              .with_text_size(32.)
               .add_child(ui);
           })
           .on_click(|| CounterSignal::Decrement)
@@ -60,7 +60,7 @@ ui_main!(
           .with_align(Alignment::Center)
           .with_children(|ui| {
             Text::new(counter.to_string())
-              .with_text_size(64)
+              .with_text_size(64.)
               .add_child(ui);
           })
           .add_child(ui);
@@ -69,7 +69,7 @@ ui_main!(
           .with_background(color::ORANGE)
           .with_children(|ui| {
             Text::new("+")
-              .with_text_size(32)
+              .with_text_size(32.)
               .add_child(ui);
           })
           .on_click(|| CounterSignal::Increment)

@@ -83,6 +83,14 @@ pub struct TextureHandle {
 }
 
 impl TextureHandle {
+  /// Create a new broken texture handle.
+  pub fn new_broken() -> Self {
+    Self {
+      id: u32::MAX,
+      size: uvec2(0, 0),
+    }
+  }
+
   pub fn size(&self) -> UVec2 {
     self.size
   }
@@ -120,6 +128,13 @@ impl TextureAllocation {
   }
 }
 
+#[derive(Clone, Copy)]
+pub struct TextureAtlasBackendData<'a> {
+  pub data: &'a [u8],
+  pub size: UVec2,
+  pub version: u64,
+}
+
 /// A texture atlas that can be used to pack multiple textures into a single texture.
 pub struct TextureAtlas {
   /// The size of the atlas, in pixels
@@ -147,9 +162,10 @@ pub struct TextureAtlas {
 }
 
 impl TextureAtlas {
-  /// Create a new texture atlas with the specified size.
-  pub(crate) fn new(size: UVec2) -> Self {
+  /// Internal function, only directly used in tests
+  pub(crate) fn new_internal(size: UVec2) -> Self {
     assert_size(size);
+
     let data_bytes = (size.x * size.y) as usize * RGBA_BYTES_PER_PIXEL;
     Self {
       size,
@@ -165,11 +181,45 @@ impl TextureAtlas {
     }
   }
 
+  /// Create a new texture atlas with the specified size.
+  pub(crate) fn new(size: UVec2) -> Self {
+    let mut this = Self::new_internal(size);
+
+    // HACK?: ensure 0,0 is a white pixel
+    let h = this.allocate_with_data(SourceTextureFormat::A8, &[255], 1);
+    debug_assert!(
+      h.size == uvec2(1, 1) && h.id == 0,
+      "The texture handle was not allocated correctly"
+    );
+    debug_assert!(
+      this.get_uv(h).is_some_and(|x| x.top_left == Vec2::ZERO),
+      "The texture was't allocated in the top-left corner"
+    );
+
+    this
+  }
+
+  /// The version of the atlas, incremented every time the atlas is modified.
   pub fn version(&self) -> u64 {
     self.version
   }
 
-  fn mark_modified(&mut self) {
+  /// The underlying texture data of the atlas, in RGBA8 format.
+  pub fn data_rgba(&self) -> &[u8] {
+    &self.data
+  }
+
+  /// Get data needed by the backend implementation.
+  pub fn backend_data(&self) -> TextureAtlasBackendData {
+    TextureAtlasBackendData {
+      data: &self.data,
+      size: self.size,
+      version: self.version,
+    }
+  }
+
+  /// Increment the version of the atlas
+  fn increment_version(&mut self) {
     // XXX: wrapping_add? will this *ever* overflow?
     self.version = self.version.wrapping_add(1);
   }
@@ -189,8 +239,48 @@ impl TextureAtlas {
     handle
   }
 
+  // TODO resize test
+
+  /// Resize the atlas to the specified size
+  ///
+  /// Downscaling is not supported.
+  pub(crate) fn resize(&mut self, new_size: UVec2) {
+    if new_size == self.size {
+      return
+    }
+    assert_size(new_size);
+    assert!(
+      new_size.x >= self.size.x &&
+      new_size.y >= self.size.y,
+      "downscaling is not supported"
+    );
+
+    let old_size = self.size;
+    self.size = new_size;
+
+    self.packer.resize(new_size.x as i32, new_size.y as i32);
+
+    let new_data_len = (new_size.y as usize * new_size.x as usize) * RGBA_BYTES_PER_PIXEL;
+    self.data.resize(new_data_len, 0);
+
+    // Resize the atlas data in-place if needed
+    if new_size.x != old_size.x {
+      for y in (1..old_size.y).rev() { // First source row can be skipped (its alr at idx 0)
+        for x in (0..old_size.x).rev() {
+          let old_idx = (y as usize * old_size.x as usize + x as usize) * RGBA_BYTES_PER_PIXEL;
+          let new_idx = (y as usize * new_size.x as usize + x as usize) * RGBA_BYTES_PER_PIXEL;
+          self.data.copy_within(old_idx..old_idx + RGBA_BYTES_PER_PIXEL, new_idx);
+        }
+      }
+    }
+
+    self.increment_version();
+  }
+
   /// Allocate a texture in the atlas, returning a handle to it.\
   /// The data present in the texture is undefined, and may include garbage data.
+  ///
+  /// The texture may be resized if the texture doesn't fit
   ///
   /// # Panics
   /// - If any of the dimensions of the texture are zero or exceed `i32::MAX`.
@@ -214,6 +304,19 @@ impl TextureAtlas {
         }
         return handle;
       }
+    }
+
+    if !self.packer.can_pack(
+      size.x as i32,
+      size.y as i32,
+      false
+    ) {
+      let new_size = self.size * if self.size.x >= self.size.y {
+        uvec2(1, 2)
+      } else {
+        uvec2(2, 1)
+      };
+      self.resize(new_size);
     }
 
     // Pack the texture
@@ -276,11 +379,13 @@ impl TextureAtlas {
       .get(&handle.id)
       .expect("invalid texture handle");
 
+    debug_assert_eq!(*size, handle.size, "texture size mismatch");
+
     for y in 0..size.y {
       for x in 0..size.x {
         let src_idx = (y * size.x + x) as usize * bpp;
         let dst_idx: usize = (
-          (offset.y + y) * size.x +
+          (offset.y + y) * self.size.x +
           (offset.x + x)
         ) as usize * RGBA_BYTES_PER_PIXEL;
 
@@ -289,6 +394,7 @@ impl TextureAtlas {
 
         match format {
           SourceTextureFormat::RGBA8 => {
+            // TODO opt: copy entire row in this case
             dst.copy_from_slice(src);
           },
           SourceTextureFormat::ARGB8 => {
@@ -321,7 +427,7 @@ impl TextureAtlas {
       }
     }
 
-    self.mark_modified();
+    self.increment_version();
   }
 
   /// Allocate a texture in the atlas, returning a handle to it.\
@@ -383,5 +489,166 @@ impl TextureAtlas {
 impl Default for TextureAtlas {
   fn default() -> Self {
     Self::new(DEFAULT_ATLAS_SIZE)
+  }
+}
+
+#[cfg(test)]
+mod tests {
+  use super::*;
+
+  #[test]
+  fn test_assert_size_valid() {
+    assert_size(uvec2(1, 1));
+    assert_size(uvec2(i32::MAX as u32, i32::MAX as u32));
+  }
+
+  #[test]
+  #[should_panic(expected = "size must be greater than 0")]
+  fn test_assert_size_zero() {
+    assert_size(uvec2(0, 0));
+  }
+
+  #[test]
+  #[should_panic(expected = "size must be less than i32::MAX")]
+  fn test_assert_size_too_large() {
+    assert_size(uvec2(i32::MAX as u32 + 1, i32::MAX as u32 + 1));
+  }
+
+  #[test]
+  fn test_texture_handle_new_broken() {
+    let handle = TextureHandle::new_broken();
+    assert_eq!(handle.id, u32::MAX);
+    assert_eq!(handle.size, uvec2(0, 0));
+  }
+
+  #[test]
+  fn test_texture_allocation_new() {
+    let handle = TextureHandle::new_broken();
+    let allocation = TextureAllocation::new(handle, uvec2(1, 1), uvec2(2, 2));
+    assert_eq!(allocation.handle, handle);
+    assert_eq!(allocation.offset, uvec2(1, 1));
+    assert_eq!(allocation.size, uvec2(2, 2));
+    assert_eq!(allocation.max_size, uvec2(2, 2));
+  }
+
+  #[test]
+  fn test_texture_atlas_new() {
+    const SIZE: u32 = 128;
+
+    let atlas = TextureAtlas::new_internal(uvec2(SIZE, SIZE));
+    assert_eq!(atlas.size, uvec2(SIZE, SIZE));
+    assert_eq!(atlas.data.len(), (SIZE as usize) * (SIZE as usize) * RGBA_BYTES_PER_PIXEL);
+    assert_eq!(atlas.next_id, 0);
+    assert_eq!(atlas.allocations.len(), 0);
+    assert_eq!(atlas.reuse_allocations.len(), 0);
+    assert_eq!(atlas.version, 0);
+  }
+
+  #[test]
+  fn test_texture_atlas_allocate() {
+    let mut atlas = TextureAtlas::new_internal(uvec2(128, 128));
+    let handle = atlas.allocate(uvec2(32, 32));
+    assert_eq!(handle.size, uvec2(32, 32));
+    assert_eq!(atlas.get_uv(handle).unwrap().bottom_right, vec2(32. / 128., 32. / 128.));
+    assert_eq!(atlas.allocations.len(), 1);
+  }
+
+  #[test]
+  fn test_texture_atlas_allocate_with_data() {
+    fn make_data(o: u8)-> Vec<u8> {
+      let mut data = vec![o; 32 * 32 * 4];
+      for y in 0..32 {
+        for x in 0..32 {
+          let idx = (y * 32 + x) * 4;
+          data[idx] = x as u8;
+          data[idx + 1] = y as u8;
+        }
+      }
+      data
+    }
+
+    let mut atlas = TextureAtlas::new_internal(uvec2(128, 128));
+
+    let data = make_data(1);
+    let handle = atlas.allocate_with_data(SourceTextureFormat::RGBA8, &data, 32);
+    assert_eq!(handle.size, uvec2(32, 32));
+    assert_eq!(atlas.allocations.len(), 1);
+    let uv = atlas.get_uv(handle).unwrap();
+    assert_eq!(uv.top_left, vec2(0.0, 0.0));
+    assert_eq!(uv.top_right, vec2(32.0 / 128.0, 0.0));
+    assert_eq!(uv.bottom_left, vec2(0.0, 32.0 / 128.0));
+    assert_eq!(uv.bottom_right, vec2(32.0 / 128.0, 32.0 / 128.0));
+
+    let data = make_data(2);
+    let handle = atlas.allocate_with_data(SourceTextureFormat::RGBA8, &data, 32);
+    assert_eq!(handle.size, uvec2(32, 32));
+    assert_eq!(atlas.allocations.len(), 2);
+    let uv = atlas.get_uv(handle).unwrap();
+    assert_eq!(uv.top_left, vec2(32.0 / 128.0, 0.0));
+    assert_eq!(uv.top_right, vec2(64.0 / 128.0, 0.0));
+    assert_eq!(uv.bottom_left, vec2(32.0 / 128.0, 32.0 / 128.0));
+    assert_eq!(uv.bottom_right, vec2(64.0 / 128.0, 32.0 / 128.0));
+
+    // now, check the texture data
+    assert_eq!(atlas.version(), 2);
+    let data = atlas.data_rgba();
+
+    // for y in 0..128 {
+    //   for x in 0..128 {
+    //     let idx = (y * 128 + x) * 4;
+    //     print!("{}", data[idx + 2]);
+    //   }
+    //   println!();
+    // }
+
+    for y in 0..128 {
+      for x in 0..128 {
+        let idx = (y * 128 + x) * 4;
+        if y >= 32 || x >= 64 {
+          continue
+        }
+        assert_eq!(
+          if x < 32 {
+            [x as u8, y as u8, 1, 1]
+          } else if x < 64 {
+            [x as u8 - 32, y as u8, 2, 2]
+          } else {
+            unreachable!()
+          },
+          data[idx..idx + 4],
+          "pixel at ({x}, {y}) idx: {idx} is incorrect",
+        );
+      }
+    }
+  }
+
+  // #[test]
+  // fn test_texture_atlas_update() {
+  //   let mut atlas = TextureAtlas::new(uvec2(128, 128));
+  //   let data = vec![255; 32 * 32 * 4];
+  //   let handle = atlas.allocate_with_data(SourceTextureFormat::RGBA8, &data, 32);
+  //   let new_data = vec![0; 32 * 32 * 4];
+  //   atlas.update(handle, SourceTextureFormat::RGBA8, &new_data);
+  //   assert_eq!(atlas.data_rgba()[..32 * 32 * 4], new_data[..]);
+  // }
+
+  #[test]
+  fn test_texture_atlas_deallocate() {
+    let mut atlas = TextureAtlas::new_internal(uvec2(128, 128));
+    let handle = atlas.allocate(uvec2(32, 32));
+    atlas.deallocate(handle);
+    assert_eq!(atlas.allocations.len(), 0);
+    assert_eq!(atlas.reuse_allocations.len(), 1);
+  }
+
+  #[test]
+  fn test_texture_atlas_get_uv() {
+    let mut atlas = TextureAtlas::new_internal(uvec2(128, 128));
+    let handle = atlas.allocate(uvec2(32, 32));
+    let uv = atlas.get_uv(handle).unwrap();
+    assert_eq!(uv.top_left, vec2(0.0, 0.0));
+    assert_eq!(uv.top_right, vec2(32.0 / 128.0, 0.0));
+    assert_eq!(uv.bottom_left, vec2(0.0, 32.0 / 128.0));
+    assert_eq!(uv.bottom_right, vec2(32.0 / 128.0, 32.0 / 128.0));
   }
 }

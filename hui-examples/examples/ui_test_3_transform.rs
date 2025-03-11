@@ -10,10 +10,10 @@ use hui::{
   },
   layout::Alignment,
   rect::Corners,
-  text::FontHandle,
   rect_frame,
   size,
 };
+use hui_painter::text::FontHandle;
 
 #[path = "../boilerplate.rs"]
 #[macro_use]
@@ -49,11 +49,11 @@ ui_main!(
           .with_children(|ui| {
             Text::default()
               .with_text("Did  you  know?")
-              .with_text_size(18)
+              .with_text_size(18.)
               .add_child(ui);
             Text::default()
               .with_text("You can die by jumping into the spike pit! :D\nCheck out the tutorial section for more tips.")
-              .with_text_size(24)
+              .with_text_size(24.)
               .with_font(FontHandle::default())
               .add_child(ui);
           })

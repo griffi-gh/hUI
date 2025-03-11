@@ -1,11 +1,27 @@
 use std::rc::Rc;
 use glam::Vec2;
 use glium::{
-  backend::{Context, Facade}, implement_vertex, index::PrimitiveType, texture::{RawImage2d, Texture2d}, uniform, uniforms::{MagnifySamplerFilter, MinifySamplerFilter, Sampler, SamplerBehavior, SamplerWrapFunction}, Api, Blend, DrawParameters, IndexBuffer, Program, Surface, VertexBuffer
+  backend::{Context, Facade},
+  index::PrimitiveType,
+  texture::{RawImage2d, Texture2d},
+  uniforms::{
+    MagnifySamplerFilter,
+    MinifySamplerFilter,
+    Sampler,
+    SamplerBehavior,
+    SamplerWrapFunction
+  },
+  Api,
+  Blend,
+  DrawParameters,
+  IndexBuffer,
+  Program,
+  Surface,
+  VertexBuffer,
+  implement_vertex,
+  uniform,
 };
-use hui::{
-  draw::{TextureAtlasMeta, UiDrawCall, UiVertex}, UiInstance
-};
+use hui_painter::{backend::BackendData, paint::buffer::Vertex, presentation::PresentatationBackendData, texture::TextureAtlasBackendData};
 
 const VERTEX_SHADER_GLES3: &str = include_str!("../shaders/vertex.es.vert");
 const FRAGMENT_SHADER_GLES3: &str = include_str!("../shaders/fragment.es.frag");
@@ -15,14 +31,14 @@ const FRAGMENT_SHADER_150: &str = include_str!("../shaders/fragment.150.frag");
 
 #[derive(Clone, Copy)]
 #[repr(C)]
-struct Vertex {
+struct GlVertex {
   position: [f32; 2],
   color: [f32; 4],
   uv: [f32; 2],
 }
 
-impl From<UiVertex> for Vertex {
-  fn from(v: UiVertex) -> Self {
+impl From<Vertex> for GlVertex {
+  fn from(v: Vertex) -> Self {
     Self {
       position: v.position.to_array(),
       color: v.color.to_array(),
@@ -31,10 +47,10 @@ impl From<UiVertex> for Vertex {
   }
 }
 
-implement_vertex!(Vertex, position, color, uv);
+implement_vertex!(GlVertex, position, color, uv);
 
 struct BufferPair {
-  pub vertex_buffer: glium::VertexBuffer<Vertex>,
+  pub vertex_buffer: glium::VertexBuffer<GlVertex>,
   pub index_buffer: glium::IndexBuffer<u32>,
   pub vertex_count: usize,
   pub index_count: usize,
@@ -51,7 +67,7 @@ impl BufferPair {
     }
   }
 
-  pub fn new_with_data<F: Facade>(facade: &F, vtx: &[Vertex], idx: &[u32]) -> Self {
+  pub fn new_with_data<F: Facade>(facade: &F, vtx: &[GlVertex], idx: &[u32]) -> Self {
     log::debug!("init ui buffers (data)...");
     Self {
       vertex_buffer: VertexBuffer::dynamic(facade, vtx).unwrap(),
@@ -62,7 +78,7 @@ impl BufferPair {
   }
 
   pub fn ensure_buffer_size(&mut self, need_vtx: usize, need_idx: usize) {
-    let current_vtx_size = self.vertex_buffer.get_size() / std::mem::size_of::<Vertex>();
+    let current_vtx_size = self.vertex_buffer.get_size() / std::mem::size_of::<GlVertex>();
     let current_idx_size = self.index_buffer.get_size() / std::mem::size_of::<u32>();
     //log::debug!("current vtx size: {}, current idx size: {}", current_vtx_size, current_idx_size);
     if current_vtx_size >= need_vtx && current_idx_size >= need_idx {
@@ -86,7 +102,7 @@ impl BufferPair {
     }
   }
 
-  pub fn write_data(&mut self, vtx: &[Vertex], idx: &[u32]) {
+  pub fn write_data(&mut self, vtx: &[GlVertex], idx: &[u32]) {
     //log::trace!("uploading {} vertices and {} indices", vtx.len(), idx.len());
 
     self.vertex_count = vtx.len();
@@ -113,7 +129,9 @@ pub struct GliumUiRenderer {
   context: Rc<Context>,
   program: glium::Program,
   ui_texture: Option<Texture2d>,
+  ui_texture_version: u64,
   buffer_pair: Option<BufferPair>,
+  buffer_hash: u64,
 }
 
 impl GliumUiRenderer {
@@ -126,22 +144,25 @@ impl GliumUiRenderer {
       },
       context: Rc::clone(facade.get_context()),
       ui_texture: None,
+      ui_texture_version: 0,
       buffer_pair: None,
+      buffer_hash: 0,
     }
   }
 
-  fn update_buffers(&mut self, call: &UiDrawCall) {
-    log::trace!("updating ui buffers (tris: {})", call.indices.len() / 3);
-    let data_vtx = &call.vertices.iter().copied().map(Vertex::from).collect::<Vec<_>>()[..];
-    let data_idx = &call.indices[..];
+  fn update_buffers(&mut self, data: &PresentatationBackendData) {
+    log::trace!("updating ui buffers (tris: {})", data.buffer.indices.len() / 3);
+    let data_vtx = &data.buffer.vertices.iter().copied().map(GlVertex::from).collect::<Vec<_>>()[..];
+    let data_idx = &data.buffer.indices[..];
     if let Some(buffer) = &mut self.buffer_pair {
       buffer.write_data(data_vtx, data_idx);
-    } else if !call.indices.is_empty() {
+    } else if !data.buffer.indices.is_empty() {
       self.buffer_pair = Some(BufferPair::new_with_data(&self.context, data_vtx, data_idx));
     }
+    self.buffer_hash = data.hash;
   }
 
-  fn update_texture_atlas(&mut self, atlas: &TextureAtlasMeta) {
+  fn update_texture_atlas(&mut self, atlas: &TextureAtlasBackendData) {
     log::trace!("updating ui atlas texture");
     self.ui_texture = Some(Texture2d::new(
       &self.context,
@@ -150,14 +171,15 @@ impl GliumUiRenderer {
         (atlas.size.x, atlas.size.y)
       )
     ).unwrap());
+    self.ui_texture_version = atlas.version;
   }
 
-  pub fn update(&mut self, instance: &UiInstance) {
-    if self.ui_texture.is_none() || instance.atlas().modified {
-      self.update_texture_atlas(&instance.atlas());
+  pub fn update(&mut self, data: &BackendData) {
+    if self.ui_texture_version != data.atlas.version {
+      self.update_texture_atlas(&data.atlas);
     }
-    if self.buffer_pair.is_none() || instance.draw_call().0 {
-      self.update_buffers(instance.draw_call().1);
+    if self.buffer_hash != data.presentation.hash {
+      self.update_buffers(&data.presentation);
     }
   }
 

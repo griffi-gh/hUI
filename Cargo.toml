@@ -5,7 +5,7 @@ members = [
   "hui-derive",
   "hui-examples",
   "hui-glium",
-  "hui-painter-wip",
+  "hui-painter",
   "hui-shared",
   "hui-wgpu",
   "hui-winit"

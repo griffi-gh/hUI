@@ -6,7 +6,10 @@ use crate::{
   paint::{
     buffer::{PaintBuffer, Vertex},
     command::PaintCommand,
-  }, text::FontHandle, PainterInstance
+  },
+  text::FontHandle,
+  util::hash_vec4,
+  PainterInstance,
 };
 
 // TODO align, multichunk etc
@@ -66,7 +69,10 @@ impl PaintCommand for PaintText {
     let layout = self.build_layout(&font_array);
 
     for glyph in layout.glyphs() {
-      ctx.fonts.render_glyph(&mut ctx.atlas, self.text.font, glyph.key);
+      if !glyph.char_data.rasterize() {
+        continue;
+      }
+      ctx.fonts.render_glyph(&mut ctx.textures, self.text.font, glyph.key);
     }
   }
 
@@ -89,28 +95,28 @@ impl PaintCommand for PaintText {
       let font_handle = self.text.font; // TODO use font_index here
 
       let vidx = into.vertices.len() as u32;
-      let glyph_texture = ctx.fonts.render_glyph(&mut ctx.atlas, font_handle, glyph.key);
-      let uv = ctx.atlas.get_uv(glyph_texture).unwrap();
+      let glyph_texture = ctx.fonts.render_glyph(&mut ctx.textures, font_handle, glyph.key);
+      let uv = ctx.textures.get_uv(glyph_texture).unwrap();
 
       into.indices.extend([vidx, vidx + 1, vidx + 2, vidx, vidx + 2, vidx + 3]);
       into.vertices.extend([
         Vertex {
-          position: vec2(glyph.x, glyph.y),
+          position: vec2(glyph.x, glyph.y).round(),
           color: self.text.color,
           uv: uv.top_left,
         },
         Vertex {
-          position: vec2(glyph.x + glyph_texture.size().x as f32, glyph.y),
+          position: vec2(glyph.x + glyph_texture.size().x as f32, glyph.y).round().round(),
           color: self.text.color,
           uv: uv.top_right,
         },
         Vertex {
-          position: vec2(glyph.x + glyph_texture.size().x as f32, glyph.y + glyph_texture.size().y as f32),
+          position: vec2(glyph.x + glyph_texture.size().x as f32, glyph.y + glyph_texture.size().y as f32).round(),
           color: self.text.color,
           uv: uv.bottom_right,
         },
         Vertex {
-          position: vec2(glyph.x, glyph.y + glyph_texture.size().y as f32),
+          position: vec2(glyph.x, glyph.y + glyph_texture.size().y as f32).round(),
           color: self.text.color,
           uv: uv.bottom_left,
         },
@@ -145,9 +151,23 @@ impl PaintCommand for PaintText {
 
   fn cache_hash(&self) -> u64 {
     let mut hasher = rustc_hash::FxHasher::default();
+
+    // cache font/size/color
     self.text.font.hash(&mut hasher);
     hasher.write_u32(self.text.size.to_bits());
-    hasher.write(self.text.text.as_bytes());
+    hash_vec4(&mut hasher, self.text.color);
+
+    // cache text content
+    match self.text.text {
+      Cow::Owned(ref s) => hasher.write(s.as_bytes()),
+      Cow::Borrowed(s) => {
+        // since the lifetime is 'static, the str is guaranteed to never change
+        // so we can safely compare the ptr + len instead of the content
+        hasher.write_usize(s.as_ptr() as usize);
+        hasher.write_usize(s.len());
+      }
+    }
+
     hasher.finish()
   }
 }

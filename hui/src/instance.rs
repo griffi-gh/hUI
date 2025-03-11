@@ -1,18 +1,14 @@
+use hui_painter::{
+  backend::BackendData, paint::command::{PaintCommand, PaintList}, presentation::Presentatation, text::FontHandle, texture::{SourceTextureFormat, TextureHandle}, PainterInstance
+};
 use crate::{
   element::{MeasureContext, ProcessContext, UiElement},
-  layout::{Direction, LayoutInfo},
-  text::{FontHandle, TextRenderer},
-  draw::{
-    ImageHandle,
-    TextureFormat,
-    UiDrawCall,
-    UiDrawCommandList,
-    atlas::{TextureAtlasManager, TextureAtlasMeta},
-  },
-  signal::{Signal, SignalStore},
   event::{EventQueue, UiEvent},
+  font::FontStack,
   input::UiInputState,
+  layout::{Direction, LayoutInfo},
   rect::Rect,
+  signal::{Signal, SignalStore},
   state::StateRepo,
 };
 
@@ -21,18 +17,18 @@ use crate::{
 /// In most cases, you should only have one instance of this struct, but multiple instances are allowed\
 /// (Please note that it's possible to render multiple UI "roots" using a single instance)
 pub struct UiInstance {
+  // TODO Do not own Presentation/Painter
+  painter: PainterInstance,
+  presentation: Presentatation,
+  paint_commands: PaintList,
   stateful_state: StateRepo,
-  prev_draw_commands: UiDrawCommandList,
-  draw_commands: UiDrawCommandList,
-  draw_call: UiDrawCall,
-  draw_call_modified: bool,
-  text_renderer: TextRenderer,
-  atlas: TextureAtlasManager,
   events: EventQueue,
   input: UiInputState,
   signal: SignalStore,
-  /// True if in the middle of a laying out a frame
-  state: bool,
+  font_stack: FontStack,
+
+  /// Set to true if present has been called since the last begin_frame
+  frame_presented: bool,
 }
 
 impl UiInstance {
@@ -41,25 +37,15 @@ impl UiInstance {
   /// In most cases, you should only do this *once*, during the initialization of your application
   pub fn new() -> Self {
     UiInstance {
-      //mouse_position: Vec2::ZERO,
+      painter: PainterInstance::new(),
+      presentation: Presentatation::new(),
+      paint_commands: PaintList::default(),
+      font_stack: FontStack::new(),
       stateful_state: StateRepo::new(),
-      //event_queue: VecDeque::new(),
-      // root_elements: Vec::new(),
-      prev_draw_commands: UiDrawCommandList::default(),
-      draw_commands: UiDrawCommandList::default(),
-      draw_call: UiDrawCall::default(),
-      draw_call_modified: false,
-      // ftm: FontTextureManager::default(),
-      text_renderer: TextRenderer::new(),
-      atlas: {
-        let mut atlas = TextureAtlasManager::default();
-        atlas.add_dummy();
-        atlas
-      },
       events: EventQueue::new(),
       input: UiInputState::new(),
       signal: SignalStore::new(),
-      state: false,
+      frame_presented: false,
     }
   }
 
@@ -70,8 +56,9 @@ impl UiInstance {
   ///
   /// ## Panics:
   /// If the font data is invalid or corrupt
+  #[deprecated(note = "use painter.fonts_mut().add instead")]
   pub fn add_font(&mut self, font: &[u8]) -> FontHandle {
-    self.text_renderer.add_font_from_bytes(font)
+    self.painter.fonts_mut().add(font)
   }
 
   /// Add an image to the texture atlas\
@@ -80,8 +67,10 @@ impl UiInstance {
   /// Returns an image handle ([`ImageHandle`])\
   /// This handle can be used to reference the texture in draw commands\
   /// It's a light reference and can be cloned/copied freely, but will not be cleaned up even when dropped
-  pub fn add_image(&mut self, format: TextureFormat, data: &[u8], width: usize) -> ImageHandle {
-    self.atlas.add(width, data, format)
+  #[deprecated(note = "use painter.textures_mut().atlas_mut().allocate_with_data instead")]
+  pub fn add_image(&mut self, format: SourceTextureFormat, data: &[u8], width: usize) -> TextureHandle {
+    // self.atlas().add(width, data, format)
+    self.painter.textures_mut().allocate_with_data(format, data, width)
   }
 
   //TODO better error handling
@@ -94,8 +83,11 @@ impl UiInstance {
   /// # Panics:
   /// - If the file exists but contains invalid image data\
   ///   (this will change to a soft error in the future)
+  ///
+  /// Deprecated.
   #[cfg(feature = "image")]
-  pub fn add_image_file_path(&mut self, path: impl AsRef<std::path::Path>) -> Result<ImageHandle, std::io::Error> {
+  #[deprecated]
+  pub fn add_image_file_path(&mut self, path: impl AsRef<std::path::Path>) -> Result<TextureHandle, std::io::Error> {
     use std::io::{Read, Seek};
 
     // Open the file (and wrap it in a bufreader)
@@ -115,7 +107,7 @@ impl UiInstance {
 
     //Add the image to the atlas
     let handle = self.add_image(
-      TextureFormat::Rgba,
+      SourceTextureFormat::RGBA8,
       image_rgba,
       image.width() as usize
     );
@@ -129,7 +121,7 @@ impl UiInstance {
   /// This function is useful for replacing the default font, use sparingly\
   /// (This library attempts to be stateless, however passing the font to every text element is not very practical)
   pub fn push_font(&mut self, font: FontHandle) {
-    self.text_renderer.push_font(font);
+    self.font_stack.push(font);
   }
 
   /// Pop a font from the font stack\
@@ -137,12 +129,12 @@ impl UiInstance {
   /// ## Panics:
   /// If the font stack is empty
   pub fn pop_font(&mut self) {
-    self.text_renderer.pop_font();
+    self.font_stack.pop();
   }
 
   /// Get the current default font
-  pub fn current_font(&self) -> FontHandle {
-    self.text_renderer.current_font()
+  pub fn current_font(&self) -> Option<FontHandle> {
+    self.font_stack.current()
   }
 
   /// Add an element or an element tree to the UI
@@ -153,7 +145,6 @@ impl UiInstance {
   /// ## Panics:
   /// If called while the UI is not active (call [`UiInstance::begin`] first)
   pub fn add(&mut self, element: impl UiElement, rect: impl Into<Rect>) {
-    assert!(self.state, "must call UiInstance::begin before adding elements");
     let rect: Rect = rect.into();
     let layout = LayoutInfo {
       position: rect.position,
@@ -161,110 +152,50 @@ impl UiInstance {
       direction: Direction::Vertical,
       remaining_space: None,
     };
+    // TODO handle font_stack.current() font being None
+    let current_font = self.font_stack.current().expect("No current font");
     let measure = element.measure(MeasureContext {
+      painter: &self.painter,
       state: &self.stateful_state,
       layout: &layout,
-      text_measure: self.text_renderer.to_measure(),
-      current_font: self.text_renderer.current_font(),
-      images: self.atlas.context(),
+      current_font,
     });
     element.process(ProcessContext {
+      painter: &mut self.painter,
       measure: &measure,
       state: &mut self.stateful_state,
       layout: &layout,
-      draw: &mut self.draw_commands,
-      text_measure: self.text_renderer.to_measure(),
-      current_font: self.text_renderer.current_font(),
-      images: self.atlas.context(),
+      paint_target: &mut self.paint_commands,
       input: self.input.ctx(),
       signal: &mut self.signal,
+      current_font,
     });
   }
 
-  /// Prepare the UI for layout and processing\
-  /// You must call this function at the beginning of the frame, before adding any elements\
+  /// Reset the state from the previous frame, and prepare the UI for layout and processing
   ///
-  /// ## Panics:
-  /// If called twice in a row (for example, if you forget to call [`UiInstance::end`])\
-  /// This is an indication of a bug in your code and should be fixed.
-  pub fn begin(&mut self) {
-    //check and update current state
-    assert!(!self.state, "must call UiInstance::end before calling UiInstance::begin again");
-    self.state = true;
-
+  /// - You must call this function at the start of the frame, before adding any elements
+  /// - Make sure to provide all of the events that happened since the last frame before calling this function, to avoid a 1-frame delay in event processing
+  pub fn begin_frame(&mut self) {
     //first, drain and process the event queue
     self.input.update_state(&mut self.events);
 
     //then, reset the (remaining) signals
     self.signal.clear();
 
-    //then, reset the draw commands
-    std::mem::swap(&mut self.prev_draw_commands, &mut self.draw_commands);
-    self.draw_commands.commands.clear();
-    self.draw_call_modified = false;
-
-    //reset atlas modification flag
-    self.atlas.reset_modified();
+    // Clear the draw commands
+    self.paint_commands.clear();
   }
 
-  /// End the frame and prepare the UI for rendering\
-  /// You must call this function at the end of the frame, before rendering the UI
+  /// End rendering the current frame and present it
   ///
-  /// ## Panics:
-  /// If called without calling [`UiInstance::begin`] first. (or if called twice)\
-  /// This is an indication of a bug in your code and should be fixed.
-  pub fn end(&mut self) {
-    //check and update current state
-    assert!(self.state, "must call UiInstance::begin before calling UiInstance::end");
-    self.state = false;
-
-    //check if the draw commands have been modified
-    if self.draw_commands.commands == self.prev_draw_commands.commands {
-      return
-    }
-
-    //if they have, rebuild the draw call and set the modified flag
-    self.draw_call = UiDrawCall::build(&self.draw_commands, &mut self.atlas, &mut self.text_renderer);
-    self.draw_call_modified = true;
+  /// You must call this function sometime at the end of the frame, after adding all elements but before rendering, but before running the render backend
+  pub fn end_frame(&mut self) {
+    self.presentation.draw(&mut self.painter, &self.paint_commands);
   }
 
-  /// Get the draw call information for the current frame
-  ///
-  /// This function should only be used by the render backend.\
-  /// You should not call this directly unless you're implementing a custom render backend
-  ///
-  /// Returns a tuple with a boolean indicating if the buffers have been modified since the last frame
-  ///
-  /// You should only call this function *after* [`UiInstance::end`]\
-  /// Calling it in the middle of a frame will result in a warning but will not cause a panic\
-  /// (please note that doing so is probably a mistake and should be fixed in your code)\
-  /// Doing so anyway will return draw call data for the previous frame, but the `modified` flag will *always* be incorrect until [`UiInstance::end`] is called
-  ///
-  pub fn draw_call(&self) -> (bool, &UiDrawCall) {
-    if self.state {
-      log::warn!("UiInstance::draw_call called while in the middle of a frame, this is probably a mistake");
-    }
-    (self.draw_call_modified, &self.draw_call)
-  }
-
-  /// Get the texture atlas size and data for the current frame
-  ///
-  /// This function should only be used by the render backend.\
-  /// You should not call this directly unless you're implementing a custom render backend
-  ///
-  /// You should only call this function *after* [`UiInstance::end`]\
-  /// Calling it in the middle of a frame will result in a warning but will not cause a panic\
-  /// (please note that doing so is probably a mistake and should be fixed in your code)\
-  /// Using this function in the middle of a frame will return partially modified atlas data that may be outdated or incomplete\
-  /// This will lead to rendering artifacts, 1-frame delays and flashes and is probably not what you want
-  ///
-  /// Make sure to check [`TextureAtlasMeta::modified`] to see if the texture has been modified
-  /// since the beginning of the current frame before uploading it to the GPU
-  pub fn atlas(&self) -> TextureAtlasMeta {
-    if self.state {
-      log::warn!("UiInstance::atlas called while in the middle of a frame, this is probably a mistake");
-    }
-    self.atlas.meta()
+  pub fn backend_data(&self) -> BackendData {
+    self.painter.backend_data(&self.presentation)
   }
 
   /// Push a platform event to the UI event queue
@@ -277,11 +208,8 @@ impl UiInstance {
   ///
   /// This function should only be used by the platform backend.\
   /// You should not call this directly unless you're implementing a custom platform backend
-  /// or have a very specific usecase
+  /// or have a very specific usecase (not using one)
   pub fn push_event(&mut self, event: UiEvent) {
-    if self.state {
-      log::warn!("UiInstance::push_event called while in the middle of a frame, this is probably a mistake");
-    }
     self.events.push(event);
   }
 
@@ -297,6 +225,11 @@ impl UiInstance {
   /// This clears the signal queue for the given type and iterates over all signals
   pub fn process_signals<T: Signal + 'static>(&mut self, f: impl FnMut(T)) {
     self.signal.drain::<T>().for_each(f);
+  }
+
+  /// Get the paint commands needed to render the UI
+  pub fn paint_command(&self) -> &impl PaintCommand {
+    &self.paint_commands
   }
 }
 

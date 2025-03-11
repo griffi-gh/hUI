@@ -1,6 +1,3 @@
-use std::hash::Hash;
-
-use glam::Vec2;
 use hui_shared::rect::Rect;
 use crate::{paint::buffer::PaintBuffer, PainterInstance};
 
@@ -16,8 +13,7 @@ pub use transform::PaintTransform;
 mod rectangle;
 pub use rectangle::PaintRectangle;
 
-mod text;
-pub use text::PaintText;
+pub mod text;
 
 pub trait PaintCommand {
   /// Called before actual paint command is executed\

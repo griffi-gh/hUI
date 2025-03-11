@@ -60,14 +60,14 @@ pub fn ui<T>(
           let mut frame = display.draw();
           frame.clear_color_srgb(0.5, 0.5, 0.5, 1.);
 
-          hui.begin();
+          hui.begin_frame();
 
           let size = UVec2::from(display.get_framebuffer_dimensions()).as_vec2();
           draw(&mut hui, size, &mut result);
 
-          hui.end();
+          hui.end_frame();
 
-          backend.update(&hui);
+          backend.update(&hui.backend_data());
           backend.draw(&mut frame, size);
 
           frame.finish().unwrap();

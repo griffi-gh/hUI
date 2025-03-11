@@ -23,6 +23,10 @@ impl PaintList {
   pub fn add(&mut self, command: impl PaintCommand + 'static) {
     self.commands.push(Box::new(command));
   }
+
+  pub fn clear(&mut self) {
+    self.commands.clear();
+  }
 }
 
 impl Default for PaintList {

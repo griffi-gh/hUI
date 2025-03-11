@@ -1,40 +1,37 @@
 //! element API and built-in elements like `Container`, `Button`, `Text`, etc.
 
 use crate::{
-  draw::{atlas::ImageCtx, UiDrawCommandList},
   input::InputCtx,
   layout::{LayoutInfo, Size2d},
   measure::Response,
   rect::Rect,
   signal::SignalStore,
   state::StateRepo,
-  text::{FontHandle, TextMeasure},
   UiInstance,
 };
 
 mod builtin;
 pub use builtin::*;
+use hui_painter::{paint::command::PaintList, text::FontHandle, PainterInstance};
 
 /// Context for the `Element::measure` function
 pub struct MeasureContext<'a> {
+  pub painter: &'a PainterInstance,
+  pub current_font: FontHandle,
   pub layout: &'a LayoutInfo,
   pub state: &'a StateRepo,
-  pub text_measure: TextMeasure<'a>,
-  pub current_font: FontHandle,
-  pub images: ImageCtx<'a>,
   //XXX: should measure have a reference to input?
   //pub input: InputCtx<'a>,
 }
 
 /// Context for the `Element::process` function
 pub struct ProcessContext<'a> {
+  pub painter: &'a mut PainterInstance,
+  pub paint_target: &'a mut PaintList,
   pub measure: &'a Response,
   pub layout: &'a LayoutInfo,
-  pub draw: &'a mut UiDrawCommandList,
   pub state: &'a mut StateRepo,
-  pub text_measure: TextMeasure<'a>,
   pub current_font: FontHandle,
-  pub images: ImageCtx<'a>,
   pub input: InputCtx<'a>,
   pub signal: &'a mut SignalStore,
 }

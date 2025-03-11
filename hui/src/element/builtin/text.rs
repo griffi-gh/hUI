@@ -2,15 +2,16 @@
 
 use std::borrow::Cow;
 use derive_setters::Setters;
-use glam::Vec4;
+use glam::{Affine2, Vec4};
+use hui_painter::{
+  paint::command::{text::{PaintText, TextChunk}, PaintCommand, PaintTransform},
+  text::FontHandle,
+};
 use crate::{
-  draw::UiDrawCommand,
   element::{MeasureContext, ProcessContext, UiElement},
   layout::{compute_size, Size, Size2d},
   measure::Response,
-  text::FontHandle,
 };
-
 
 //TODO: text fit
 // pub enum TextSize {
@@ -41,7 +42,7 @@ pub struct Text {
   pub font: Option<FontHandle>,
 
   /// Size of the text, in points (these are not pixels)
-  pub text_size: u16,
+  pub text_size: f32,
 }
 
 impl Default for Text {
@@ -51,7 +52,7 @@ impl Default for Text {
       size: (Size::Auto, Size::Auto).into(),
       color: Vec4::new(1., 1., 1., 1.),
       font: None,
-      text_size: 16,
+      text_size: 16.,
     }
   }
 }
@@ -69,6 +70,19 @@ impl Text {
   }
 }
 
+impl Text {
+  fn paint_cmd(&self, current_font: FontHandle) -> PaintText {
+    PaintText {
+      text: TextChunk {
+        text: self.text.clone(),
+        font: self.font.unwrap_or(current_font),
+        size: self.text_size as f32,
+        color: self.color.into(),
+      }
+    }
+  }
+}
+
 impl UiElement for Text {
   fn name(&self) -> &'static str {
     "text"
@@ -82,9 +96,13 @@ impl UiElement for Text {
     let mut size = (0., 0.);
     if matches!(self.size.width, Size::Auto) || matches!(self.size.height, Size::Auto) {
       //TODO optimized measure if only one of the sizes is auto
-      let res = ctx.text_measure.measure(self.font(ctx.current_font), self.text_size, &self.text);
-      size.0 = res.max_width;
-      size.1 = res.height;
+      // let res = ctx.text_measure.measure(self.font(ctx.current_font), self.text_size, &self.text);
+      // size.0 = res.max_width;
+      // size.1 = res.height;
+      let cmd = self.paint_cmd(ctx.current_font);
+      let cmd_size = cmd.bounds(ctx.painter).size;
+      size.0 = cmd_size.x;
+      size.1 = cmd_size.y;
     }
     Response {
       size: compute_size(ctx.layout, self.size, size.into()),
@@ -96,12 +114,9 @@ impl UiElement for Text {
     if self.text.is_empty() || self.color.w == 0. {
       return
     }
-    ctx.draw.add(UiDrawCommand::Text {
-      text: self.text.clone(),
-      position: ctx.layout.position,
-      size: self.text_size,
-      color: self.color,
-      font: self.font(ctx.current_font),
+    ctx.paint_target.add(PaintTransform {
+      transform: Affine2::from_translation(ctx.layout.position),
+      child: self.paint_cmd(ctx.current_font),
     });
   }
 }

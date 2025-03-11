@@ -2,7 +2,6 @@
 
 use hui::{
   color, size,
-  draw::{ImageHandle, TextureFormat},
   layout::{Alignment, Direction},
   element::{
     container::Container,
@@ -12,13 +11,14 @@ use hui::{
     UiElementExt
   },
 };
+use hui_painter::texture::{SourceTextureFormat, TextureHandle};
 
 #[path = "../boilerplate.rs"]
 #[macro_use]
 mod boilerplate;
 
 struct Stuff {
-  vscode_icon: ImageHandle,
+  vscode_icon: TextureHandle,
 }
 
 ui_main!(
@@ -27,7 +27,7 @@ ui_main!(
     let handle = ui.add_font(include_bytes!("../assets/fira/FiraSans-Light.ttf"));
     ui.push_font(handle);
     Stuff {
-      vscode_icon: ui.add_image(TextureFormat::Rgba, include_bytes!("../assets/icons/visual-studio-code-icon_32x32.rgba"), 32),
+      vscode_icon: ui.add_image(SourceTextureFormat::RGBA8, include_bytes!("../assets/icons/visual-studio-code-icon_32x32.rgba"), 32),
     }
   },
   run: |ui, size, stuff| {
@@ -48,7 +48,7 @@ ui_main!(
               .add_child(ui);
             for item in ["File", "Edit", "Selection", "View", "Go", "Run", "Terminal", "Help"] {
               Text::new(item)
-                .with_text_size(15)
+                .with_text_size(15.)
                 .add_child(ui);
             }
             Container::default()
@@ -56,7 +56,7 @@ ui_main!(
               .with_align((Alignment::End, Alignment::Center))
               .with_children(|ui| {
                 Text::new("- ×")
-                  .with_text_size(32)
+                  .with_text_size(32.)
                   .add_child(ui);
               })
               .add_child(ui);
@@ -111,12 +111,12 @@ ui_main!(
                 .with_padding((10., 2.))
                 .with_children(|ui| {
                   Text::new("><")
-                    .with_text_size(13)
+                    .with_text_size(13.)
                     .add_child(ui);
                 })
                 .add_child(ui);
               Text::new("master")
-                .with_text_size(15)
+                .with_text_size(15.)
                 .add_child(ui);
             })
           .add_child(ui);

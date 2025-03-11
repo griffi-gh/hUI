@@ -1,4 +1,5 @@
-use super::FontHandle;
+
+use hui_painter::text::{FontHandle, DEFAULT_FONT};
 
 pub struct FontStack {
   fonts: Vec<FontHandle>,
@@ -7,10 +8,10 @@ pub struct FontStack {
 impl FontStack {
   pub fn new() -> Self {
     Self {
-      #[cfg(not(feature = "builtin_font"))]
+      #[cfg(not(feature = "default-font"))]
       fonts: Vec::new(),
-      #[cfg(feature = "builtin_font")]
-      fonts: vec![super::BUILTIN_FONT],
+      #[cfg(feature = "default-font")]
+      fonts: vec![DEFAULT_FONT],
     }
   }
 
@@ -26,7 +27,13 @@ impl FontStack {
     self.fonts.last().copied()
   }
 
-  pub fn current_or_default(&self) -> FontHandle {
-    self.current().unwrap_or_default()
+  // pub fn current_or_default(&self) -> FontHandle {
+  //   self.current().unwrap_or_default()
+  // }
+}
+
+impl Default for FontStack {
+  fn default() -> Self {
+    Self::new()
   }
 }

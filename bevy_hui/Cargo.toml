@@ -1,0 +1,16 @@
+[package]
+name = "bevy_hui"
+version = "0.1.0-alpha.7"
+edition = "2024"
+publish = false # WIP
+
+[dependencies]
+bevy = { version = "0.15", default-features = false }
+hui-painter = { version = "0.1.0-alpha.7", path = "../hui-painter", default-features = false }
+hui = { version = "0.1.0-alpha.7", path = "../hui", default-features = false, optional = true }
+
+[features]
+default = ["plugin-all"]
+plugin-all = ["plugin-painter", "plugin-input"]
+plugin-painter = []
+plugin-input = ["dep:hui"]

@@ -10,4 +10,5 @@ members = [
   "hui-wgpu",
   "hui-winit",
   "hui-loaders",
+  "bevy_hui",
 ]

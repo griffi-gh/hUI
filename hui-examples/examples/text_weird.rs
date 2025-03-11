@@ -106,7 +106,7 @@ fn main() {
           ..Default::default()
         }, resolution);
 
-        hui.end();
+        hui.end_frame();
 
         backend.update(&hui);
         backend.draw(&mut frame, resolution);

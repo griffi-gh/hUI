@@ -65,9 +65,9 @@ pub fn ui<T>(
           let size = UVec2::from(display.get_framebuffer_dimensions()).as_vec2();
           draw(&mut hui, size, &mut result);
 
-          hui.end();
+          hui.end_frame();
 
-          backend.update(&hui);
+          backend.update(&hui.backend_data());
           backend.draw(&mut frame, size);
 
           frame.finish().unwrap();

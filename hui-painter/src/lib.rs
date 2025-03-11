@@ -3,6 +3,7 @@ pub mod texture;
 pub mod text;
 pub mod util;
 pub mod backend;
+pub mod presentation;
 
 use text::FontManager;
 use texture::TextureAtlas;

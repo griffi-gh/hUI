@@ -1,5 +1,4 @@
 use hui::{
-  draw::TextureFormat,
   element::{
     br::Break,
     container::Container,
@@ -12,6 +11,7 @@ use hui::{
   layout::{Alignment, Direction},
   size,
 };
+use hui_painter::texture::SourceTextureFormat;
 
 #[derive(Signal)]
 enum CounterSignal {
@@ -27,7 +27,7 @@ const IMAGE_DATA: &[u8] = include_bytes!("../assets/icons/visual-studio-code-ico
 ui_main!(
   "hUI: Internal input test",
   init: |ui| {
-    let image = ui.add_image(TextureFormat::Rgba, IMAGE_DATA, 32);
+    let image = ui.add_image(SourceTextureFormat::RGBA8, IMAGE_DATA, 32);
     (0, image)
   },
   run: |ui, size, &mut (ref mut counter, image)| {
@@ -41,11 +41,11 @@ ui_main!(
       .with_wrap(true)
       .with_children(|ui| {
         Text::new(format!("Number of images: {counter}"))
-          .with_text_size(32)
+          .with_text_size(32.)
           .add_child(ui);
         Break.add_child(ui);
         Text::new("Absolute tracking slider:")
-          .with_text_size(16)
+          .with_text_size(16.)
           .add_child(ui);
         Break.add_child(ui);
         Slider::new(*counter as f32 / 100.)
@@ -56,7 +56,7 @@ ui_main!(
           .add_child(ui);
         Break.add_child(ui);
         Text::new("Relative tracking slider (Experimental):")
-          .with_text_size(16)
+          .with_text_size(16.)
           .add_child(ui);
         Break.add_child(ui);
         Slider::new(*counter as f32 / 100.)

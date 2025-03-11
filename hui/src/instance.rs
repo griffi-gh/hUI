@@ -1,5 +1,5 @@
 use hui_painter::{
-  backend::{BackendData, Presentatation}, paint::{buffer::PaintBuffer, command::{PaintCommand, PaintList, PaintRoot}}, text::FontHandle, texture::{SourceTextureFormat, TextureAtlasBackendData, TextureHandle}, PainterInstance
+  backend::BackendData, paint::command::{PaintCommand, PaintList}, presentation::Presentatation, text::FontHandle, texture::{SourceTextureFormat, TextureHandle}, PainterInstance
 };
 use crate::{
   element::{MeasureContext, ProcessContext, UiElement},
@@ -17,13 +17,18 @@ use crate::{
 /// In most cases, you should only have one instance of this struct, but multiple instances are allowed\
 /// (Please note that it's possible to render multiple UI "roots" using a single instance)
 pub struct UiInstance {
+  // TODO Do not own Presentation/Painter
   painter: PainterInstance,
+  presentation: Presentatation,
   paint_commands: PaintList,
   stateful_state: StateRepo,
   events: EventQueue,
   input: UiInputState,
   signal: SignalStore,
   font_stack: FontStack,
+
+  /// Set to true if present has been called since the last begin_frame
+  frame_presented: bool,
 }
 
 impl UiInstance {
@@ -33,12 +38,14 @@ impl UiInstance {
   pub fn new() -> Self {
     UiInstance {
       painter: PainterInstance::new(),
+      presentation: Presentatation::new(),
       paint_commands: PaintList::default(),
       font_stack: FontStack::new(),
       stateful_state: StateRepo::new(),
       events: EventQueue::new(),
       input: UiInputState::new(),
       signal: SignalStore::new(),
+      frame_presented: false,
     }
   }
 
@@ -165,12 +172,10 @@ impl UiInstance {
     });
   }
 
-  /// Reset the state from the previous frame, and prepare the UI for layout and processing\
-  /// You must call this function at the start of the frame, before adding any elements\
+  /// Reset the state from the previous frame, and prepare the UI for layout and processing
   ///
-  /// ## Panics:
-  /// If called twice in a row (for example, if you forget to call [`UiInstance::end`])\
-  /// This is an indication of a bug in your code and should be fixed.
+  /// - You must call this function at the start of the frame, before adding any elements
+  /// - Make sure to provide all of the events that happened since the last frame before calling this function, to avoid a 1-frame delay in event processing
   pub fn begin_frame(&mut self) {
     //first, drain and process the event queue
     self.input.update_state(&mut self.events);
@@ -180,6 +185,17 @@ impl UiInstance {
 
     // Clear the draw commands
     self.paint_commands.clear();
+  }
+
+  /// End rendering the current frame and present it
+  ///
+  /// You must call this function sometime at the end of the frame, after adding all elements but before rendering, but before running the render backend
+  pub fn end_frame(&mut self) {
+    self.presentation.draw(&mut self.painter, &self.paint_commands);
+  }
+
+  pub fn backend_data(&self) -> BackendData {
+    self.painter.backend_data(&self.presentation)
   }
 
   /// Push a platform event to the UI event queue

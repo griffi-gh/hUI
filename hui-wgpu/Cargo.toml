@@ -16,7 +16,7 @@ include = [
 ]
 
 [dependencies]
-hui = { version = "=0.1.0-alpha.6", path = "../hui", default-features = false }
+hui-painter = { version = "=0.1.0-alpha.6", path = "../hui-painter", default-features = false }
 wgpu = { version = "24", default-features = false, features = ["wgsl"]}
 bytemuck = "1.15"
 log = "0.4"

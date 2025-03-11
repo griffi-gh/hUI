@@ -1,5 +1,7 @@
 use glam::{Vec2, Vec4};
 
+#[derive(Clone, Copy)]
+#[repr(C)]
 pub struct Vertex {
   pub position: Vec2, //Vec3,
   pub uv: Vec2,

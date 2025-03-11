@@ -20,7 +20,7 @@ ui_main!{
   "Mom downloader 2000",
   init: |ui| {
     let font_handle = ui.add_font(include_bytes!("../assets/roboto/Roboto-Regular.ttf"));
-    ui.push_font(font_handle);
+    ui.push_font_stack(font_handle);
     Instant::now()
   },
   run: |ui, max_size, instant| {

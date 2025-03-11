@@ -186,7 +186,7 @@ impl TextureAtlas {
     let mut this = Self::new_internal(size);
 
     // HACK?: ensure 0,0 is a white pixel
-    let h = this.allocate_with_data(SourceTextureFormat::A8, &[255], 1);
+    let h = this.add_with_data(SourceTextureFormat::A8, &[255], 1);
     debug_assert!(
       h.size == uvec2(1, 1) && h.id == 0,
       "The texture handle was not allocated correctly"
@@ -284,7 +284,7 @@ impl TextureAtlas {
   ///
   /// # Panics
   /// - If any of the dimensions of the texture are zero or exceed `i32::MAX`.
-  pub fn allocate(&mut self, size: UVec2) -> TextureHandle {
+  pub fn add_empty(&mut self, size: UVec2) -> TextureHandle {
     assert_size(size);
 
     // Check if any deallocated allocations can be reused
@@ -344,7 +344,7 @@ impl TextureAtlas {
   ///
   /// # Panics
   /// - If the texture handle is invalid for this atlas.
-  pub fn deallocate(&mut self, handle: TextureHandle) {
+  pub fn remove(&mut self, handle: TextureHandle) {
     // Remove the allocation from the active allocations
     let allocation = self.allocations
       .remove(&handle.id)
@@ -439,7 +439,7 @@ impl TextureAtlas {
   /// # Panics
   /// - If any of the dimensions of the texture are zero or exceed `i32::MAX`.
   /// - The length of the data array is zero or not a multiple of the stride (stride = width * bytes per pixel).
-  pub fn allocate_with_data(&mut self, format: SourceTextureFormat, data: &[u8], width: usize) -> TextureHandle {
+  pub fn add_with_data(&mut self, format: SourceTextureFormat, data: &[u8], width: usize) -> TextureHandle {
     assert!(
       !data.is_empty(),
       "texture data must not be empty"
@@ -461,7 +461,7 @@ impl TextureAtlas {
     assert_size(size);
 
     // Allocate the texture
-    let handle = self.allocate(size);
+    let handle = self.add_empty(size);
 
     // Write the data to the texture
     self.update(handle, format, data);
@@ -545,16 +545,16 @@ mod tests {
   }
 
   #[test]
-  fn test_texture_atlas_allocate() {
+  fn test_texture_atlas_add_empty() {
     let mut atlas = TextureAtlas::new_internal(uvec2(128, 128));
-    let handle = atlas.allocate(uvec2(32, 32));
+    let handle = atlas.add_empty(uvec2(32, 32));
     assert_eq!(handle.size, uvec2(32, 32));
     assert_eq!(atlas.get_uv(handle).unwrap().bottom_right, vec2(32. / 128., 32. / 128.));
     assert_eq!(atlas.allocations.len(), 1);
   }
 
   #[test]
-  fn test_texture_atlas_allocate_with_data() {
+  fn test_texture_atlas_add_with_data() {
     fn make_data(o: u8)-> Vec<u8> {
       let mut data = vec![o; 32 * 32 * 4];
       for y in 0..32 {
@@ -570,7 +570,7 @@ mod tests {
     let mut atlas = TextureAtlas::new_internal(uvec2(128, 128));
 
     let data = make_data(1);
-    let handle = atlas.allocate_with_data(SourceTextureFormat::RGBA8, &data, 32);
+    let handle = atlas.add_with_data(SourceTextureFormat::RGBA8, &data, 32);
     assert_eq!(handle.size, uvec2(32, 32));
     assert_eq!(atlas.allocations.len(), 1);
     let uv = atlas.get_uv(handle).unwrap();
@@ -580,7 +580,7 @@ mod tests {
     assert_eq!(uv.bottom_right, vec2(32.0 / 128.0, 32.0 / 128.0));
 
     let data = make_data(2);
-    let handle = atlas.allocate_with_data(SourceTextureFormat::RGBA8, &data, 32);
+    let handle = atlas.add_with_data(SourceTextureFormat::RGBA8, &data, 32);
     assert_eq!(handle.size, uvec2(32, 32));
     assert_eq!(atlas.allocations.len(), 2);
     let uv = atlas.get_uv(handle).unwrap();
@@ -633,10 +633,10 @@ mod tests {
   // }
 
   #[test]
-  fn test_texture_atlas_deallocate() {
+  fn test_texture_atlas_remove() {
     let mut atlas = TextureAtlas::new_internal(uvec2(128, 128));
-    let handle = atlas.allocate(uvec2(32, 32));
-    atlas.deallocate(handle);
+    let handle = atlas.add_empty(uvec2(32, 32));
+    atlas.remove(handle);
     assert_eq!(atlas.allocations.len(), 0);
     assert_eq!(atlas.reuse_allocations.len(), 1);
   }
@@ -644,7 +644,7 @@ mod tests {
   #[test]
   fn test_texture_atlas_get_uv() {
     let mut atlas = TextureAtlas::new_internal(uvec2(128, 128));
-    let handle = atlas.allocate(uvec2(32, 32));
+    let handle = atlas.add_empty(uvec2(32, 32));
     let uv = atlas.get_uv(handle).unwrap();
     assert_eq!(uv.top_left, vec2(0.0, 0.0));
     assert_eq!(uv.top_right, vec2(32.0 / 128.0, 0.0));

@@ -21,7 +21,7 @@ ui_main!(
   "hUI: Loading screen demo",
   init: |ui| {
     let font = ui.add_font(include_bytes!("../assets/blink/Blink-ynYZ.otf"));
-    ui.push_font(font);
+    ui.push_font_stack(font);
     (std::time::Instant::now(),)
   },
   run: |ui, size, (instant,)| {

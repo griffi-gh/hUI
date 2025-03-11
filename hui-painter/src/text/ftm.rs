@@ -36,7 +36,7 @@ impl FontTextureManager {
   pub(crate) fn drop_font(&mut self, font: FontHandle, atlas: &mut TextureAtlas) {
     let dump = self.partition.remove(&font.0).expect("Font handle is invalid");
     for (_, item) in dump {
-      atlas.deallocate(item.handle);
+      atlas.remove(item.handle);
     }
   }
 
@@ -77,7 +77,7 @@ impl FontTextureManager {
 
     // Rasterize the font and copy the texture data
     let (metrics, data) = font.rasterize_config(config);
-    let handle = atlas.allocate_with_data(SourceTextureFormat::A8, &data, metrics.width);
+    let handle = atlas.add_with_data(SourceTextureFormat::A8, &data, metrics.width);
 
     // Create a texture item struct and insert it into the partition
     let itm = RasterizedGlyphInternal { handle, metrics };

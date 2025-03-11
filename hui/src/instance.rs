@@ -1,5 +1,5 @@
 use hui_painter::{
-  backend::BackendData, paint::command::{PaintCommand, PaintList}, presentation::Presentatation, text::FontHandle, texture::{SourceTextureFormat, TextureHandle}, PainterInstance
+  backend::BackendData, paint::command::{PaintCommand, PaintList}, presentation::Presentatation, text::{FontHandle, FontManager}, texture::{SourceTextureFormat, TextureAtlas, TextureHandle}, PainterInstance
 };
 use crate::{
   element::{MeasureContext, ProcessContext, UiElement},
@@ -49,6 +49,41 @@ impl UiInstance {
     }
   }
 
+
+  /// Returns a reference to the painter instance
+  pub fn painter(&self) -> &PainterInstance {
+    &self.painter
+  }
+
+  /// Returns a mutable reference to the painter instance
+  pub fn painter_mut(&mut self) -> &mut PainterInstance {
+    &mut self.painter
+  }
+
+  /// Returns a reference to the texture atlas
+  ///
+  /// Shorthand for:
+  /// ```
+  /// # let mut instance = hui::UiInstance::new();
+  /// instance.painter_mut().textures_mut()
+  /// # ;
+  /// ```
+  pub fn textures_mut(&mut self) -> &mut TextureAtlas {
+    self.painter.textures_mut()
+  }
+
+  /// Returns a reference to the font manager
+  ///
+  /// Shorthand for:
+  /// ```
+  /// # let mut instance = hui::UiInstance::new();
+  /// instance.painter_mut().fonts_mut()
+  /// # ;
+  /// ```
+  pub fn fonts_mut(&mut self) -> &mut FontManager {
+    self.painter.fonts_mut()
+  }
+
   /// Parse and add a font from a raw byte slice to the UI\
   /// TrueType (`.ttf`/`.ttc`) and OpenType (`.otf`) fonts are supported\
   ///
@@ -56,7 +91,7 @@ impl UiInstance {
   ///
   /// ## Panics:
   /// If the font data is invalid or corrupt
-  #[deprecated(note = "use painter.fonts_mut().add instead")]
+  #[deprecated(since = "0.1.0-alpha.7", note = "use instance.fonts_mut().add(...) instead")]
   pub fn add_font(&mut self, font: &[u8]) -> FontHandle {
     self.painter.fonts_mut().add(font)
   }
@@ -67,10 +102,10 @@ impl UiInstance {
   /// Returns an image handle ([`ImageHandle`])\
   /// This handle can be used to reference the texture in draw commands\
   /// It's a light reference and can be cloned/copied freely, but will not be cleaned up even when dropped
-  #[deprecated(note = "use painter.textures_mut().atlas_mut().allocate_with_data instead")]
+  #[deprecated(since = "0.1.0-alpha.7", note = "use instance.textures_mut().add_with_data(...) instead")]
   pub fn add_image(&mut self, format: SourceTextureFormat, data: &[u8], width: usize) -> TextureHandle {
     // self.atlas().add(width, data, format)
-    self.painter.textures_mut().allocate_with_data(format, data, width)
+    self.painter.textures_mut().add_with_data(format, data, width)
   }
 
   //TODO better error handling
@@ -120,7 +155,7 @@ impl UiInstance {
   ///
   /// This function is useful for replacing the default font, use sparingly\
   /// (This library attempts to be stateless, however passing the font to every text element is not very practical)
-  pub fn push_font(&mut self, font: FontHandle) {
+  pub fn push_font_stack(&mut self, font: FontHandle) {
     self.font_stack.push(font);
   }
 
@@ -128,11 +163,11 @@ impl UiInstance {
   ///
   /// ## Panics:
   /// If the font stack is empty
-  pub fn pop_font(&mut self) {
+  pub fn pop_font_stack(&mut self) {
     self.font_stack.pop();
   }
 
-  /// Get the current default font
+  /// Get the current default font from the font stack
   pub fn current_font(&self) -> Option<FontHandle> {
     self.font_stack.current()
   }

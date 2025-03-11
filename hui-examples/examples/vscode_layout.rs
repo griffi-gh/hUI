@@ -25,7 +25,7 @@ ui_main!(
   "hUI: vscode demo",
   init: |ui| {
     let handle = ui.add_font(include_bytes!("../assets/fira/FiraSans-Light.ttf"));
-    ui.push_font(handle);
+    ui.push_font_stack(handle);
     Stuff {
       vscode_icon: ui.add_image(SourceTextureFormat::RGBA8, include_bytes!("../assets/icons/visual-studio-code-icon_32x32.rgba"), 32),
     }

@@ -239,8 +239,48 @@ impl TextureAtlas {
     handle
   }
 
+  // TODO resize test
+
+  /// Resize the atlas to the specified size
+  ///
+  /// Downscaling is not supported.
+  pub(crate) fn resize(&mut self, new_size: UVec2) {
+    if new_size == self.size {
+      return
+    }
+    assert_size(new_size);
+    assert!(
+      new_size.x >= self.size.x &&
+      new_size.y >= self.size.y,
+      "downscaling is not supported"
+    );
+
+    let old_size = self.size;
+    self.size = new_size;
+
+    self.packer.resize(new_size.x as i32, new_size.y as i32);
+
+    let new_data_len = (new_size.y as usize * new_size.x as usize) * RGBA_BYTES_PER_PIXEL;
+    self.data.resize(new_data_len, 0);
+
+    // Resize the atlas data in-place if needed
+    if new_size.x != old_size.x {
+      for y in (1..old_size.y).rev() { // First source row can be skipped (its alr at idx 0)
+        for x in (0..old_size.x).rev() {
+          let old_idx = (y as usize * old_size.x as usize + x as usize) * RGBA_BYTES_PER_PIXEL;
+          let new_idx = (y as usize * new_size.x as usize + x as usize) * RGBA_BYTES_PER_PIXEL;
+          self.data.copy_within(old_idx..old_idx + RGBA_BYTES_PER_PIXEL, new_idx);
+        }
+      }
+    }
+
+    self.increment_version();
+  }
+
   /// Allocate a texture in the atlas, returning a handle to it.\
   /// The data present in the texture is undefined, and may include garbage data.
+  ///
+  /// The texture may be resized if the texture doesn't fit
   ///
   /// # Panics
   /// - If any of the dimensions of the texture are zero or exceed `i32::MAX`.
@@ -264,6 +304,19 @@ impl TextureAtlas {
         }
         return handle;
       }
+    }
+
+    if !self.packer.can_pack(
+      size.x as i32,
+      size.y as i32,
+      false
+    ) {
+      let new_size = self.size * if self.size.x >= self.size.y {
+        uvec2(1, 2)
+      } else {
+        uvec2(2, 1)
+      };
+      self.resize(new_size);
     }
 
     // Pack the texture

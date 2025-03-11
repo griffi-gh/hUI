@@ -1,5 +1,6 @@
 //! allows stacking two frames on top of each other
 
+use alloc::boxed::Box;
 use hui_painter::paint::command::PaintList;
 use crate::rect::Rect;
 use super::Frame;

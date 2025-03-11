@@ -1,5 +1,6 @@
 //! input, window events and event handling
 
+use alloc::vec::{Vec, Drain};
 use glam::Vec2;
 use crate::input::{MouseButton, ButtonState, KeyboardKey};
 
@@ -31,7 +32,7 @@ impl EventQueue {
     self.events.push(event);
   }
 
-  pub(crate) fn drain(&mut self) -> std::vec::Drain<UiEvent> {
+  pub(crate) fn drain(&mut self) -> Drain<UiEvent> {
     self.events.drain(..)
   }
 }

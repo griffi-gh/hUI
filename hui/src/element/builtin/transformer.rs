@@ -1,5 +1,6 @@
 //! wrapper that allows applying various transformations to an element, such as translation, rotation, or scaling
 
+use alloc::boxed::Box;
 use glam::{Affine2, Vec2};
 use hui_painter::paint::command::{PaintList, PaintTransform};
 use crate::{

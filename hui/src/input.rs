@@ -1,6 +1,7 @@
 //! keyboard, mouse, and touch input handling
 
-use std::hash::{Hash, Hasher};
+use core::hash::{Hash, Hasher};
+use alloc::vec::Vec;
 use glam::Vec2;
 use hashbrown::HashMap;
 use nohash_hasher::BuildNoHashHasher;

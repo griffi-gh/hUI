@@ -1,6 +1,7 @@
 //! signal handling for UI events
 
-use std::any::{Any, TypeId};
+use core::any::{Any, TypeId};
+use alloc::{boxed::Box, vec::Vec};
 use hashbrown::HashMap;
 use nohash_hasher::BuildNoHashHasher;
 

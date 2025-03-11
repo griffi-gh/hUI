@@ -1,5 +1,6 @@
 //! a slider element that allows selecting a value in a range
 
+use alloc::boxed::Box;
 use derive_setters::Setters;
 use glam::{Vec2, vec2};
 
@@ -33,7 +34,7 @@ pub enum SliderFollowMode {
 
 /// A slider element that allows selecting a value in a range
 #[derive(Setters)]
-#[setters(prefix = "with_")]
+#[setters(no_std, prefix = "with_")]
 pub struct Slider {
   /// Value of the slider, should be in range 0..1
   ///

@@ -1,4 +1,5 @@
 
+use alloc::vec::Vec;
 use hui_painter::text::{FontHandle, DEFAULT_FONT};
 
 pub struct FontStack {

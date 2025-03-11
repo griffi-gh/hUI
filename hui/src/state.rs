@@ -1,8 +1,9 @@
 //! state managment for stateful elements
 
+use alloc::{boxed::Box, vec::Vec};
 use hashbrown::{HashMap, HashSet};
 use nohash_hasher::BuildNoHashHasher;
-use std::{any::Any, hash::{Hash, Hasher}};
+use core::{any::Any, hash::{Hash, Hasher}};
 use rustc_hash::FxHasher;
 
 //TODO impl StateRepo functions and automatic cleanup of inactive ids
@@ -78,7 +79,7 @@ impl StateRepo {
   pub fn acquire_or_insert<T: State>(&mut self, id: impl Hash, state: T) -> &T {
     let id = hash_local(id, &self.id_stack);
     self.state.entry(id)
-      .or_insert_with(|| Box::new(state))
+      .or_insert_with(|| Box::new(state) as Box<dyn Any>)
       .downcast_ref::<T>().unwrap()
   }
 
@@ -86,7 +87,7 @@ impl StateRepo {
   pub fn acquire_or_default<T: State + Default>(&mut self, id: impl Hash) -> &T {
     let id = hash_local(id, &self.id_stack);
     self.state.entry(id)
-      .or_insert_with(|| Box::<T>::default())
+      .or_insert_with(|| Box::<T>::default() as Box<dyn Any>)
       .downcast_ref::<T>().unwrap()
   }
 
@@ -101,7 +102,7 @@ impl StateRepo {
   pub fn acquire_mut_or_insert<T: State>(&mut self, id: impl Hash, state: T) -> &mut T {
     let id = hash_local(id, &self.id_stack);
     self.state.entry(id)
-      .or_insert_with(|| Box::new(state))
+      .or_insert_with(|| Box::new(state) as Box<dyn Any>)
       .downcast_mut::<T>().unwrap()
   }
 
@@ -109,7 +110,7 @@ impl StateRepo {
   pub fn acquire_mut_or_default<T: State + Default>(&mut self, id: impl Hash) -> &mut T {
     let id = hash_local(id, &self.id_stack);
     self.state.entry(id)
-      .or_insert_with(|| Box::<T>::default())
+      .or_insert_with(|| Box::<T>::default() as Box<dyn Any>)
       .downcast_mut::<T>().unwrap()
   }
 
@@ -118,9 +119,9 @@ impl StateRepo {
   /// Can be useful for state management of non-hierarchical objects, e.g. popups
   pub fn global<R>(&mut self, f: impl FnOnce(&mut Self) -> R) -> R {
     self.standby.clear();
-    std::mem::swap(&mut self.id_stack, &mut self.standby);
+    core::mem::swap(&mut self.id_stack, &mut self.standby);
     let ret = f(self);
-    std::mem::swap(&mut self.id_stack, &mut self.standby);
+    core::mem::swap(&mut self.id_stack, &mut self.standby);
     ret
   }
 
@@ -132,7 +133,7 @@ impl StateRepo {
     self.standby.clear();
     self.standby.extend(self.id_stack.iter().copied());
     let ret = f(self);
-    std::mem::swap(&mut self.id_stack, &mut self.standby);
+    core::mem::swap(&mut self.id_stack, &mut self.standby);
     ret
     //XXX: this is super efficient, but works only for pushes, if anything is popped, it will be lost
     // let len = self.id_stack.len();

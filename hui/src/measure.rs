@@ -1,5 +1,7 @@
 //! element measurement, hints and responses
 
+use core::any::Any;
+use alloc::{boxed::Box, vec::Vec};
 use glam::Vec2;
 use crate::rect::Rect;
 
@@ -20,7 +22,7 @@ pub struct Response {
   pub hints: Hints,
 
   /// Arbitrary user data, can be used to pass data (for example, cache) between measure and process stages
-  pub user_data: Option<Box<dyn std::any::Any>>,
+  pub user_data: Option<Box<dyn Any>>,
 
   /// If true, the element should always cause the content to wrap to the next line\
   /// (the element itself gets wrapped to the next line too)

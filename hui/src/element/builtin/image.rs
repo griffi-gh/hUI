@@ -9,7 +9,7 @@ use crate::{
 };
 
 #[derive(Setters)]
-#[setters(prefix = "with_")]
+#[setters(no_std, prefix = "with_")]
 pub struct Image {
   /// Image handle to draw
   #[setters(skip)]

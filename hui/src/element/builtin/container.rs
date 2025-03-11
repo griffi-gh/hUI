@@ -1,5 +1,6 @@
 //! a container element that can hold and layout multiple children elements
 
+use alloc::{boxed::Box, vec::Vec};
 use derive_setters::Setters;
 use glam::{Vec2, vec2};
 use crate::{
@@ -28,7 +29,7 @@ struct ContainerUserData {
 
 /// A container element that can hold and layout multiple children elements
 #[derive(Setters)]
-#[setters(prefix = "with_")]
+#[setters(no_std, prefix = "with_")]
 pub struct Container {
   /// Size of the container
   #[setters(into)]

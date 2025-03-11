@@ -1,7 +1,7 @@
 //! Contains the implementation of signal triggers, which simplify creation of custom elements
 
+use alloc::boxed::Box;
 use super::{Signal, SignalStore};
-//use crate::element::UiElement;
 
 /// Signal trigger that does not take any arguments
 #[allow(clippy::complexity)]

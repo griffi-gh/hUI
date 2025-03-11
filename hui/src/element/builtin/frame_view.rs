@@ -1,5 +1,6 @@
 //! Simple element that displays the specified frame
 
+use alloc::boxed::Box;
 use derive_setters::Setters;
 use crate::{
   element::{MeasureContext, ProcessContext, UiElement},
@@ -11,7 +12,7 @@ use crate::{
 
 /// Simple rectangle that displays the specified frame
 #[derive(Setters)]
-#[setters(prefix = "with_")]
+#[setters(no_std, prefix = "with_")]
 pub struct FrameView {
   /// Size of the rectangle
   #[setters(into)]

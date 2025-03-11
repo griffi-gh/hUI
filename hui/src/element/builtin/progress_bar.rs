@@ -1,3 +1,4 @@
+use alloc::boxed::Box;
 use derive_setters::Setters;
 use glam::vec2;
 use crate::{
@@ -10,7 +11,7 @@ use crate::{
 //TODO: Use Frames here instead of FillColor
 
 #[derive(Setters)]
-#[setters(prefix = "with_")]
+#[setters(no_std, prefix = "with_")]
 pub struct ProgressBar {
   /// Current progress, should be in the range 0.0..=1.0
   pub value: f32,

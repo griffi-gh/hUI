@@ -1,6 +1,6 @@
 //! simple text element, renders a string of text
 
-use std::borrow::Cow;
+use alloc::borrow::Cow;
 use derive_setters::Setters;
 use glam::{Affine2, Vec4};
 use hui_painter::{
@@ -22,7 +22,7 @@ use crate::{
 
 /// Simple text element, renders a string of text
 #[derive(Setters)]
-#[setters(prefix = "with_")]
+#[setters(no_std, prefix = "with_")]
 pub struct Text {
   /// Text to render
   #[setters(into)]

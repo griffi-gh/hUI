@@ -4,7 +4,7 @@ description = "wgpu render backend for `hui`"
 repository = "https://github.com/griffi-gh/hui"
 readme = "../README.md"
 authors = ["griffi-gh <prasol258@gmail.com>"]
-version = "0.1.0-alpha.6"
+version = "0.1.0-alpha.7"
 rust-version = "1.85"
 edition = "2024"
 license = "GPL-3.0-or-later"
@@ -16,7 +16,7 @@ include = [
 ]
 
 [dependencies]
-hui-painter = { version = "=0.1.0-alpha.6", path = "../hui-painter", default-features = false }
+hui-painter = { version = "=0.1.0-alpha.7", path = "../hui-painter", default-features = false }
 wgpu = { version = "24", default-features = false, features = ["wgsl"]}
 bytemuck = "1.15"
 log = "0.4"

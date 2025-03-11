@@ -5,7 +5,7 @@ repository = "https://github.com/griffi-gh/hui"
 readme = "../README.md"
 authors = ["griffi-gh <prasol258@gmail.com>"]
 rust-version = "1.85"
-version = "0.1.0-alpha.6"
+version = "0.1.0-alpha.7"
 edition = "2024"
 license = "GPL-3.0-or-later"
 publish = true
@@ -16,7 +16,7 @@ include = [
 ]
 
 [dependencies]
-hui-shared = { version = "0.1.0-alpha.6", path = "../hui-shared" }
+hui-shared = { version = "0.1.0-alpha.7", path = "../hui-shared" }
 glam = "0.30"
 log = "0.4"
 rect_packer = "0.2" # TODO: use sth else like `crunch` instead?

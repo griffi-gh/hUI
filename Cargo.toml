@@ -11,4 +11,5 @@ members = [
   "hui-winit",
   "hui-loaders",
   "bevy_hui",
+  "hui-euc",
 ]

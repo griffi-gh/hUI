@@ -1,0 +1,13 @@
+[package]
+name = "hui-euc"
+version = "0.1.0"
+edition = "2024"
+publish = false
+
+[dependencies]
+euc = { version = "0.5", default-features = false, features = ["libm"] }
+
+[features]
+default = [ "std" ]
+std = [ "euc/std" ]
+libm = [ "euc/libm" ]

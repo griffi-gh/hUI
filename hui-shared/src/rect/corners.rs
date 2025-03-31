@@ -1,5 +1,7 @@
+use derive_more::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Product, Sub, SubAssign, Sum};
+
 /// Represents 4 corners of a rectangular shape.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash, Default)]
+#[derive(Default, Clone, Copy, PartialEq, Eq, Hash, Debug, Add, AddAssign, Sub, SubAssign, Neg, Mul, MulAssign, Div, DivAssign, Sum, Product)]
 pub struct Corners<T> {
   pub top_left: T,
   pub top_right: T,

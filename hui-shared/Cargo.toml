@@ -17,3 +17,4 @@ include = [
 
 [dependencies]
 glam = "0.30"
+derive_more = { version = "2", features = [ "add", "add_assign", "mul", "mul_assign", "sum" ] }

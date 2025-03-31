@@ -1,6 +1,7 @@
+use derive_more::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Product, Sub, SubAssign, Sum};
 
 /// Represents 4 sides of a rectangular shape.
-#[derive(Default, Clone, Copy, PartialEq, Eq, Debug)]
+#[derive(Default, Clone, Copy, PartialEq, Eq, Hash, Debug, Add, AddAssign, Sub, SubAssign, Neg, Mul, MulAssign, Div, DivAssign, Sum, Product)]
 pub struct Sides<T> {
   pub top: T,
   pub bottom: T,

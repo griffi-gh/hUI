@@ -324,10 +324,7 @@ impl UiElement for Container {
     //After setting the inner_content_size, we can calculate the size of the container
     //Including padding, and in case the size is set to non-auto, override the size
 
-    total_size += vec2(
-      padding_with_margin.sum_horizontal(),
-      padding_with_margin.sum_vertical(),
-    );
+    total_size += padding_with_margin.sum_vec();
 
     let computed_size = compute_size(ctx.layout, self.size, total_size);
     match self.size.width {
@@ -385,7 +382,7 @@ impl UiElement for Container {
     // }
 
     let frame_position = ctx.layout.position + self.margin.top_left();
-    let frame_size = ctx.measure.size - vec2(padding_with_margin.sum_horizontal(), padding_with_margin.sum_vertical());
+    let frame_size = ctx.measure.size - self.margin.sum_vec();
     self.background_frame.draw(ctx.paint_target, (frame_position, frame_size).into());
 
     //padding

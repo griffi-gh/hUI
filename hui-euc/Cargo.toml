@@ -5,7 +5,10 @@ edition = "2024"
 publish = false
 
 [dependencies]
+hui-painter = { version = "=0.1.0-alpha.7", path = "../hui-painter", default-features = false }
 euc = { version = "0.5", default-features = false }
+glam = "0.30"
+# vek = "0.17"
 
 [features]
 default = [ "std" ]

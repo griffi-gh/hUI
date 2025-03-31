@@ -1,34 +1,30 @@
 #![cfg_attr(not(feature = "std"), no_std)]
 
-// TODO
+use hui_painter::backend::BackendData;
 
-use euc::Pipeline;
+mod pipeline;
+use pipeline::UiPipeline;
 
-struct UiPipeline;
+pub struct EucUiRenderer {
+  pipeline: UiPipeline,
+  // output: Buffer2d<<UiPipeline as Pipeline>::Pixel>,
+}
 
-impl Pipeline for UiPipeline {
-  type Vertex = [f32; 2];
-  type VsOut = ();
-  type Pixel = [u8; 4];
-
-  // Vertex shader
-  fn vert(&self, pos: &Self::Vertex) -> ([f32; 4], Self::VsOut) {
-    ([pos[0], pos[1], 0.0, 1.0], ())
+impl EucUiRenderer {
+  pub fn new() -> Self {
+    Self {
+      pipeline: UiPipeline::default(),
+    }
   }
 
-  // Fragment shader
-  fn frag(&self, _: &Self::VsOut) -> Self::Pixel {
-    [0, 0, 0, 255]
+  pub fn update(&mut self, data: &BackendData) {
+
   }
 }
 
-// fn main() {
-//   let mut color = Buffer2d::new([640, 480], [0; 4]);
-//   let mut depth = Buffer2d::new([640, 480], 1.0);
+impl Default for EucUiRenderer {
+  fn default() -> Self {
+    Self::new()
+  }
+}
 
-//   Example.draw::<Triangles<_>, _>(
-//     &[[-1.0, -1.0], [1.0, -1.0], [0.0, 1.0]],
-//     &mut color,
-//     &mut depth,
-//   );
-// }

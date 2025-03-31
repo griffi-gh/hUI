@@ -66,6 +66,10 @@ macro_rules! impl_sides_glam_fns {
         pub fn bottom_right(&self) -> $glam_type {
           <$glam_type>::new(self.right, self.bottom)
         }
+
+        pub fn sum_vec(&self) -> $glam_type {
+          <$glam_type>::new(self.left + self.right, self.top + self.bottom)
+        }
       }
     )*
   };

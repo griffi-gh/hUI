@@ -14,6 +14,7 @@ use hui::{
   signal::Signal,
   size,
 };
+use hui_painter::texture::SourceTextureFormat;
 
 #[path = "../boilerplate.rs"]
 #[macro_use]
@@ -24,11 +25,17 @@ struct SetValue(f32);
 
 ui_main!(
   "hUI: 9-Patch demo",
-  init: |_ui| {
+  init: |ui| {
     (
       NinePatchAsset {
         // FIXME add image loader here
-        image: todo!("FIXME add image loader here"), //ui.add_image_file_path("./hui-examples/assets/ninepatch_button.png").unwrap(),
+        image: {
+          let data = std::fs::read("./hui-examples/assets/ninepatch_button.png").unwrap();
+          let image = image::load_from_memory(&data[..]).unwrap();
+          let width = image.width() as usize;
+          let data = image.as_rgba8().unwrap().as_raw();
+          ui.textures_mut().add_with_data(SourceTextureFormat::RGBA8, data, width)
+        },
         size: (190, 49),
         scalable_region: Rect {
           position: vec2(8. / 190., 8. / 49.),

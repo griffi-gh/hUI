@@ -1,5 +1,5 @@
 [package]
-name = "bevy_hui"
+name = "hui-bevy"
 version = "0.1.0-alpha.7"
 edition = "2024"
 publish = false # WIP

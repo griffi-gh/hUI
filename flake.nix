@@ -47,7 +47,7 @@
         LD_LIBRARY_PATH = pkgs.lib.makeLibraryPath buildInputs;
         RUSTFLAGS = "-Zthreads=8"; # (may cause rustc to ice?)
         MANGOHUD_DLSYM = "1"; # mangohud glium fix
-        RUST_LOG = "hui=trace,hui-derive=trace,hui-examples=trace,hui-glium=trace,hui-painter=trace,hui-shared=trace,hui-wgpu=trace,hui-winit=trace,hui-loaders=trace,bevy_hui=trace,hui-euc=trace,info";
+        RUST_LOG = "hui=trace,hui-derive=trace,hui-examples=trace,hui-glium=trace,hui-painter=trace,hui-shared=trace,hui-wgpu=trace,hui-winit=trace,hui-loaders=trace,hui-bevy=trace,hui-euc=trace,info";
       };
     });
 }

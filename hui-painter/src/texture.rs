@@ -240,6 +240,15 @@ impl TextureAtlas {
     handle
   }
 
+  /// Returns the next size the canvas should be resized to in case we run out of space
+  pub(crate) fn next_size(size: UVec2) -> UVec2 {
+    size * if size.x >= size.y {
+      uvec2(1, 2)
+    } else {
+      uvec2(2, 1)
+    }
+  }
+
   // TODO resize test
 
   /// Resize the atlas to the specified size
@@ -259,7 +268,11 @@ impl TextureAtlas {
     let old_size = self.size;
     self.size = new_size;
 
-    self.packer.resize(new_size.x as i32, new_size.y as i32);
+    log::debug!("resize canvas {old_size} -> {new_size}");
+
+    if self.packer.size() != (new_size.x as i32, new_size.y as i32) {
+      self.packer.resize(new_size.x as i32, new_size.y as i32);
+    }
 
     let new_data_len = (new_size.y as usize * new_size.x as usize) * RGBA_BYTES_PER_PIXEL;
     self.data.resize(new_data_len, 0);
@@ -307,16 +320,17 @@ impl TextureAtlas {
       }
     }
 
-    if !self.packer.can_pack(
+    let mut new_size = self.size;
+    while !self.packer.can_pack(
       size.x as i32,
       size.y as i32,
       false
     ) {
-      let new_size = self.size * if self.size.x >= self.size.y {
-        uvec2(1, 2)
-      } else {
-        uvec2(2, 1)
-      };
+      new_size = Self::next_size(new_size);
+      log::trace!("need to resize, is {new_size} enough?");
+      self.packer.resize(new_size.x as i32, new_size.y as i32);
+    }
+    if new_size != self.size {
       self.resize(new_size);
     }
 

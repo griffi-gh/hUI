@@ -23,8 +23,8 @@ use glium::{
 };
 use hui_painter::{backend::BackendData, paint::buffer::Vertex, presentation::PresentatationBackendData, texture::TextureAtlasBackendData};
 
-const VERTEX_SHADER_GLES3: &str = include_str!("../shaders/vertex.es.vert");
-const FRAGMENT_SHADER_GLES3: &str = include_str!("../shaders/fragment.es.frag");
+const VERTEX_SHADER_300ES: &str = include_str!("../shaders/vertex.300es.vert");
+const FRAGMENT_SHADER_300ES: &str = include_str!("../shaders/fragment.300es.frag");
 
 const VERTEX_SHADER_150: &str = include_str!("../shaders/vertex.150.vert");
 const FRAGMENT_SHADER_150: &str = include_str!("../shaders/fragment.150.frag");
@@ -140,7 +140,7 @@ impl GliumUiRenderer {
     Self {
       program: match facade.get_context().get_supported_glsl_version().0 {
         Api::Gl => Program::from_source(facade, VERTEX_SHADER_150, FRAGMENT_SHADER_150, None).unwrap(),
-        Api::GlEs => Program::from_source(facade, VERTEX_SHADER_GLES3, FRAGMENT_SHADER_GLES3, None).unwrap(),
+        Api::GlEs => Program::from_source(facade, VERTEX_SHADER_300ES, FRAGMENT_SHADER_300ES, None).unwrap(),
       },
       context: Rc::clone(facade.get_context()),
       ui_texture: None,

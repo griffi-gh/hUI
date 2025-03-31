@@ -1,3 +1,4 @@
+use core::ops::Add;
 use derive_more::{Add, AddAssign, Div, DivAssign, Mul, MulAssign, Neg, Product, Sub, SubAssign, Sum};
 
 /// Represents 4 sides of a rectangular shape.
@@ -28,6 +29,18 @@ impl<T: Clone> Sides<T> {
       left: horizontal.clone(),
       right: horizontal,
     }
+  }
+}
+
+impl<T: Add + Clone> Sides<T> {
+  #[inline]
+  pub fn sum_horizontal(&self) -> <T as Add>::Output {
+    self.left.clone() + self.right.clone()
+  }
+
+  #[inline]
+  pub fn sum_vertical(&self) -> <T as Add>::Output {
+    self.top.clone() + self.bottom.clone()
   }
 }
 
